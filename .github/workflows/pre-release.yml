@@ -6,7 +6,9 @@ on:
 
 jobs:
   pre-release:
-    name: Upload the pre-release assets
+    permissions:
+      contents: write
+    name: Upload the assets
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
