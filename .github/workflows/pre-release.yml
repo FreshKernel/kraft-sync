@@ -1,0 +1,41 @@
+name: Pre-release
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  pre-release:
+    name: Pre Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: 11
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          validate-wrappers: true
+          cache-disabled: false
+
+      - name: Build & Test with Gradle
+        run: ./gradlew build --stacktrace
+
+      - name: Upload the pre-release assets
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE
+            build/libs/*.jar

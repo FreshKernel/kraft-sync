@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Jar" type="JarApplication">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/build/libs/minecraft-sync.jar" />
+    <option name="PROGRAM_PARAMETERS" value="nogui" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/testScript" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="false" tasks="shadowJar" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>
