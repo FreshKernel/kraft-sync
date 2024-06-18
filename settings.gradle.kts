@@ -1,4 +1,21 @@
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+rootProject.name = "kraft-sync"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
-rootProject.name = "MinecraftSync"
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
+include(":common")
+include(":sync-script")
+include(":admin")
+include(":dev-local-server")

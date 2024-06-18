@@ -1,10 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="MainKt" />
-    <module name="MinecraftSync.main" />
-    <option name="PROGRAM_PARAMETERS" value="nogui" />
+    <module name="kraft-sync.sync-script.main" />
     <shortenClasspath name="NONE" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/testScript" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sync-script/devWorkingDirectory" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
