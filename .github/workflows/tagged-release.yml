@@ -1,4 +1,4 @@
-name: Tagged-release
+name: 🏷️ Tagged-release 🚀
 
 on:
   push:
@@ -6,37 +6,42 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-  tagged-release:
+  publish:
     permissions:
       contents: write
-    name: Upload the assets
+    name: 📦 Upload the assets
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - name: Clone Repository
+      - name: 📥 Clone Repository
         uses: actions/checkout@v4
 
-      - name: Setup JDK 11
+      - name: ☕ Setup JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: 11
           distribution: 'adopt'
 
-      - name: Setup Gradle
+      - name: 🛠️ Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           validate-wrappers: true
           cache-disabled: false
 
-      - name: Build & Test with Gradle
+      - name: 📥 Build & Test 🧪 with Gradle
         run: ./gradlew build --stacktrace
 
-      - name: Upload the pre-release assets
+      - name: 🛡️ Build the Minimized JAR with Proguard
+        run: ./gradlew minimizedJar -i
+
+      # TODO: This GitHub action is no longer maintained https://github.com/marvinpinto/actions/commit/40312c52f0ca0d0589b25e8f5172a3613f0759c3
+      - name: ⬆️ Upload the assets
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
             LICENSE
-            build/libs/*.jar
+            sync-script/build/dist/*.jar
+            admin/build/dist/*.jar
