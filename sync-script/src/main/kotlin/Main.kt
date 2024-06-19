@@ -153,7 +153,10 @@ suspend fun main(args: Array<String>) {
     }
 
     // TODO: Plan if we should implement this in non GUI mode
-    if (GuiState.isGuiEnabled && !SyncScriptInstanceFiles.SyncScriptData.IsPreferencesConfigured.file.exists()) {
+    if (GuiState.isGuiEnabled &&
+        !SyncScriptInstanceFiles.SyncScriptData.IsPreferencesConfigured.file
+            .exists()
+    ) {
         val newScriptConfig = QuickPreferencesDialog().showDialog()
 
         scriptConfigDataSource.replaceConfig(newScriptConfig).getOrElse {
@@ -170,7 +173,8 @@ suspend fun main(args: Array<String>) {
         GuiState.updateIsGuiEnabled()
 
         withContext(Dispatchers.IO) {
-            SyncScriptInstanceFiles.SyncScriptData.IsPreferencesConfigured.file.createNewFile()
+            SyncScriptInstanceFiles.SyncScriptData.IsPreferencesConfigured.file
+                .createNewFile()
         }
     }
 
@@ -182,22 +186,24 @@ suspend fun main(args: Array<String>) {
         )
     // TODO: Might want to add a loading screen for this if taking longer than expected
     SyncInfo.instance =
-        syncInfoDataSource.fetchSyncInfo(
-            url = ScriptConfig.getInstanceOrThrow().syncInfoUrl,
-        ).getOrElse {
-            showErrorMessageAndTerminate(
-                title = "Sync Info Unavailable \uD83D\uDD04",
-                message = "An error occurred while trying to fetch sync info from the server: ${it.message}",
-            )
-            return
-        }
+        syncInfoDataSource
+            .fetchSyncInfo(
+                url = ScriptConfig.getInstanceOrThrow().syncInfoUrl,
+            ).getOrElse {
+                showErrorMessageAndTerminate(
+                    title = "Sync Info Unavailable \uD83D\uDD04",
+                    message = "An error occurred while trying to fetch sync info from the server: ${it.message}",
+                )
+                return
+            }
 
     // Make sure the user trusts the admin
 
     // TODO: Plan on how we will implement this in non GUI mode
     if (GuiState.isGuiEnabled && Constants.Features.TRUST_ADMIN_ENABLED) {
         val currentDoesUserTrustThisSource =
-            scriptPreferencesDataSource.doesUserTrustSource(ScriptConfig.getInstanceOrThrow().syncInfoUrl)
+            scriptPreferencesDataSource
+                .doesUserTrustSource(ScriptConfig.getInstanceOrThrow().syncInfoUrl)
                 .getOrElse {
                     showErrorMessageAndTerminate(
                         title = "Error Loading Data \uD83D\uDED1",
@@ -218,11 +224,12 @@ suspend fun main(args: Array<String>) {
                 terminateWithOrWithoutError()
             }
             runBlocking {
-                scriptPreferencesDataSource.updateDoesUserTrustSource(
-                    ScriptConfig.getInstanceOrThrow().syncInfoUrl,
-                    // Should be true
-                    doesUserTrustThisSource,
-                ).getOrThrow()
+                scriptPreferencesDataSource
+                    .updateDoesUserTrustSource(
+                        ScriptConfig.getInstanceOrThrow().syncInfoUrl,
+                        // Should be true
+                        doesUserTrustThisSource,
+                    ).getOrThrow()
             }
         }
     }

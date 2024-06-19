@@ -149,6 +149,7 @@ val minimizedJar =
 
         printmapping(fatJarFileDestinationDirectory.get().file("$fatJarFileNameWithoutExtension.map"))
 
+//        dontobfuscate()
         // Kotlinx serialization breaks when using Proguard optimizations
         dontoptimize()
 
