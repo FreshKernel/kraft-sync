@@ -54,7 +54,7 @@ tasks.shadowJar {
     archiveFileName.set("${rootProject.name}.jar")
     destinationDirectory = layout.buildDirectory.dir("dist")
     description =
-        "A script that allows you to sync mods, resource packs, shaders, and more seamlessly before launching the game."
+        "A script that allows to sync mods, resource packs, shaders, and more seamlessly before launching the game."
     minimize {
         // Exclude the entire FlatLaf dependency from minimization to fix `no ComponentUI class for: javax.swing.<component>`
         // Due to reflections, more details: https://github.com/JFormDesigner/FlatLaf/issues/648#issuecomment-1441547550

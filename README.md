@@ -14,7 +14,7 @@
 AN **experimental** lightweight & simple and quick script that helps you to sync the content of a **Minecraft Java
 instance**
 
-Currently, the script will sync with the following:
+The script will sync the following:
 
 1. 🛠️ Mods (experimental)
 2. 🎨 Resource packs (not implemented yet)
@@ -70,8 +70,7 @@ info.
 > Kraft Sync
 > <img src="common/src/main/resources/apple.png" height="30px" align="center"/> <br>
 > The meaning of this name:
-> - `K`: will depend on how you look at it, it could be **Keep** which mean
-    > Keep Minecraft Instance synced
+> - `K`: will depend on how you look at it, it could be **Keep** which mean keep Minecraft instance synced
 > - `Craft` or `Kraft`: Indicating this is specific for Minecraft<br>
 > - `Sync`: Indicating it's for syncing the content/assets/data
 
