@@ -54,8 +54,7 @@ tasks.shadowJar {
     archiveFileName.set("${rootProject.name}.jar")
     destinationDirectory = layout.buildDirectory.dir("dist")
     description =
-        "A script written in Kotlin/JVM that allows you to sync mods, resource packs, shaders, and more seamlessly" +
-        " before launching the game."
+        "A script that allows you to sync mods, resource packs, shaders, and more seamlessly before launching the game."
     minimize {
         // Exclude the entire FlatLaf dependency from minimization to fix `no ComponentUI class for: javax.swing.<component>`
         // Due to reflections, more details: https://github.com/JFormDesigner/FlatLaf/issues/648#issuecomment-1441547550
@@ -198,14 +197,14 @@ val minimizedJar =
         doLast {
             val original = fatJarFile.get().asFile
             val minimized = minimizedJarFile.get().asFile
-            val minimizedFileSizeMB = String.format("%.2f", minimized.length().toDouble() / (1024L * 1024L))
+            val minimizedFileSizeInMegabytes = String.format("%.2f", minimized.length().toDouble() / (1024L * 1024L))
 
             val percentageDifference =
                 ((minimized.length() - original.length()).toDouble() / original.length()) * 100
             val formattedPercentageDifference = String.format("%.2f%%", kotlinMathAbs(percentageDifference))
 
             logger.lifecycle(
-                "📦 The size of the Proguard minimized JAR file (${minimized.name}) is $minimizedFileSizeMB MB." +
+                "📦 The size of the Proguard minimized JAR file (${minimized.name}) is $minimizedFileSizeInMegabytes MB." +
                     " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimized.path}",
             )
         }
@@ -224,13 +223,13 @@ tasks.assemble {
 
 // Run tasks
 
-val testWorkingDirectory = file("devWorkingDirectory")
+val devWorkingDirectory = file("devWorkingDirectory")
 
 val createTestDirectory =
     tasks.register("createTestDirectory") {
         doLast {
-            if (testWorkingDirectory.exists()) return@doLast
-            testWorkingDirectory.mkdirs()
+            if (devWorkingDirectory.exists()) return@doLast
+            devWorkingDirectory.mkdirs()
         }
     }
 
@@ -244,7 +243,7 @@ private fun <T : Task?> registerExecuteJavaJarTask(
     tasks.register<JavaExec>(taskName) {
         dependsOn(createTestDirectory, buildJarFileTaskProvider)
         classpath = files(jarFile)
-        workingDir = testWorkingDirectory
+        workingDir = devWorkingDirectory
         args = additionalArgs
         group = tasks.run.get().group
         if (overrideHeadless != null) {
@@ -254,32 +253,27 @@ private fun <T : Task?> registerExecuteJavaJarTask(
 }
 
 fun registerRunTasks() {
-    registerExecuteJavaJarTask(
-        "runJar",
-        tasks.shadowJar,
+    val fatJarFile =
         tasks.shadowJar
             .get()
             .archiveFile
-            .get(),
+            .get()
+    registerExecuteJavaJarTask(
+        "runJar",
+        tasks.shadowJar,
+        fatJarFile,
     )
     registerExecuteJavaJarTask(
         "runJarCli",
         tasks.shadowJar,
-        tasks.shadowJar
-            .get()
-            .archiveFile
-            .get(),
+        fatJarFile,
         listOf("nogui"),
     )
 
     val minimizedJarFile =
         getMinimizedJarFile(
             fatJarFileNameWithoutExtension =
-                tasks.shadowJar
-                    .get()
-                    .archiveFile
-                    .get()
-                    .asFile.nameWithoutExtension,
+                fatJarFile.asFile.nameWithoutExtension,
             fatJarFileDestinationDirectory = tasks.shadowJar.get().destinationDirectory,
         ).get()
     registerExecuteJavaJarTask("runMinimizedJar", minimizedJar, minimizedJarFile)
@@ -291,10 +285,7 @@ fun registerRunTasks() {
     registerExecuteJavaJarTask(
         "runHeadlessJar",
         tasks.shadowJar,
-        tasks.shadowJar
-            .get()
-            .archiveFile
-            .get(),
+        fatJarFile,
         overrideHeadless = true,
     )
 }
@@ -304,5 +295,5 @@ registerRunTasks()
 // Configure runShadow
 
 tasks.runShadow {
-    workingDir = testWorkingDirectory
+    workingDir = devWorkingDirectory
 }

@@ -9,5 +9,5 @@ Create a file called `file.json` in this module directory, start the server usin
 
 > If you're on **Microsoft Windows**, use: `./gradlew.bat` instead
 
-If you're using any other way to start the server, change the working directory to `dev-local-server` instead
-of the root project folder
+If you're using any other way to start the server, change the working directory
+to `dev-local-server/devWorkingDirectory` instead of the root project folder.

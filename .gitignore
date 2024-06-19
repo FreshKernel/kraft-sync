@@ -46,3 +46,4 @@ bin/
 
 ### Script ###
 sync-script/devWorkingDirectory/
+dev-local-server/devWorkingDirectory/

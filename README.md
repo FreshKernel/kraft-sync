@@ -14,19 +14,6 @@
 AN **experimental** lightweight & simple and quick script that helps you to sync the content of a **Minecraft Java
 instance**
 
-Let's say you're running a Minecraft server and every time you add, remove, update a mod, resource-pack, or shader, each
-player has to make the changes manually each time you do it or let's say you're changing the server address, the
-players have to manually update it in the game
-
-It's designed primarily for server owners, yet it can also be effective for mod-pack developers., the script will run
-before each time when launching the game will make a `GET` request to a file you upload somewhere (GitHub for example)
-and it contains information about the sync info like the mods and some other configurations that allow you to customize
-the behavior, you don't need to upload the mods anywhere it will simply need a public download URL for the mod
-(For example CurseForge or Modrinth) and it will download the mod from there
-
-You don't have to do that manually, see [Mods Info Converter] 💾 for more
-info
-
 Currently, the script will sync with the following:
 
 1. 🛠️ Mods (experimental)
@@ -41,23 +28,13 @@ Currently, the script will sync with the following:
    own key-binds and until now, we have not discovered a way to solve this, unless you want to force all players
    to have the same keybindings
 
-More might be coming later once we finish the current `TODO` list
-
 If you're a player interested in joining a server, **make sure you trust the server administration** on this
 matter—unless you're confident you know what you're doing.
 
 ![Screenshot](https://github.com/ellet0/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
 
-The script might introduce **Breaking Changes** as it's still in the early stages, we will provide migration
+The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
 instructions if there is any breaking change in each release
-
-> Kraft Sync
-> <img src="common/src/main/resources/apple.png" height="30px" align="center"/> <br>
-> The meaning of this name:<br>
-> `K`: will depend on how you look at it, it could be **Keep** which mean
-> Keep Minecraft Instance synced
-> `Craft` or `Kraft`: Indicating this is specific for Minecraft <br>
-> `Sync`: Indicating it's for syncing the content/assets/data
 
 **Kraft Sync is not affiliated
 with [Mojang AB](https://mojang.com/), [Microsoft Corporation](https://www.microsoft.com/), or any of their
@@ -65,6 +42,7 @@ subsidiaries.**
 
 ## Table of Contents
 
+- [About](#about) 📖
 - [Features](#features) ✨
 - [How it works?](#how-it-works) 🔧
 - [Usage️](#usage) 🖥
@@ -73,6 +51,29 @@ subsidiaries.**
 - [Build from Source️](#build-from-source) 🛠
 - [Contributing](#contributing) 🤝
 - [Acknowledgments](#acknowledgments) 📜
+
+## About
+
+Let's say you're running a Minecraft server and every time you add, remove, update a mod, resource-pack, or shader, each
+player has to make the changes manually each time you do it or let's say you're changing the server address, the
+players have to manually update it in the game.
+
+It's designed primarily for server owners, yet it can also be effective for mod-pack developers.
+The script will run before each time when launching the game will make a `GET` request to a file you upload somewhere (
+GitHub for example) and it contains information about the sync info like the mods and some other configurations that
+allow you to customize the behavior, you don't need to upload the mods anywhere it will simply need a public download
+URL for the mod (For example CurseForge or Modrinth) and it will download the mod from there.
+
+You don't have to do that manually, see [Mods Info Converter] 💾 for more
+info.
+
+> Kraft Sync
+> <img src="common/src/main/resources/apple.png" height="30px" align="center"/> <br>
+> The meaning of this name:
+> - `K`: will depend on how you look at it, it could be **Keep** which mean
+    > Keep Minecraft Instance synced
+> - `Craft` or `Kraft`: Indicating this is specific for Minecraft<br>
+> - `Sync`: Indicating it's for syncing the content/assets/data
 
 ## Features
 
@@ -104,24 +105,22 @@ List the key features of the script
 
 ## How it works?
 
-First of all, you are not going to send this script to all the players?
-We would appreciate it if you do.
-However, to provide an easy way to use for the players without doing anything manually, all you need is to use a
+To provide an easy way to use for the players without doing anything manually, all you need is to use a
 Minecraft launcher that supports running a command before launching the game
 
 You can use [MultiMC Launcher] or [Prism Launcher] which provide more features than the original
-[Minecraft Launcher], Features like
+[Minecraft Launcher], features like:
 
 1. Exporting the instance, each instance has its own assets (e.g., Mods, Resource-packs, Shader-packs)
 2. Configurations and data in a way so no instance will affect another
 3. Other features like allow to launch
    Pre-launch
-   command which is needed by this script to automate the process, otherwise if you're using the original Minecraft
-   launcher, then the players need to run the script each time they launch the game or only when they want to
-   (when new mods added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script that launches this
-   script first then the launcher, This way the players are forced to use your mods and resource packs, etc... even
-   if they don't want to use the mods, still [Minecraft Launcher] doesn't provide a way to separate the mods and
-   settings for different instances and servers, to get the best experience, use one of the supported launchers or a
+   command which is needed by this script to automate the process, otherwise if you're using the
+   official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
+   they want to (when new mods added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script that
+   launches this script first then the launcher, This way the players are forced to use your mods and resource packs,
+   etc... even if they don't want to use the mods, still [Minecraft Launcher] doesn't provide a way to separate the mods
+   and settings for different instances and servers, to get the best experience, use one of the supported launchers or a
    launcher that support running a command before launching the game
 4. Many other features, like automatically joining a Minecraft server when launching the game
 
@@ -156,12 +155,15 @@ The easiest way to use the script 🚀:
    or the command to run before launching the game.
    For example, for [MultiMC Launcher], it's
    in [here](https://github.com/MultiMC/Launcher/wiki/Instance-settings#custom-commands), the same apply
-   the launchers based on it like [Prism Launcher] and other launchers like [ATLauncher]
+   the launchers based on it like [Prism Launcher]
 8. Once you find the `Pre-launch command` or something similar, type the following:
    ```
    $INST_JAVA -jar $INST_MC_DIR/kraft-sync.jar
    ```
-   and replace `kraft-sync` with the JAR file name from **Step 6** if necessary
+   and replace `kraft-sync` with the JAR file name from **Step 6** if necessary.
+   You might need to replace `$INST_JAVA` and `$INST_MC_DIR` environment variables with something else depending on the
+   launcher, [MultiMC Launcher] and the launchers that based on it use those variables,
+   and other launchers like [ATLauncher] use the same for compatibility
 9. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
    that from **Step 4**. Enter it and then wait for the sync process to finish, the game will launch with the new synced
    content
@@ -217,7 +219,7 @@ some of the common issues in the  `minecraft mods` using sync mods:
 1. It will require running the HTTP server on a port other than the minecraft port (e.g., 25565) which can be used by
    attackers
    to cause performance issues if you haven't implemented Rate Limit (otherwise some users might spam the server)
-   and another security mechanism it's might affect the network and traffic from your Minecraft hosting
+   and another security mechanism it might affect the network and traffic from your Minecraft hosting
 2. You will constantly need to update the mod for Forge/Fabric or the mod loader you are using, and for a specific
    Minecraft version,
    while this script works independently of the Minecraft version and the mod loader
@@ -232,14 +234,12 @@ some of the common issues in the  `minecraft mods` using sync mods:
    update the data as admin, then ask your friends and players to restart the game
 4. Can only sync Minecraft mods (which might be exactly what you want)
 5. Server and client-side mods are different: There are completely server-side mods
-   like [Geyser](https://modrinth.com/mod/geyser)
-   or [Spawn Animations](https://modrinth.com/datapack/spawn-animations) and including them on the client side will
-   increase
-   the size and require the players to download more, for example, Geyser is above
-   10MB, Another client-side mod [Physics Mod](https://modrinth.com/mod/physicsmod) which is more than 130 MB, when
-   using more and more mods not only the syncing process will be slower, it will also require more space on the
-   disk and in some rare cases it could cause issues (if the server-side mod will cause an exception when running on the
-   client side) or it's not marked as a server-side mod
+   like [Geyser](https://modrinth.com/mod/geyser) or [Spawn Animations](https://modrinth.com/datapack/spawn-animations)
+   and including them on the client side will increase the size and require the players to download more, for example,
+   Geyser is above 10 MB, Another client-side mod [Physics Mod](https://modrinth.com/mod/physicsmod) which is more than
+   130 MB, when using more and more mods not only the syncing process will be slower, it will also require more space on
+   the disk and in some rare cases it could cause issues (if the server-side mod will cause an exception when running on
+   the client side) or it's not marked as a server-side mod
 6. Uploading Minecraft developer mods and downloading them to the players from external sources other than the original
    might be against the LICENSE
 7. You might have large client-side mods like [Physics Mod](https://modrinth.com/mod/physicsmod) which might not be
@@ -324,7 +324,7 @@ There are some technical reasons:
    to run the script as Kotlin will include everything it needs in the JAR file directly allowing it to
    use the existing Java JRE on your system/launcher, it's also
    use [Kotlin Standard Library](https://kotlinlang.org/api/latest/jvm/stdlib/), the JAR file for Kotlin/JVM
-   applications around 1.7MB without dependencies, it does provide too many features and advantages compared to this
+   applications around 1.7 MB without dependencies, it does provide many features and advantages compared to this
    size
 2. **Compatible with older versions of Java**: Thanks to [Kotlin], it's possible to use recent language features
    like [Sealed Classes](https://docs.oracle.com/en/java/javase/17/language/sealed-classes-and-interfaces.html)
@@ -346,7 +346,7 @@ There are some technical reasons:
 4. **Features**: The script provides some features like dark and light mode support with different themes
    which makes the bundle size a little bit larger
 
-We will try to find a good balance between using more recent technologies and the bundle size, we
+We will try to find a good balance between the features and the bundle size, we
 use a tool called [Proguard](https://www.guardsquare.com/proguard) which makes it easy to shrink and minimize
 the JAR file, sometimes it doesn't if it should keep something or remove it due to reflections and dynamic class
 loading, we will try to always test it and make sure the minimized JAR works like expected and will also provide both
@@ -385,7 +385,9 @@ to use Minecraft mods with players
 6. It can only support mods; The term "Mod packs" typically refers to collections of mods, which can include resource
    packs as well.
    However, they might not always meet specific needs or preferences.
-7. More, features like the quick play support feature, see [Features](#features) for more info
+7. More features like
+   the [Quick Play](https://www.minecraft.net/en-us/article/quick-play-coming-java-and-bedrock-edition) support feature,
+   see [Features](#features) for more info
 
 </details>
 
@@ -437,7 +439,7 @@ If you want to build from source for the latest version:
 
 1. Install the [Requirements]
 2. Run `./gradlew assemble` or `./gradlew.bat assemble` on **Microsoft Windows**
-3. Now go to [sync-script/build/dist](./sync-script/build/dist) folder where you should find the Jar
+3. Navigate to [sync-script/build/dist](./sync-script/build/dist) folder where you should find the Jar
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
@@ -453,17 +455,22 @@ See [Contributing] for more details.
 
 ## Acknowledgments
 
-- Thanks to the welcoming community, the volunteers who helped along the journey, developers, contributors
-  and contributors who put time and effort into everything including making all the libraries, tools, and the
-  information we rely on
-- Thanks to [JetBrains](https://www.jetbrains.com/)
-  for [Kotlin], [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/) in along with other projects
-- Thanks to [Square Community](https://square.github.io/) for [OkHttp](https://square.github.io/okhttp/)
-
 We are incredibly grateful to many individuals and organizations who have played a
 role in the project.
 This includes the community, dedicated volunteers, talented developers and
 contributors, and the creators of the open-source tools we rely on.
+
+Thanks to:
+
+- The welcoming community, the volunteers who helped along the journey, developers, contributors
+  and contributors who put time and effort into everything including making all the libraries, tools, and the
+  information we rely on
+- [JetBrains](https://www.jetbrains.com/) for developing and maintaining [Kotlin],
+  [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/) in along with other projects
+- [Square Community](https://square.github.io/) for developing and
+  maintaining [OkHttp](https://square.github.io/okhttp/)
+- [GuardSquare](https://github.com/Guardsquare) for developing and
+  maintaining [Proguard](https://github.com/guardsquare/proguard/)
 
 [//]: # (Links)
 

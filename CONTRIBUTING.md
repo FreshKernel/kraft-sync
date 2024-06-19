@@ -9,7 +9,7 @@ and commit them, then push the branch to your fork, and you will get a link to s
 
 If you don't have anything specific in mind to improve or fix, you can take a look at
 the [issues](https://github.com/ellet0/kraft-sync/issues) or take a look at
-the todos of the project, they all start with `TODO: ` so you can search in your IDE or use the todos tab of the IDE
+the todos of the project, they all start with `TODO:` so you can search in your IDE or use the todos tab of the IDE
 
 > We highly recommend contacting us if you're planning to make big changes.
 
@@ -120,7 +120,7 @@ discussed above
    Profile the application for performance bottlenecks and optimize critical sections if needed.
 4. **Bundle size**:
 
-   Try to make the jar file size as less as possible and as much as needed
+   Try to make the JAR file size as less as possible and as much as needed
 5. **Code Review**:
 
    Encourage code reviews for all changes to maintain code quality and catch potential issues early.

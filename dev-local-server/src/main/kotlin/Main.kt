@@ -8,12 +8,12 @@ import kotlin.concurrent.thread
 fun main() {
     println("📂 Current Directory: ${System.getProperty("user.dir")}")
 
-    val filePath = "file.json"
-    val file = File(filePath)
+    val fileName = "file.json"
+    val file = File(fileName)
     println("ℹ\uFE0F File Path: ${file.absolutePath}")
 
     if (!file.exists()) {
-        println("❌ The file to host in localhost does not exist: $filePath")
+        println("❌ The file to host in localhost does not exist: $fileName")
         return
     }
 
@@ -55,12 +55,16 @@ private fun listenForQToStop(server: HttpServer) {
     }
 }
 
-fun getLocalIpAddress(): String? {
-    return try {
-        NetworkInterface.getNetworkInterfaces().asSequence().toList().flatMap { it.inetAddresses.asSequence().toList() }
-            .firstOrNull { !it.isLoopbackAddress && it.isSiteLocalAddress }?.hostAddress
+fun getLocalIpAddress(): String? =
+    try {
+        NetworkInterface
+            .getNetworkInterfaces()
+            .asSequence()
+            .toList()
+            .flatMap { it.inetAddresses.asSequence().toList() }
+            .firstOrNull { !it.isLoopbackAddress && it.isSiteLocalAddress }
+            ?.hostAddress
     } catch (ex: Exception) {
         ex.printStackTrace()
         null
     }
-}
