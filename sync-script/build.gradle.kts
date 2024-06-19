@@ -149,6 +149,7 @@ val minimizedJar =
 
         printmapping(fatJarFileDestinationDirectory.get().file("$fatJarFileNameWithoutExtension.map"))
 
+        // Disabling obfuscation makes the JAR file size a bit larger, and the debugging process a bit less easy
 //        dontobfuscate()
         // Kotlinx serialization breaks when using Proguard optimizations
         dontoptimize()
@@ -168,7 +169,6 @@ val minimizedJar =
                             }
                         }.toList()
 
-                // TODO: Might Check this to Version control to help reviewing the changes
                 val buildProguardDirectory =
                     layout.buildDirectory
                         .dir("proguard")
