@@ -65,14 +65,14 @@ data class ScriptConfig(
      * */
     val environment: Environment = Environment.Client,
     /**
-     * Currently, the auto update feature is **highly experimental**, might be removed, changed at anytime.
+     * Currently, the auto-update feature is **highly experimental**, and might be removed, or changed at any time.
      * And for now, this feature has the following known issues:
-     * 1. It will always update even if the next version has as **breaking changes**
+     * 1. It will always update even if the next version has **breaking changes**
      * that can't be automatically migrated.
-     * 2. It will always update even the next version is not a stable release;
-     * we haven't implemented an update channel for now (e.g., stable, beta, alpha, development etc...).
+     * 2. It will always update even if the next version is not a stable release;
+     * we haven't implemented an update channel for now (e.g., stable, beta, alpha, development, etc...).
      * 3. Once the update is finished, the application will close with
-     * exit code 1 which will indicate as an error by the launcher.
+     * exit code 1 which will indicate an error by the launcher.
      * The user will have to launch once again to run the updated JAR.
      * 4. Currently, it lacks the ability to check for updates, such as on a weekly basis.
      * 5. Lacks the option to ask if the user wants to update or skip.
