@@ -64,7 +64,22 @@ data class ScriptConfig(
      * then consider passing false to [isGuiEnabledOverride]
      * */
     val environment: Environment = Environment.Client,
-    // TODO: add `autoUpdate` property, plan how it work and add some kind of caching or how often it will update
+    /**
+     * Currently, the auto update feature is **highly experimental**, might be removed, changed at anytime.
+     * And for now, this feature has the following known issues:
+     * 1. It will always update even if the next version has as **breaking changes**
+     * that can't be automatically migrated.
+     * 2. It will always update even the next version is not a stable release;
+     * we haven't implemented an update channel for now (e.g., stable, beta, alpha, development etc...).
+     * 3. Once the update is finished, the application will close with
+     * exit code 1 which will indicate as an error by the launcher.
+     * The user will have to launch once again to run the updated JAR.
+     * 4. Currently, it lacks the ability to check for updates, such as on a weekly basis.
+     * 5. Lacks the option to ask if the user wants to update or skip.
+     * 6. At the moment we have minimized JAR and the fat JAR,
+     * the update process will always update to the minimized JAR.
+     * */
+    val autoUpdateEnabled: Boolean = false,
 ) {
     companion object {
         var instance: ScriptConfig? = null
