@@ -161,6 +161,8 @@ discussed above
 - Usually when we add a new fields or modify existing ones in the data classes, like, for example, adding `description`
   field in the `Mod` data class, we will try to update the [Admin](./admin) module too to convert the new
   data from other launchers to make the process easier for administrations
+- The project generate `BuildConfig` object using a Gradle task once you start the application or building it,
+  you might get `Unresolved reference: BuildConfig` which can be solved by either start the application or building it.
 
 ### Development Known Issues 🚧
 
