@@ -3,6 +3,7 @@ import config.data.ScriptConfigDataSource
 import config.models.ScriptConfig
 import constants.Constants
 import constants.SyncScriptInstanceFiles
+import generated.BuildConfig
 import gui.GuiState
 import gui.dialogs.CreateScriptConfigDialog
 import gui.dialogs.QuickPreferencesDialog
@@ -40,6 +41,7 @@ suspend fun main(args: Array<String>) {
 
     passedArgs = args
 
+    println("📋 Current project version: ${BuildConfig.PROJECT_VERSION}")
     println("\uD83D\uDCC1 Current working directory: ${SystemInfoProvider.getCurrentWorkingDirectoryPath()}")
 
     when (OperatingSystem.current) {
@@ -150,6 +152,10 @@ suspend fun main(args: Array<String>) {
             theme = ScriptConfig.getInstanceOrThrow().theme,
             themeMode = ScriptConfig.getInstanceOrThrow().themeMode,
         )
+    }
+
+    if (scriptConfig.autoUpdateEnabled) {
+        JarAutoUpdater.updateIfAvailable()
     }
 
     // TODO: Plan if we should implement this in non GUI mode

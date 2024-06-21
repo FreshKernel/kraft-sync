@@ -7,7 +7,7 @@ import java.net.URL
  * @throws IllegalStateException if the application is not being run from a JAR file
  * */
 fun getRunningJarFileAsUrl(): Result<URL> {
-    val codeSource = object {}.javaClass.enclosingClass.protectionDomain?.codeSource
+    val codeSource = object {}.javaClass.protectionDomain?.codeSource
     codeSource?.location?.let {
         if (!it.file.endsWith(".jar", ignoreCase = true)) {
             return Result.failure(

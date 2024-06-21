@@ -22,5 +22,26 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.java.get().toInt())
+    jvmToolchain(
+        libs.versions.java
+            .get()
+            .toInt(),
+    )
+}
+
+val generateBuildConfig =
+    tasks.register<GenerateBuildConfigTask>("generateBuildConfig") {
+        val buildConfigDirectory = project.layout.buildDirectory.dir("generated")
+
+        classFullyQualifiedName.set("generated.BuildConfig")
+        generatedOutputDirectory.set(buildConfigDirectory)
+        fieldsToGenerate.put("PROJECT_VERSION", libs.versions.project.get())
+    }
+
+sourceSets.main.configure {
+    kotlin.srcDirs(generateBuildConfig.flatMap { it.generatedOutputDirectory })
+}
+
+tasks.compileKotlin.configure {
+    dependsOn(generateBuildConfig)
 }

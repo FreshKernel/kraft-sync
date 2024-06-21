@@ -1,6 +1,7 @@
 package utils
 
 import utils.os.OperatingSystem
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -73,4 +74,16 @@ fun powerShellCommandLine(
         reasonOfRunningTheCommand = reasonOfRunningTheCommand,
         isLoggingEnabled = isLoggingEnabled,
     )
+}
+
+/**
+ * Launch a bat script file on **Microsoft Windows** in a new window which will **prevent blocking the code execution**
+ * the code execution of the bat script will continue to work even if the application has been closed
+ * @throws IllegalStateException If the current operating system is not [OperatingSystem.Windows]
+ * */
+fun executeBatchScriptInSeparateWindow(batScriptFile: File) {
+    if (!OperatingSystem.current.isWindows()) {
+        throw IllegalStateException("Bat script can be only executed on Windows.")
+    }
+    ProcessBuilder("cmd", "/c", "start", batScriptFile.absolutePath).start()
 }
