@@ -83,8 +83,10 @@ class ATLauncherDataSource : LauncherDataSource {
                         val name = modrinthProject?.title
                         val description = modrinthProject?.description
 
+                        // ATLauncher always store Modrinth data even if the mod downloaded
+                        // from Curse Forge if available on both.
                         if (isCurseForgeApiRequestNeededForMod(atLauncherMod = atLauncherMod)) {
-                            // Handle the case where the mod is not available on Modrinth
+                            // Handle the case when the mod is exclusively found on Curse Forge, not on Modrinth
                             val curseForgeModFile =
                                 curseForgeDataSource
                                     .getModFile(
