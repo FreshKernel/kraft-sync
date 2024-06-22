@@ -39,6 +39,8 @@ jobs:
       - name: 📥 Build & Test 🧪 with Gradle
         run: ./gradlew build --stacktrace
 
+      # This action will validate HTTP links and not
+      # relative anchor links within the same markdown file like: [Install](#install)
       - name: 🔍 Verify Markdown Links
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
