@@ -35,13 +35,8 @@ jobs:
       - name: 🛡️ Build the Minimized JAR with Proguard
         run: ./gradlew minimizedJar -i
 
-      # TODO: This GitHub action is no longer maintained https://github.com/marvinpinto/actions/commit/40312c52f0ca0d0589b25e8f5172a3613f0759c3
       - name: ⬆️ Upload the assets
-        uses: "marvinpinto/action-automatic-releases@latest"
+        uses: AButler/upload-release-assets@v3.0
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            LICENSE
-            sync-script/build/dist/*.jar
-            admin/build/dist/*.jar
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          files: "LICENSE;sync-script/build/dist/*;admin/build/dist/*"
