@@ -4,7 +4,7 @@ import config.models.ScriptConfig
 
 object Constants {
     /**
-     * Should we by default use GUI for the (error messages, download loading indicator etc...) as default value?
+     * Should we by default use GUI for the (error messages, download loading indicator, etc...) as default value?
      * */
     const val GUI_ENABLED_WHEN_AVAILABLE_DEFAULT = true
 

@@ -37,8 +37,9 @@ data class ATLauncherInstance(
             val curseForgeFileId: Int? = null,
             val curseForgeProject: CurseForgeProject? = null,
             val curseForgeFile: CurseForgeFile? = null,
-            val modrinthProject: ModrinthProject,
-            val modrinthVersion: ModrinthVersion,
+            // ATLauncher might not store Modrinth data if the mod is available on Curse Forge and not on Modrinth
+            val modrinthProject: ModrinthProject? = null,
+            val modrinthVersion: ModrinthVersion? = null,
         ) {
             @Serializable
             enum class Type {

@@ -45,12 +45,17 @@ class ATLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
+    private fun isCurseForgeApiRequestNeededForMod(atLauncherMod: ATLauncherInstance.Launcher.Mod): Boolean {
+        val modrinthFile = atLauncherMod.modrinthVersion?.files?.firstOrNull()
+        return modrinthFile == null && (atLauncherMod.curseForgeProjectId != null && atLauncherMod.curseForgeFileId != null)
+    }
+
     override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             val isCurseForgeApiRequestNeeded =
                 getATLauncherMods(instance).any { atLauncherMod ->
-                    atLauncherMod.modrinthVersion.files.firstOrNull() == null
+                    isCurseForgeApiRequestNeededForMod(atLauncherMod = atLauncherMod)
                 }
             Result.success(isCurseForgeApiRequestNeeded)
         } catch (e: Exception) {
@@ -58,7 +63,6 @@ class ATLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    // TODO: Needs to be tested with Curse Forge and Modrinth with resource-packs at the same time, also convert/import more data like description field
     override suspend fun getMods(
         launcherInstanceDirectory: File,
         overrideCurseForgeApiKey: String?,
@@ -69,13 +73,18 @@ class ATLauncherDataSource : LauncherDataSource {
                 instance.launcher.mods
                     .filter { it.type == ATLauncherInstance.Launcher.Mod.Type.Mods }
                     .map { atLauncherMod ->
-                        val modrinthFile = atLauncherMod.modrinthVersion.files.firstOrNull()
+                        val modrinthFile = atLauncherMod.modrinthVersion?.files?.firstOrNull()
+                        val modrinthProject = atLauncherMod.modrinthProject
+
                         var downloadUrl = modrinthFile?.url
                         var fileIntegrityInfo = modrinthFile?.getFileIntegrityInfo()
+                        val clientSupport = modrinthProject?.clientSide?.toModSupport() ?: Mod.ModSupport.Required
+                        val serverSupport = modrinthProject?.serverSide?.toModSupport() ?: Mod.ModSupport.Required
+                        val name = modrinthProject?.title
+                        val description = modrinthProject?.description
 
-                        if (modrinthFile == null) {
-                            // ATLauncher always store the info for both CurseForge and Modrinth even if it's downloaded
-                            // from CurseForge, we will use Curse Forge instead if the file doesn't exist for some reason
+                        if (isCurseForgeApiRequestNeededForMod(atLauncherMod = atLauncherMod)) {
+                            // Handle the case where the mod is not available on Modrinth
                             val curseForgeModFile =
                                 curseForgeDataSource
                                     .getModFile(
@@ -90,17 +99,13 @@ class ATLauncherDataSource : LauncherDataSource {
                         requireNotNull(downloadUrl)
                         requireNotNull(fileIntegrityInfo)
 
-                        // ATLauncher seems to always store the Modrinth project,
-                        // regardless of whether it's downloaded from CurseForge or Modrinth.
-                        val modrinthProject = atLauncherMod.modrinthProject
-
                         Mod(
                             downloadUrl = downloadUrl,
                             fileIntegrityInfo = fileIntegrityInfo,
-                            clientSupport = modrinthProject.clientSide.toModSupport(),
-                            serverSupport = modrinthProject.serverSide.toModSupport(),
-                            name = modrinthProject.title,
-                            description = modrinthProject.description,
+                            clientSupport = clientSupport,
+                            serverSupport = serverSupport,
+                            name = name,
+                            description = description,
                         )
                     }
             Result.success(mods)

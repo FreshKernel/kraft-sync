@@ -73,8 +73,6 @@ Use one of the shared run configurations of IntelliJ IDEA in `.idea` which will 
 If you're not using any of the supported IDEs, text editor or something like `vim` and you want to test the changes,
 and you want to test the code changes, you can use the following Gradle tasks:
 
-[//]: # (TODO: Those tasks are not avaliable to the admin, update them if we splitted the script into a module instead of root project)
-
 - `./gradlew build` to build the project, running checks, tests and build JAR files
 - `./gradlew minimizedJar` to build the full JAR file to build the minimized one
 - `./gradlew run` to run the application

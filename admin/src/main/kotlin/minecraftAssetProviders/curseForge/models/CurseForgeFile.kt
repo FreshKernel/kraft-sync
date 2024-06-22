@@ -3,8 +3,6 @@ package minecraftAssetProviders.curseForge.models
 import kotlinx.serialization.Serializable
 import syncInfo.models.FileIntegrityInfo
 
-// TODO: Update the integer types (64) to Long maybe, check all the types again
-
 /**
  * From https://docs.curseforge.com/#tocS_File
  * */
@@ -27,7 +25,7 @@ data class CurseForgeFile(
     val hashes: List<FileHash>,
     val fileDate: String,
     val fileLength: Long,
-    val downloadCount: Int,
+    val downloadCount: Long,
     val fileSizeOnDisk: Long? = null,
     val downloadUrl: String,
     val gameVersions: List<String>,
@@ -44,14 +42,18 @@ data class CurseForgeFile(
     val modules: List<FileModule>,
 ) {
     @Serializable
-    enum class FileReleaseType(val value: Int) {
+    enum class FileReleaseType(
+        val value: Int,
+    ) {
         Release(1),
         Beta(2),
         Alpha(3),
     }
 
     @Serializable
-    enum class FileStatus(val value: Int) {
+    enum class FileStatus(
+        val value: Int,
+    ) {
         Processing(1),
         ChangesRequired(2),
         UnderReview(3),
@@ -100,7 +102,9 @@ data class CurseForgeFile(
         val relationType: Int,
     ) {
         @Serializable
-        enum class FileRelationType(val value: Int) {
+        enum class FileRelationType(
+            val value: Int,
+        ) {
             EmbeddedLibrary(1),
             OptionalDependency(2),
             RequiredDependency(3),

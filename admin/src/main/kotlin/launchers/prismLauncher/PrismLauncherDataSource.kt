@@ -52,50 +52,68 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    override suspend fun isValidInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
-        return try {
+    override suspend fun isValidInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
+        try {
             getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 
-    override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> {
-        return try {
+    private fun isCurseForgeApiRequestNeededForMod(prismLauncherModMetadata: PrismLauncherModMetadata): Boolean =
+        prismLauncherModMetadata.download.url.isBlank() && prismLauncherModMetadata.update.curseForge != null
+
+    override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> =
+        try {
             val prismLauncherModsMetadata =
                 getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             val isCurseForgeApiRequestNeeded =
                 prismLauncherModsMetadata.any { prismLauncherModMetadata ->
-                    prismLauncherModMetadata.download.url.isBlank() && prismLauncherModMetadata.update.curseForge != null
+                    isCurseForgeApiRequestNeededForMod(prismLauncherModMetadata = prismLauncherModMetadata)
                 }
             Result.success(isCurseForgeApiRequestNeeded)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
     override suspend fun getMods(
         launcherInstanceDirectory: File,
         overrideCurseForgeApiKey: String?,
-    ): Result<List<Mod>> {
-        return try {
+    ): Result<List<Mod>> =
+        try {
             // TODO: use File.exist(), check of File.exist() might need to be shared to avoid duplications
             val prismLauncherModsMetadata =
                 getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             val mods =
                 prismLauncherModsMetadata.map { prismLauncherModMetadata ->
                     var modDownloadUrl = prismLauncherModMetadata.download.url
-                    if (modDownloadUrl.isBlank() && prismLauncherModMetadata.update.curseForge != null) {
+                    if (isCurseForgeApiRequestNeededForMod(prismLauncherModMetadata = prismLauncherModMetadata)) {
+                        // The mod download URL is null though not null
+
                         // Prism launcher and most launchers are no longer store the curse forge CDN download link
-                        // see https://github.com/orgs/PrismLauncher/discussions/2394 for more details
+                        // see https://github.com/orgs/PrismLauncher/discussions/2394 for more details.
+
+                        requireNotNull(prismLauncherModMetadata.update.curseForge) {
+                            "The return value of ${::isCurseForgeApiRequestNeededForMod.name} " +
+                                "is true yet the Curse Forge data is null."
+                        }
+
                         modDownloadUrl =
-                            curseForgeDataSource.getModFileDownloadUrl(
-                                modId = prismLauncherModMetadata.update.curseForge.projectId.toString(),
-                                fileId = prismLauncherModMetadata.update.curseForge.fileId.toString(),
-                                overrideApiKey = overrideCurseForgeApiKey,
-                            ).getOrThrow().data
+                            curseForgeDataSource
+                                .getModFileDownloadUrl(
+                                    fileId =
+                                        prismLauncherModMetadata.update.curseForge.fileId
+                                            .toString(),
+                                    modId =
+                                        prismLauncherModMetadata.update.curseForge.projectId
+                                            .toString(),
+                                    overrideApiKey = overrideCurseForgeApiKey,
+                                ).getOrThrow()
+                                .data
+                    }
+                    require(modDownloadUrl.isNotBlank()) {
+                        "The mod download URL should not be empty."
                     }
                     val (clientSupport, serverSupport) = prismLauncherModMetadata.side.toClientServerModSupport()
                     Mod(
@@ -111,5 +129,4 @@ class PrismLauncherDataSource : LauncherDataSource {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 }
