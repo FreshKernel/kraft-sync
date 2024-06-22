@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    name: 🧱️ Build and Test the Script
+  link-check:
+    name: 🌐 Check Links
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
