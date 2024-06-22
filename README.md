@@ -31,7 +31,7 @@ The script will sync the following:
 If you're a player interested in joining a server, **make sure you trust the server administration** on this
 matter—unless you're confident you know what you're doing.
 
-![Screenshot](https://github.com/ellet0/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e1)
+![Screenshot](https://github.com/ellet0/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
 
 The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
 instructions if there is any breaking change in each release
@@ -42,8 +42,8 @@ subsidiaries.**
 
 ## Table of Contents
 
-- 📖 [About](#about1)
-- ✨ [Features](#features1)
+- 📖 [About](#about)
+- ✨ [Features](#features)
 - 🔧 [How it works?](#how-it-works)
 - 🖥 [Usage️](#usage)
 - 💬 [Frequently Asked Questions](#frequently-asked-questions)
