@@ -1,4 +1,4 @@
-# Contributing
+# 🌱 Contributing
 
 First of all, we would like to thank you for your time and efforts on this project, we appreciate it
 
@@ -13,7 +13,7 @@ the todos of the project, they all start with `TODO:` so you can search in your 
 
 > We highly recommend contacting us if you're planning to make big changes.
 
-## Requirements
+## 📋 Requirements
 
 [//]: # (This section is referenced by the README.md file)
 
@@ -34,9 +34,9 @@ Make sure you installed the following:
    anti-bike-shedding linter/formatter for Kotlin code based on the Kotlin Coding Conventions, Kotlin Style
    guide, and other best practices.
 
-## Test your changes 🧪
+## 🧪 Test your changes
 
-Make sure you have the [Requirement](#requirements) installed and configured correctly
+Make sure you have the [Requirement](#-requirements) installed and configured correctly
 
 To set up your IDE for this project, so you can test the changes:
 
@@ -97,9 +97,9 @@ discussed above
 >
 > Use [dev-local-server](dev-local-server/README.md) module
 
-> If you're on **Microsoft Windows**, use: `./gradlew.bat` instead of `./gradlew`
+> If you're on **Microsoft Windows**, replace `gradlew` with `gradlew.bat`.
 
-## Guidelines 📝
+## 📝 Guidelines
 
 1. **Code Style and Formatting**:
 
@@ -141,7 +141,7 @@ discussed above
 
    This project does not prioritize testing rigorously, typically featuring unit tests.
 
-## Development Notes ⚙️
+## ⚙️ Development Notes
 
 - If you add a new dependency, update existing one, add assets in the resources or do anything that increase or decrease
   the size of the bundle, make sure to update the badges in `README.md` (at the start) to update the size
@@ -164,7 +164,7 @@ discussed above
 - The project generate `BuildConfig` object using a Gradle task once you start the application or building it,
   you might get `Unresolved reference: BuildConfig` which can be solved by either start the application or building it.
 
-### Development Known Issues 🚧
+### 🚧 Development Known Issues
 
 - If you work on different modules,
     ```kotlin

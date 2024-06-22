@@ -1,4 +1,4 @@
-# Sync Script
+# 🔄 Sync Script
 
 This module contains the code for the script that will sync Minecraft instance. The executable file
 of this will be shipped with the instance of all minecraft players that use it.
