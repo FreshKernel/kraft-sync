@@ -31,8 +31,8 @@ class ModsSyncService : SyncService {
 
     private val syncInfo = SyncInfo.instance
 
-    override suspend fun syncData() {
-        return withContext(Dispatchers.IO) {
+    override suspend fun syncData() =
+        withContext(Dispatchers.IO) {
             val modsExecutionTimer = ExecutionTimer()
             modsExecutionTimer.setStartTime()
             println("\n\uD83D\uDD04 Syncing mods...")
@@ -70,7 +70,6 @@ class ModsSyncService : SyncService {
 
             println("\uD83D\uDD52 Finished syncing the mods in ${modsExecutionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
         }
-    }
 
     private fun validateModsFolder() {
         if (!modsFolder.exists()) {
@@ -223,7 +222,7 @@ class ModsSyncService : SyncService {
                 },
             ).downloadFile()
 
-            // Notice that currently will always validate newly downloaded mods regarding of the configurations
+            // This will always validate newly downloaded mods regardless of the configurations
             val isNewlyDownloadedFileHasValidFileIntegrity = mod.hasValidFileIntegrityOrError(modFile)
             if (isNewlyDownloadedFileHasValidFileIntegrity == false) {
                 showErrorMessageAndTerminate(

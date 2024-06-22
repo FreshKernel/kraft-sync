@@ -10,7 +10,14 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
-// TODO: Add the option to cancel a download, might need to refactor this class too, close using response.body.close(quietly)
+/**
+ * A utility class for downloading files from [downloadUrl] to [targetFile] with [progressListener].
+ * TODO: Add the option to cancel a download, might need to refactor this class too
+ *
+ * Currently will handle errors internally by showing a error message and close.
+ * This might change in case
+ * we want to share this with other modules.
+ * */
 class FileDownloader(
     private val downloadUrl: String,
     private val targetFile: File,
@@ -31,7 +38,8 @@ class FileDownloader(
             )
         }
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url(downloadUrl)
                 .build()
 

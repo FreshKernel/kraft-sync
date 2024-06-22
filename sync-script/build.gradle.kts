@@ -97,19 +97,17 @@ val minimizedJar =
         dependsOn(tasks.shadowJar)
 
         val fatJarFile = tasks.shadowJar.flatMap { it.archiveFile }
-        val fatJarFileNameWithoutExtension = fatJarFile.get().asFile.nameWithoutExtension
         val fatJarFileDestinationDirectory = tasks.shadowJar.get().destinationDirectory
 
         val minimizedJarFile =
             getMinimizedJarFile(
-                fatJarFileNameWithoutExtension = fatJarFileNameWithoutExtension,
+                fatJarFileNameWithoutExtension = fatJarFile.get().asFile.nameWithoutExtension,
                 fatJarFileDestinationDirectory = fatJarFileDestinationDirectory,
             )
 
         injars(fatJarFile)
         outjars(minimizedJarFile)
 
-        // TODO: Improve this, avoid hardcoding
         val javaHome = System.getProperty("java.home")
         if (System.getProperty("java.version").startsWith("1.")) {
             // Before Java 9, runtime classes are packaged in a single JAR file.
@@ -147,7 +145,9 @@ val minimizedJar =
         // is essential for resolving Kotlin and other library warnings without using '-dontwarn kotlin.**'
         injars(sourceSets.main.get().compileClasspath)
 
-        printmapping(fatJarFileDestinationDirectory.get().file("$fatJarFileNameWithoutExtension.map"))
+        printmapping(
+            fatJarFileDestinationDirectory.get().file("${minimizedJarFile.get().asFile.nameWithoutExtension}.map"),
+        )
 
         // Disabling obfuscation makes the JAR file size a bit larger, and the debugging process a bit less easy
 //        dontobfuscate()

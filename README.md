@@ -58,11 +58,11 @@ Let's say you're running a Minecraft server and every time you add, remove, upda
 player has to make the changes manually each time you do it or let's say you're changing the server address, the
 players have to manually update it in the game.
 
-It's designed primarily for server owners, yet it can also be effective for mod-pack developers.
-The script will run before each time when launching the game will make a `GET` request to a file you upload somewhere (
-GitHub for example) and it contains information about the sync info like the mods and some other configurations that
-allow you to customize the behavior, you don't need to upload the mods anywhere it will simply need a public download
-URL for the mod (For example CurseForge or Modrinth) and it will download the mod from there.
+It's designed for server owners, yet it can also be effective for mod-pack developers and other use cases.
+The script will run before each time when launching the game will make a `GET` request to a file you upload somewhere
+(GitHub for example) and it contains information about the sync information like the **Mods** and other
+configurations that allow you to customize the behavior, you don't need to upload the mods anywhere it will need
+a public download URL for the mod (e.g, **Modrinth**) and it will download the mod directly from there.
 
 You don't have to do that manually, see [Mods Info Converter] 💾 for more
 info.

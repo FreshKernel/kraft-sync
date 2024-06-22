@@ -144,8 +144,6 @@ suspend fun main(args: Array<String>) {
 
     println("ℹ\uFE0F Script Configuration: ${ScriptConfig.instance}")
 
-    // This will not show as the script is configured to disable GUI mode on headless environments
-
     // Switch to the themes specified by config
     if (GuiState.isGuiEnabled) {
         GuiUtils.applyThemeIfNeeded(
@@ -249,7 +247,7 @@ suspend fun main(args: Array<String>) {
 
     syncServices.forEach { it.syncData() }
 
-    // Finally, finish the script
+    // Finish the script
 
     // The temporary folder usually contains the downloaded files which will be moved once finished
     // after finish syncing the contents successfully, we don't need it anymore.
