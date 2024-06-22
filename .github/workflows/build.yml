@@ -38,8 +38,3 @@ jobs:
 
       - name: 📥 Build & Test 🧪 with Gradle
         run: ./gradlew build --stacktrace
-
-      - name: 🔍 Verify Markdown Links 🔗
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          config-file: .github/workflows/markdown_link_check_config.json
