@@ -42,15 +42,15 @@ subsidiaries.**
 
 ## Table of Contents
 
-- [About](#about) 📖
-- [Features](#features) ✨
-- [How it works?](#how-it-works) 🔧
-- [Usage️](#usage) 🖥
-- [Frequently Asked Questions](#frequently-asked-questions) 💬
-- [Admin Utility](#admin-utility) 🔰
-- [Build from Source️](#build-from-source) 🛠
-- [Contributing](#contributing) 🤝
-- [Acknowledgments](#acknowledgments) 📜
+- 📖 [About](#about)
+- ✨ [Features](#features)
+- 🔧 [How it works?](#how-it-works)
+- 🖥 [Usage️](#usage)
+- 💬 [Frequently Asked Questions](#frequently-asked-questions)
+- 🔰 [Admin Utility](#admin-utility)
+- 🛠 [Build from Source️](#build-from-source)
+- 🤝 [Contributing](#contributing)
+- 📜 [Acknowledgments](#acknowledgments)
 
 ## About
 
