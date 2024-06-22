@@ -42,4 +42,4 @@ jobs:
       - name: 🔍 Verify Markdown Links 🔗
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
-          config-file: .github/workflows/mlc_config.json
+          config-file: .github/workflows/markdown_link_check_config.json
