@@ -54,7 +54,7 @@ subsidiaries.**
 
 ## About
 
-Let's say you're running a Minecraft server and every time you add, remove, update a mod, resource-pack, or shader, each
+Let's say you're running a Minecraft server and every time you add, remove, or update a mod, resource pack, or shader, each
 player has to make the changes manually each time you do it or let's say you're changing the server address, the
 players have to manually update it in the game.
 
@@ -70,7 +70,7 @@ info.
 > Kraft Sync
 > <img src="common/src/main/resources/apple.png" height="30px" align="center"/> <br>
 > The meaning of this name:
-> - `K`: will depend on how you look at it, it could be **Keep** which mean keep Minecraft instance synced
+> - `K`: will depend on how you look at it, it could be **Keep** which means keep a Minecraft instance synced
 > - `Craft` or `Kraft`: Indicating this is specific for Minecraft<br>
 > - `Sync`: Indicating it's for syncing the content/assets/data
 
@@ -83,7 +83,7 @@ List the key features of the script
 ## Features
 
 - 🛠️ Easy to use and customizable.
-- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or completely disable it.
+- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or completely disable the GUI.
 - 🖥️ Simple GUI for download indicators and errors for both dark and light with different themes (can be disabled).
 - 🚫 Handles different errors.
 - 🌐 Multiplatform: Works using JVM, which means you don't need different binaries for different desktop platforms.
@@ -97,7 +97,7 @@ List the key features of the script
 - 🔄 You can use the exact same script for syncing server mods (if you have access to running JAR files) and you can
   exclude or include some mods to be downloaded on the client or server.
 - 💾 Easily convert the info of the mods from other launchers.
-- ⚡ Support for quick play feature for automatically joining a minecraft server on launch (limited to supported
+- ⚡ Support for quick play feature for automatically joining a Minecraft server on launch (limited to supported
   launchers)
 
 ```
@@ -110,20 +110,20 @@ Minecraft launcher that supports running a command before launching the game
 You can use [MultiMC Launcher] or [Prism Launcher] which provide more features than the original
 [Minecraft Launcher], features like:
 
-1. Exporting the instance, each instance has its own assets (e.g., Mods, Resource-packs, Shader-packs)
+1. Exporting the instance, each instance has its assets (e.g., Mods, Resource-packs, Shader-packs)
 2. Configurations and data in a way so no instance will affect another
 3. Other features like allow to launch
    Pre-launch
    command which is needed by this script to automate the process, otherwise if you're using the
-   official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
-   they want to (when new mods added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script that
+   the official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
+   they want to (when new mods are added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script that
    launches this script first then the launcher, This way the players are forced to use your mods and resource packs,
    etc... even if they don't want to use the mods, still [Minecraft Launcher] doesn't provide a way to separate the mods
    and settings for different instances and servers, to get the best experience, use one of the supported launchers or a
-   launcher that support running a command before launching the game
+   launcher that supports running a command before launching the game
 4. Many other features, like automatically joining a Minecraft server when launching the game
 
-You will need to ship the script with the exported instance, configure the instance to launch the script before each
+You will need to ship the script with the exported instance and configure the instance to launch the script before each
 game launch and export it.
 It's important to check the script files; otherwise, it won't be shipped.
 
@@ -139,21 +139,21 @@ The easiest way to use the script 🚀:
 2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
    launcher.
 
-   Consider using [Modrinth] as it will make the process easier, faster with smaller possibility of errors
+   Consider using [Modrinth] as it will make the process easier, and faster with a smaller possibility of errors
    for the utility as it will be an offline task
-3. **Create a new instance**, choose the version, mod loader, create it and download the mods you want to use
-4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, upload the new file
+3. **Create a new instance**, choose the version, mod loader, create it, and download the mods you want to use
+4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, and upload the new file
    you get from the utility program to somewhere public, like [GitHub](https://github.com/)
 5. To prepare the instance that the players will use, **create a new instance**, choose the same version
    and mod loader as the previous instance while refraining from downloading the mods.
-   As this instance will be configured to use the script and download them.
+   This instance will be configured to use the script and download them.
 
    The previous one will be used by [Admin Utility] to convert the info format
 6. Move the downloaded script JAR file to the instance directory where it has the `mods` and other folders
 7. Go to the settings of the newly created instance, try to find the section of the custom commands,
    or the command to run before launching the game.
    For example, for [MultiMC Launcher], it's
-   in [here](https://github.com/MultiMC/Launcher/wiki/Instance-settings#custom-commands), the same apply
+   in [here](https://github.com/MultiMC/Launcher/wiki/Instance-settings#custom-commands), the same applies
    the launchers based on it like [Prism Launcher]
 8. Once you find the `Pre-launch command` or something similar, type the following:
    ```
@@ -161,13 +161,13 @@ The easiest way to use the script 🚀:
    ```
    and replace `kraft-sync` with the JAR file name from **Step 6** if necessary.
    You might need to replace `$INST_JAVA` and `$INST_MC_DIR` environment variables with something else depending on the
-   launcher, [MultiMC Launcher] and the launchers that based on it use those variables,
+   launcher, [MultiMC Launcher] and the launchers that are based on it use those variables,
    and other launchers like [ATLauncher] use the same for compatibility
 9. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
    that from **Step 4**. Enter it and then wait for the sync process to finish, the game will launch with the new synced
    content
 10. To make this process much easier for all the players, export the instance from **Step 5** that's configured
-    to use the script, make sure to include used JAR file and the `kraft-sync-data` folder
+    to use the script, make sure to include the used JAR file and the `kraft-sync-data` folder
     and exclude the content that will be synced like the `mods` as the script will download them once the player import
     the instance and launch the instance, you can include them though, the script will sync them if they're outdated.
 
@@ -208,17 +208,17 @@ answer.
 
 <details>
 <summary id="q1">Why not sync the mods on the server?</summary>
-There are some mods that is required to be installed on both the client and server-side
+There are some mods that are required to be installed on both the client and server-side
 and it will simply sync the mods when you join a server by downloading the mods from the Minecraft server
 while those mods work great and might require even more effort than this script, depending on your use case,
 you might use them or use this script
 
-some of the common issues in the  `minecraft mods` using sync mods:
+some of the common issues in the  `Minecraft mods` using sync mods:
 
-1. It will require running the HTTP server on a port other than the minecraft port (e.g., 25565) which can be used by
+1. It will require running the HTTP server on a port other than the Minecraft port (e.g., 25565) which can be used by
    attackers
    to cause performance issues if you haven't implemented Rate Limit (otherwise some users might spam the server)
-   and another security mechanism it might affect the network and traffic from your Minecraft hosting
+   and another security mechanism that might affect the network and traffic from your Minecraft hosting
 2. You will constantly need to update the mod for Forge/Fabric or the mod loader you are using, and for a specific
    Minecraft version,
    while this script works independently of the Minecraft version and the mod loader
@@ -237,7 +237,7 @@ some of the common issues in the  `minecraft mods` using sync mods:
    and including them on the client side will increase the size and require the players to download more, for example,
    Geyser is above 10 MB, Another client-side mod [Physics Mod](https://modrinth.com/mod/physicsmod) which is more than
    130 MB, when using more and more mods not only the syncing process will be slower, it will also require more space on
-   the disk and in some rare cases it could cause issues (if the server-side mod will cause an exception when running on
+   the disk and in some rare cases it could cause issues (if the server-side mod causes an exception when running on
    the client side) or it's not marked as a server-side mod
 6. Uploading Minecraft developer mods and downloading them to the players from external sources other than the original
    might be against the LICENSE
@@ -255,7 +255,7 @@ issues later.
 <details>
 <summary id="q2">Does it sync the Minecraft version, Mod loader, and Java version?</summary>
 Right now, the script won't download or sync the Java version, because the custom launcher you are using
-or even the official Minecraft launcher already has java JRE installed,
+or even the official Minecraft launcher already has Java JRE installed,
 the script will use that installed Java instead of
 requiring the players to download and install Java on their system,
 launchers like official Minecraft and some other custom launchers
@@ -285,12 +285,9 @@ so each admin can access their multiple servers and update the assets (e.g. Mods
 provide add and edit functionalities, for the add you will insert all the data, for the edit you will provide the raw
 JSON data and then edit it in GUI and get the new one
 
-The GUI should allow selecting assets (e.g. Mods, Resource-packs) from some providers like Modrinth, CurseForges, or by
-custom URL
+The GUI should allow selecting assets (e.g., Mods, Resource-packs) from some providers like Modrinth, CurseForges, or by
+custom URL.
 
-we might use [Kobweb](https://github.com/varabyte/kobweb) for the GUI which is also in Kotlin and allow us to share
-code
-and logic between Kotlin/JS and Kotlin/JVM
 </details>
 
 <details>
@@ -298,7 +295,7 @@ and logic between Kotlin/JS and Kotlin/JVM
 
 File an issue in the [issues](https://github.com/ellet0/kraft-sync/issues) with detailed information as much as you can,
 with the error and what are you trying to do and how to reproduce it.
-We will do our best to help fixing it.
+We will do our best to help fix it.
 
 if you have a question, use the Discussions tab instead
 </details>
@@ -339,7 +336,7 @@ There are some technical reasons:
    the script is to make it as easy as possible to run without installing anything extra or too many manual
    configurations
    which is one reason why this script uses JVM as most Minecraft Java Launchers already have it installed, which
-   make it easier to write cross-platform script from a single code base, the script
+   make it easier to write a cross-platform script from a single code base, the script
    will use [Java Swing](https://docs.oracle.com/javase/tutorial/uiswing/) for GUI support
    without making the bundle size larger, and we will use imports from Java when possible
 4. **Features**: The script provides some features like dark and light mode support with different themes
@@ -348,7 +345,7 @@ There are some technical reasons:
 We will try to find a good balance between the features and the bundle size, we
 use a tool called [Proguard](https://www.guardsquare.com/proguard) which makes it easy to shrink and minimize
 the JAR file, sometimes it doesn't if it should keep something or remove it due to reflections and dynamic class
-loading, we will try to always test it and make sure the minimized JAR works like expected and will also provide both
+loading, we will try to always test it and make sure the minimized JAR works as expected and will also provide both
 the minimized JAR and the full JAR files in the release assets which can be found in the [Releases].
 
 if the JAR file is a priority, use the minimized JAR.
@@ -359,27 +356,27 @@ if you would rather not risk getting unexpected errors at runtime, use the norma
 <details>
 <summary id="q7">Why not Mod packs?</summary>
 
-It depends on your use-case, there are some reasons that prevent some players from using Mod packs
+It depends on your use case, there are some reasons that prevent some players from using Mod packs
 to use Minecraft mods with players
 
 1. To allow your friends to use your mod pack to get the updates, you have to publish it to a provider
    that is supported by the launcher like [Modrinth] or [Curse Forge].
 
-   It will be listed publicly, a review is usually required, you might only want to play it with your friends
+   It will be listed publicly, a review is usually required, and you might only want to play it with your friends
 2. Limited to the supported launchers, technically you can run this script without Minecraft.
    It can work on any launcher or even the
    official [Minecraft Launcher], we recommend using any launcher that supports Instances and Pre-launch command
    feature, which most Minecraft launchers do
 3. Server and Client Flexibility, Mod-packs are usually for syncing the client side, while it's possible to get the
    updates of a Minecraft mod pack into a server, or most server hosting providers already support a wide range of
-   mod-packs with one click, this script allows you to split the used mods on the server and the client or use them on
+   mod-packs with one click, this script allows you to split the used mods between the server and the client or use them on
    both sides, and it can work on any server even on localhost
 4. Allow you to use a mix of mods from multiple providers, the script only needs the URL to the mod, and it can be from
    anywhere, it doesn't store anything specific about any mod provider, only the links to the mod providers which will
    be used to detect the mod provider, if it's unknown or unverified, then it will warn the user before continuing for
    the
-   first time, the script doesn't store any data remotely by itself, which gives you more control on where to store it
-5. License Compliance by avoiding re-uploading the mods on somewhere other than the original source, the script will
+   the first time, the script doesn't store any data remotely by itself, which gives you more control over where to store it
+5. License Compliance by avoiding re-uploading the mods somewhere other than the original source, the script will
    download the mods as if you're downloading them from the website
 6. It can only support mods; The term "Mod packs" typically refers to collections of mods, which can include resource
    packs as well.
@@ -393,18 +390,18 @@ to use Minecraft mods with players
 <details>
 <summary id="q8">Will there be Bedrock support?</summary>
 
-There are some reasons preventing us from proving support to
+There are some reasons preventing us from providing support to
 [Minecraft Bedrock](https://play.google.com/store/apps/details?id=com.mojang.minecraftpe&hl=en_US&pli=1) Support
 
 1. Built with different code and underline data, which requires us to do breaking changes, and make more steps to use
-   the script with different data for resource-packs and behavior-packs, add-ons and shaders for Bedrock and for Java
-   which require different information to be stored or maybe both in the same URL, or maybe provide two versions of the
+   the script with different data for resource-packs and behavior-packs, add-ons, and shaders for Bedrock and for Java
+   which require different information to be stored or maybe both in the same URL or maybe provide two versions of the
    scripts
-2. Lack of Assets providers support for the Bedrock edition
-3. The bedrock edition already has a way to sync the resource-packs and behavior-packs to all the players; it's much
-   easier, all you have to enter the IP address and join as a player and click continue
-4. Require refactor almost all the logic and abstract it to different editions of Minecraft
-5. It will require Java JRE installed on the machine, since the script now will use JVM as Minecraft Java already need
+2. Lack of asset provider support for the Bedrock edition
+3. The bedrock edition already has a way to sync the resource packs and behavior packs to all the players; it's much
+   easier, all you have to enter the IP address join as a player, and click continue
+4. Require refactoring almost all the logic and abstracting it to different editions of Minecraft
+5. It will require Java JRE installed on the machine since the script now will use JVM as Minecraft Java already needs
    it installed on the launcher/system, the script will use the same Java installation to run, if players are only
    interested in playing a Minecraft Bedrock edition, installing Java on the system might not be preferred,
    which requires us to bundle the JRE and provide native platform binaries or
@@ -415,7 +412,7 @@ There are some reasons preventing us from proving support to
 7. Bedrock Edition does not support multiple instances, each with its own data and configurations
 8. The modifications are limited to the Bedrock edition, which reduces the necessity for using this script
 
-There may be additional reasons, as discussed above, using this script is less needed for the Bedrock edition,
+There may be additional reasons, as discussed above, why using this script is less needed for the Bedrock edition,
 the bedrock edition already has something similar
 
 </details>
