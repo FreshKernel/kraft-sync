@@ -40,6 +40,8 @@ jobs:
         run: ./gradlew build --stacktrace
 
       - name: 🔍 Verify Markdown Links
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        uses: umbrelladocs/action-linkspector@v1
         with:
-          config-file: .github/workflows/markdown_link_check_config.json
+          github_token: ${{ secrets.github_token }}
+          reporter: github-check
+          fail_on_error: true
