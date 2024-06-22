@@ -39,9 +39,5 @@ jobs:
       - name: 📥 Build & Test 🧪 with Gradle
         run: ./gradlew build --stacktrace
 
-      - name: 🔍 Run linkSpector
-        uses: umbrelladocs/action-linkspector@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          fail_on_error: true
+      - name: 🔍 Verify Markdown Links 🔗
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
