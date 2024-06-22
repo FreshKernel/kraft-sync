@@ -54,7 +54,7 @@ Use one of the shared run configurations of IntelliJ IDEA in `.idea` which will 
 
 1. Edit the Run/Debug configurations of IntelliJ IDEA, click on the add plus
 2. Choose the JAR Application, name it, and choose the JAR file path which is usually located under
-   the [build/dist](./build/dist),
+   the [sync-script/build/dist](./sync-script/build/dist),
    also, change the working directory to a directory other than the current or somewhere that is in `.gitignore` like
    like `testScript`
 3. In before launch add two Gradle tasks, first `clean` and then `shadowJar` (in order) or only `shadowJar`.
