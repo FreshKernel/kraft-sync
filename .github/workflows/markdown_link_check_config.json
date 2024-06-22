@@ -1,3 +1,7 @@
 {
-
+  "ignorePatterns": [
+    {
+      "pattern": "^(http|https):\\/\\/(?!github\\.com\\/ellet0\\/kraft-sync\\/).*"
+    }
+  ]
 }
