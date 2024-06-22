@@ -42,7 +42,7 @@ subsidiaries.**
 
 ## Table of Contents
 
-- 📖 [About](#about)
+- 📖 [About](#-about)
 - ✨ [Features](#features)
 - 🔧 [How it works?](#how-it-works)
 - 🖥 [Usage️](#usage)
