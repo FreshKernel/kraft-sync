@@ -1,4 +1,4 @@
-# Admin
+# 🔰 Admin
 
 A utility for the [Kraft Sync](../README.md) for the administration who manage the sync info
 
@@ -8,12 +8,12 @@ This page isn't complete yet, and this tool is experimental and can have many br
 
 [//]: # (TODO: Complete this page)
 
-## Mods Info Converter
+## 🔁 Mods Info Converter
 
 This feature allows you to convert the downloaded mods info
 to the script data format from a Minecraft Launcher that supports downloading mods **inside the launcher**
 
-### Important for mods uploaded to Curse Forge:
+### ⭐️ Important for mods uploaded to Curse Forge:
 
 Most Minecraft launchers doesn't store Curse Forge CDN Download URL anymore, they usually store the project and the file
 id, the script will send a GET request to [Curse Forge API](https://docs.curseforge.com/) which require an API key and

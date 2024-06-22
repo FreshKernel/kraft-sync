@@ -40,21 +40,22 @@ instructions if there is any breaking change in each release
 with [Mojang AB](https://mojang.com/), [Microsoft Corporation](https://www.microsoft.com/), or any of their
 subsidiaries.**
 
-## Table of Contents
+## 📚 Table of Contents
 
-- [About](#about) 📖
-- [Features](#features) ✨
-- [How it works?](#how-it-works) 🔧
-- [Usage️](#usage) 🖥
-- [Frequently Asked Questions](#frequently-asked-questions) 💬
-- [Admin Utility](#admin-utility) 🔰
-- [Build from Source️](#build-from-source) 🛠
-- [Contributing](#contributing) 🤝
-- [Acknowledgments](#acknowledgments) 📜
+- 📖 [About](#-about)
+- ✨ [Features](#-features)
+- 🔧 [How it works?](#-how-it-works)
+- 🖥 [Usage️](#-usage)
+- 💬 [Frequently Asked Questions](#-frequently-asked-questions)
+- 🔰 [Admin Utility](#-admin-utility)
+- 🛠 [Build from Source️](#-build-from-source)
+- 🤝 [Contributing](#-contributing)
+- 📜 [Acknowledgments](#-acknowledgments)
 
-## About
+## 📖 About
 
-Let's say you're running a Minecraft server and every time you add, remove, or update a mod, resource pack, or shader, each
+Let's say you're running a Minecraft server and every time you add, remove, or update a mod, resource pack, or shader,
+each
 player has to make the changes manually each time you do it or let's say you're changing the server address, the
 players have to manually update it in the game.
 
@@ -74,7 +75,7 @@ info.
 > - `Craft` or `Kraft`: Indicating this is specific for Minecraft<br>
 > - `Sync`: Indicating it's for syncing the content/assets/data
 
-## Features
+## ✨ Features
 
 List the key features of the script
 
@@ -102,7 +103,7 @@ List the key features of the script
 
 ```
 
-## How it works?
+## 🔧 How it works?
 
 To provide an easy way to use for the players without doing anything manually, all you need is to use a
 Minecraft launcher that supports running a command before launching the game
@@ -113,14 +114,13 @@ You can use [MultiMC Launcher] or [Prism Launcher] which provide more features t
 1. Exporting the instance, each instance has its assets (e.g., Mods, Resource-packs, Shader-packs)
 2. Configurations and data in a way so no instance will affect another
 3. Other features like allow to launch
-   Pre-launch
-   command which is needed by this script to automate the process, otherwise if you're using the
-   the official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
-   they want to (when new mods are added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script that
-   launches this script first then the launcher, This way the players are forced to use your mods and resource packs,
-   etc... even if they don't want to use the mods, still [Minecraft Launcher] doesn't provide a way to separate the mods
-   and settings for different instances and servers, to get the best experience, use one of the supported launchers or a
-   launcher that supports running a command before launching the game
+   Pre-launch command which is needed by this script to automate the process, otherwise if you're using the
+   official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
+   they want to (when new mods are added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script
+   that launches this script first then the launcher, This way the players are forced to use your mods and resource
+   packs, etc... even if they don't want to use the mods, still [Minecraft Launcher] doesn't provide a way to separate
+   the mods and settings for different instances and servers, to get the best experience, use one of the supported
+   launchers or a launcher that supports running a command before launching the game
 4. Many other features, like automatically joining a Minecraft server when launching the game
 
 You will need to ship the script with the exported instance and configure the instance to launch the script before each
@@ -129,13 +129,13 @@ It's important to check the script files; otherwise, it won't be shipped.
 
 The process is straightforward; don't get confused by the required steps.
 
-## Usage
+## 🖥 Usage
 
 [//]: # (TODO: Add supported launchers section)
 
 The easiest way to use the script 🚀:
 
-1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#admin-utility)
+1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#-admin-utility)
 2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
    launcher.
 
@@ -180,7 +180,7 @@ This section is incomplete and should be updated in the future.
 
 [//]: # (TODO: Update or rework this section)
 
-## Frequently Asked Questions
+## 💬 Frequently Asked Questions
 
 This FAQ provides answers to some of the most commonly asked questions. Click on the question to expand and see the
 answer.
@@ -213,24 +213,19 @@ and it will simply sync the mods when you join a server by downloading the mods 
 while those mods work great and might require even more effort than this script, depending on your use case,
 you might use them or use this script
 
-some of the common issues in the  `Minecraft mods` using sync mods:
+Some common issues encountered when using Minecraft mods that synchronize other mods include:
 
 1. It will require running the HTTP server on a port other than the Minecraft port (e.g., 25565) which can be used by
-   attackers
-   to cause performance issues if you haven't implemented Rate Limit (otherwise some users might spam the server)
-   and another security mechanism that might affect the network and traffic from your Minecraft hosting
+   attackers to cause performance issues if you haven't implemented Rate Limit (otherwise some users might spam the
+   server) and another security mechanism that might affect the network and traffic from your Minecraft hosting
 2. You will constantly need to update the mod for Forge/Fabric or the mod loader you are using, and for a specific
-   Minecraft version,
-   while this script works independently of the Minecraft version and the mod loader
+   Minecraft version, while this script works independently of the Minecraft version and the mod loader
 3. The users have to update the mods when joining the server, then restarting the game, so let's say a new Minecraft
    version has been released, and you were playing with your friends, you will have to wait for the mod that syncs the
-   mods
-   to be updated or update it yourself, then ask your friends to restart the game with the new version and manually
-   update
-   the sync mod, then you will have to update all the mods on the server, after when they launch the game
+   mods to be updated or update it yourself, then ask your friends to restart the game with the new version and manually
+   update the sync mod, then you will have to update all the mods on the server, after when they launch the game
    once they launch the game they will have to update and then restart once again, when using the script, you only have
-   to
-   update the data as admin, then ask your friends and players to restart the game
+   to update the data as admin, then ask your friends and players to restart the game
 4. Can only sync Minecraft mods (which might be exactly what you want)
 5. Server and client-side mods are different: There are completely server-side mods
    like [Geyser](https://modrinth.com/mod/geyser) or [Spawn Animations](https://modrinth.com/datapack/spawn-animations)
@@ -369,13 +364,14 @@ to use Minecraft mods with players
    feature, which most Minecraft launchers do
 3. Server and Client Flexibility, Mod-packs are usually for syncing the client side, while it's possible to get the
    updates of a Minecraft mod pack into a server, or most server hosting providers already support a wide range of
-   mod-packs with one click, this script allows you to split the used mods between the server and the client or use them on
+   mod-packs with one click, this script allows you to split the used mods between the server and the client or use them
+   on
    both sides, and it can work on any server even on localhost
 4. Allow you to use a mix of mods from multiple providers, the script only needs the URL to the mod, and it can be from
    anywhere, it doesn't store anything specific about any mod provider, only the links to the mod providers which will
    be used to detect the mod provider, if it's unknown or unverified, then it will warn the user before continuing for
-   the
-   the first time, the script doesn't store any data remotely by itself, which gives you more control over where to store it
+   the first time, the script doesn't store any data remotely by itself, which gives you more control over where to
+   store it
 5. License Compliance by avoiding re-uploading the mods somewhere other than the original source, the script will
    download the mods as if you're downloading them from the website
 6. It can only support mods; The term "Mod packs" typically refers to collections of mods, which can include resource
@@ -383,7 +379,7 @@ to use Minecraft mods with players
    However, they might not always meet specific needs or preferences.
 7. More features like
    the [Quick Play](https://www.minecraft.net/en-us/article/quick-play-coming-java-and-bedrock-edition) support feature,
-   see [Features](#features) for more info
+   see [Features](#-features) for more info
 
 </details>
 
@@ -424,23 +420,23 @@ the bedrock edition already has something similar
 If you have any further questions that are not covered here, feel free to file an issue or create a new
 discussion.
 
-## Admin Utility
+## 🔰 Admin Utility
 
 We provide a utility program 🛠️ for the Admin which helps when dealing with the data or converting them from other
-launchers, for more details, go to the [Admin Utility] page
+launchers, for more details, navigate to [Admin Utility] page.
 
-## Build from Source
+## 🛠 Build from Source
 
 If you want to build from source for the latest version:
 
-1. Install the [Requirements]
+1. Install the [Requirements](./CONTRIBUTING.md#-requirements)
 2. Run `./gradlew assemble` or `./gradlew.bat assemble` on **Microsoft Windows**
 3. Navigate to [sync-script/build/dist](./sync-script/build/dist) folder where you should find the Jar
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 
-## Contributing
+## 🤝 Contributing
 
 We greatly appreciate your time and effort.
 
@@ -449,7 +445,7 @@ These guidelines help ensure that everyone can understand and work with the code
 
 See [Contributing] for more details.
 
-## Acknowledgments
+## 📜 Acknowledgments
 
 We are incredibly grateful to many individuals and organizations who have played a
 role in the project.
@@ -491,5 +487,3 @@ Thanks to:
 [Mods Info Converter]: ./admin/README.md#mods-info-converter
 
 [Contributing]: ./CONTRIBUTING.md
-
-[Requirements]: ./CONTRIBUTING.md#requirements
