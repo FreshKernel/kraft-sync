@@ -102,7 +102,7 @@ suspend fun main(args: Array<String>) {
             // No need to set the value of the script config due to the statement after the current one
 
             // Don't update `doesUserTrustSource` to true,
-            // as the user might have downloaded the script and set up it manually
+            // as the user might have downloaded the script and set it up manually
             // doesn't necessarily mean he/she is the admin
         } else {
             // TODO: Might request the data using readln()
