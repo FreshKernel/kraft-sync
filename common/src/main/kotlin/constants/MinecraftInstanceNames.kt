@@ -13,10 +13,10 @@ object MinecraftInstanceNames {
      * */
     const val OPTIONS_FILE = "options.txt"
 
-    // TODO: Might add support for `servers.essential.dat` in the future.
-
     /**
      * A file that contains all the information about the list of servers
      * */
     const val SERVERS_FILE = "servers.dat"
+
+    // 'servers.essential.dat' is not supported yet
 }

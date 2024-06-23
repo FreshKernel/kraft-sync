@@ -1,5 +1,6 @@
 package gui.tabs
 
+import constants.AdminConstants
 import constants.ProjectInfoConstants
 import gui.Tab
 import gui.components.HintTextField
@@ -41,8 +42,8 @@ class ModsConverterTab : Tab() {
         setupTabContent()
     }
 
-    override fun getTabContent(): JPanel {
-        return row(
+    override fun getTabContent(): JPanel =
+        row(
             HtmlTextWithLinks {
                 text("With ")
                 link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE)
@@ -71,10 +72,11 @@ class ModsConverterTab : Tab() {
                     ConversionInputDialog(this.getCurrentWindowFrame()).isVisible = true
                 },
         )
-    }
 }
 
-private class ConversionInputDialog(owner: Frame) : JDialog(owner) {
+private class ConversionInputDialog(
+    owner: Frame,
+) : JDialog(owner) {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private lateinit var launcherComboBox: JComboBox<MinecraftLauncher>
@@ -108,9 +110,10 @@ private class ConversionInputDialog(owner: Frame) : JDialog(owner) {
                 labelText = "Launcher",
                 tooltipText = "The Minecraft launcher to convert the info from.",
                 inputComponent =
-                    JComboBox<MinecraftLauncher>().apply {
-                        MinecraftLauncher.entriesWithModDownloadSupport().forEach { addItem(it) }
-                    }.also { launcherComboBox = it },
+                    JComboBox<MinecraftLauncher>()
+                        .apply {
+                            MinecraftLauncher.entriesWithModDownloadSupport().forEach { addItem(it) }
+                        }.also { launcherComboBox = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
             labeledInputPanel(
@@ -153,9 +156,10 @@ private class ConversionInputDialog(owner: Frame) : JDialog(owner) {
                     "Either copy the mods info as mods list or inside a new sync info. Notice that the " +
                         "second option is easier as it will reset the configurations if you have any.",
                 inputComponent =
-                    JComboBox<ModsConvertMode>().apply {
-                        ModsConvertMode.entries.forEach { addItem(it) }
-                    }.also { modsConvertModeComboBox = it },
+                    JComboBox<ModsConvertMode>()
+                        .apply {
+                            ModsConvertMode.entries.forEach { addItem(it) }
+                        }.also { modsConvertModeComboBox = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
             labeledInputPanel(
@@ -163,9 +167,10 @@ private class ConversionInputDialog(owner: Frame) : JDialog(owner) {
                 tooltipText =
                     "Choose to either copy the output to your clipboard or save it as a file on your local system.",
                 inputComponent =
-                    JComboBox<ModsConvertOutputOption>().apply {
-                        ModsConvertOutputOption.entries.forEach { addItem(it) }
-                    }.also { outputModeComboBox = it },
+                    JComboBox<ModsConvertOutputOption>()
+                        .apply {
+                            ModsConvertOutputOption.entries.forEach { addItem(it) }
+                        }.also { outputModeComboBox = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
             labeledInputPanel(
@@ -280,17 +285,33 @@ private class ConversionInputDialog(owner: Frame) : JDialog(owner) {
 
                 ModsConvertResult.NeedToAcceptCurseForgeForStudiosTermsOfUse -> {
                     val hasUserAcceptedCurseForgeForStudiosTermsOfUse =
-                        SwingDialogManager.showConfirmDialog(
-                            title = "CurseForge for Studios Terms of Use",
-                            // TODO: Improve this message, styling and the link instead of text
-                            message =
-                                "You're using Curse Forge mods in the launcher, a network request must sent to Curse Forge API\n" +
-                                    "to fetch the mods data as the selected launcher doesn't store the mod download URLs.\n\n" +
-                                    "Do you agree to Curse Forge API Terms of Service? Link can be found here " +
-                                    "https://docs.curseforge.com/#curseforge-for-studios-terms-of-use",
-                            parentComponent = this@ConversionInputDialog,
-                            messageType = SwingDialogManager.MessageType.Question,
-                        ).isConfirmed()
+                        SwingDialogManager
+                            .showConfirmDialog(
+                                title = "CurseForge for Studios Terms of Use",
+                                message =
+                                    HtmlTextWithLinks {
+                                        text(
+                                            "You're using Curse Forge mods in the launcher, a network request must sent to Curse Forge API",
+                                        )
+                                        newLine()
+                                        text("to fetch the mods data as the selected launcher doesn't store the mod download URLs.")
+                                        newLine()
+                                        newLine()
+
+                                        text("Do you agree to ")
+                                        link(
+                                            labelText = "Curse Forge API Terms of Service",
+                                            linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
+                                        )
+                                        text("?")
+                                        newLine()
+                                        text("The link can also be found here:")
+                                        newLine()
+                                        text(AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL)
+                                    },
+                                parentComponent = this@ConversionInputDialog,
+                                messageType = SwingDialogManager.MessageType.Question,
+                            ).isConfirmed()
                     if (!hasUserAcceptedCurseForgeForStudiosTermsOfUse) {
                         return@launch
                     }
