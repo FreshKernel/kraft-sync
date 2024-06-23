@@ -54,7 +54,7 @@ data class Mod(
      *
      * If it's required on both sides, pass [ModSupport.Required] to both [clientSupport] and [serverSupport]
      * */
-    val clientSupport: ModSupport = ModSupport.Required,
+    val clientSupport: ModSupport = ModSupport.defaultValue(),
     /**
      * The script needs this info to know if it should download the mod based on the [Environment]
      * if you're using a server side only and not needed in a client,
@@ -63,7 +63,7 @@ data class Mod(
      *
      * If it's required on both sides, pass [ModSupport.Required] to both [clientSupport] and [serverSupport]
      * */
-    val serverSupport: ModSupport = ModSupport.Required,
+    val serverSupport: ModSupport = ModSupport.defaultValue(),
     /**
      * The description of the mod might be used in GUI or console
      * while downloading the mods, for example
@@ -87,5 +87,11 @@ data class Mod(
 
         @SerialName("unsupported")
         Unsupported,
+
+        ;
+
+        companion object {
+            fun defaultValue() = Required
+        }
     }
 }

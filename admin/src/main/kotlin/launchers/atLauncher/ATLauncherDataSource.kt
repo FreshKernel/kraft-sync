@@ -78,8 +78,8 @@ class ATLauncherDataSource : LauncherDataSource {
 
                         var downloadUrl = modrinthFile?.url
                         var fileIntegrityInfo = modrinthFile?.getFileIntegrityInfo()
-                        val clientSupport = modrinthProject?.clientSide?.toModSupport() ?: Mod.ModSupport.Required
-                        val serverSupport = modrinthProject?.serverSide?.toModSupport() ?: Mod.ModSupport.Required
+                        val clientSupport = modrinthProject?.clientSide?.toModSupport() ?: Mod.ModSupport.defaultValue()
+                        val serverSupport = modrinthProject?.serverSide?.toModSupport() ?: Mod.ModSupport.defaultValue()
                         val name = modrinthProject?.title
                         val description = modrinthProject?.description
 

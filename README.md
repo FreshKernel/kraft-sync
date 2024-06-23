@@ -12,7 +12,7 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
 
 AN **experimental** lightweight & simple and quick script that helps you to sync the content of a **Minecraft Java
-instance**
+instance**.
 
 The script will sync the following:
 
@@ -20,13 +20,11 @@ The script will sync the following:
 2. 🎨 Resource packs (not implemented yet)
 3. ✨ Shader-packs (not implemented yet)
 4. 🌐 Server List (in-game) (not implemented yet)
-5. 🧩 Mods configurations (not implemented yet): we might sync them for the first time because each player might have
-   their
-   own configurations and until now, we have not discovered a way to solve this, unless you want to force all players
-   to have the same mods settings
-6. ⌨️ Keybindings (not implemented yet): we might sync them for the first time because each player might have their
-   own key-binds and until now, we have not discovered a way to solve this, unless you want to force all players
-   to have the same keybindings
+5. 🧩 Mods configurations (not implemented yet): These may be synced initially, since each player can have their own
+   configurations.
+   We have not yet found a solution for this, except by enforcing the same mod settings for all players.
+6. ⌨️ Keybindings (not implemented yet): These may be synced initially, since each player can have their own keybindings.
+   We have not yet found a solution for this, except by enforcing the same keybindings for all players
 
 If you're a player interested in joining a server, **make sure you trust the server administration** on this
 matter—unless you're confident you know what you're doing.
@@ -34,7 +32,7 @@ matter—unless you're confident you know what you're doing.
 ![Screenshot](https://github.com/ellet0/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
 
 The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
-instructions if there is any breaking change in each release
+instructions if there is any breaking change in each release. Some features might not be available yet, or unstable.
 
 **Kraft Sync is not affiliated
 with [Mojang AB](https://mojang.com/), [Microsoft Corporation](https://www.microsoft.com/), or any of their
@@ -55,8 +53,7 @@ subsidiaries.**
 ## 📖 About
 
 Let's say you're running a Minecraft server and every time you add, remove, or update a mod, resource pack, or shader,
-each
-player has to make the changes manually each time you do it or let's say you're changing the server address, the
+each player has to make the changes manually each time you do it or let's say you're changing the server address, the
 players have to manually update it in the game.
 
 It's designed for server owners, yet it can also be effective for mod-pack developers and other use cases.
@@ -71,7 +68,7 @@ info.
 > Kraft Sync
 > <img src="common/src/main/resources/apple.png" height="30px" align="center"/> <br>
 > The meaning of this name:
-> - `K`: will depend on how you look at it, it could be **Keep** which means keep a Minecraft instance synced
+> - `K`: will depend on how you look at it, it could be **Keep**, which means keep a Minecraft instance synced
 > - `Craft` or `Kraft`: Indicating this is specific for Minecraft<br>
 > - `Sync`: Indicating it's for syncing the content/assets/data
 
@@ -88,8 +85,8 @@ List the key features of the script
 - 🖥️ Simple GUI for download indicators and errors for both dark and light with different themes (can be disabled).
 - 🚫 Handles different errors.
 - 🌐 Multiplatform: Works using JVM, which means you don't need different binaries for different desktop platforms.
-- 📦 Relatively small bundle size (compared to how the JVM ecosystem works).
-- ⚙️ Compatibility with Java 11 and newer versions, thanks to Kotlin/JVM allowing us to use most of the recent language
+- 📦 Relatively small bundle size.
+- ⚙️ Compatibility with Java 11 and newer versions
   features.
 - 📜 Completely open-source and documented code.
 - 🔌 No need to restart the game after syncing the data; it will work once you open the game.
@@ -408,7 +405,7 @@ There are some reasons preventing us from providing support to
 7. Bedrock Edition does not support multiple instances, each with its own data and configurations
 8. The modifications are limited to the Bedrock edition, which reduces the necessity for using this script
 
-There may be additional reasons, as discussed above, why using this script is less needed for the Bedrock edition,
+There may be additional reasons, as discussed above, why using this script is less needed for the Bedrock edition;
 the bedrock edition already has something similar
 
 </details>
@@ -484,6 +481,6 @@ Thanks to:
 
 [Admin Utility]: ./admin/README.md
 
-[Mods Info Converter]: ./admin/README.md#mods-info-converter
+[Mods Info Converter]: ./admin/README.md#-mods-info-converter
 
 [Contributing]: ./CONTRIBUTING.md
