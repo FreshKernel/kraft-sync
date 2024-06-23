@@ -81,7 +81,7 @@ List the key features of the script
 ## Features
 
 - 🛠️ Easy to use and customizable.
-- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or completely disable the GUI.
+- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or completely the file integrity validation.
 - 🖥️ Simple GUI for download indicators and errors for both dark and light with different themes (can be disabled).
 - 🚫 Handles different errors.
 - 🌐 Multiplatform: Works using JVM, which means you don't need different binaries for different desktop platforms.
@@ -152,7 +152,7 @@ The easiest way to use the script 🚀:
    For example, for [MultiMC Launcher], it's
    in [here](https://github.com/MultiMC/Launcher/wiki/Instance-settings#custom-commands), the same applies
    the launchers based on it like [Prism Launcher]
-8. Once you find the `Pre-launch command` or something similar, type the following:
+8. Once you find the `Pre-launch command` or something similar, enter the following:
    ```
    $INST_JAVA -jar $INST_MC_DIR/kraft-sync.jar
    ```
@@ -192,7 +192,7 @@ answer.
 
 **List of Questions:**
 
-1. [**Why not sync the mods on the server?**](#q1)
+1. [**Why not use sync mods?**](#q1)
 2. [**Does it sync the Minecraft version, Mod loader, and Java version?**](#q2)
 3. [**Is there a GUI for admins?**](#q3)
 4. [**I have an issue/bug or feature request**](#q4)
@@ -204,13 +204,13 @@ answer.
 **Answers:**
 
 <details>
-<summary id="q1">Why not sync the mods on the server?</summary>
+<summary id="q1">Why not use sync mods?</summary>
 There are some mods that are required to be installed on both the client and server-side
-and it will simply sync the mods when you join a server by downloading the mods from the Minecraft server
-while those mods work great and might require even more effort than this script, depending on your use case,
-you might use them or use this script
+and it will simply sync the mods when you join a server by downloading the mods a Minecraft server.
+while those mods work great, depending on your use case,
+you might use one of those mods or use this script
 
-Some common issues encountered when using Minecraft mods that synchronize other mods include:
+Some common issues encountered when using Minecraft mods that synchronize the mods include:
 
 1. It will require running the HTTP server on a port other than the Minecraft port (e.g., 25565) which can be used by
    attackers to cause performance issues if you haven't implemented Rate Limit (otherwise some users might spam the
@@ -232,7 +232,7 @@ Some common issues encountered when using Minecraft mods that synchronize other 
    the disk and in some rare cases it could cause issues (if the server-side mod causes an exception when running on
    the client side) or it's not marked as a server-side mod
 6. Uploading Minecraft developer mods and downloading them to the players from external sources other than the original
-   might be against the LICENSE
+   might be violating the LICENSE
 7. You might have large client-side mods like [Physics Mod](https://modrinth.com/mod/physicsmod) which might not be
    needed in the server mod
 8. Only work with official Minecraft servers, you might use some other solution to play with your friends

@@ -12,7 +12,7 @@ class AdminMainWindow : BaseJFrame() {
     init {
         title = "${ProjectInfoConstants.DISPLAY_NAME} Admin"
         defaultCloseOperation = EXIT_ON_CLOSE
-        minimumSize = Dimension(450, 290)
+        minimumSize = Dimension(450, 250)
         maximumSize = Dimension(800, 350)
 
         val tabbedPane = JTabbedPane()

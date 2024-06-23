@@ -46,26 +46,20 @@ class ModsConverterTab : Tab() {
         row(
             HtmlTextWithLinks {
                 text("With ")
-                link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE)
+                link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE_URL)
                 text(
-                    " Utility, you can create an instance in your favorite Minecraft launcher, and download the mods you want," +
-                        " then select the launcher and the instance. Then it will convert the metadata/info" +
-                        " of the mods into the script format.",
+                    " Admin, you can create an instance in your favorite Minecraft launcher and download your desired " +
+                        "mods. Simply select the launcher and instance, and the utility will convert " +
+                        "the mods' metadata into script format.",
                 )
                 newLines(2)
-                text("Some launchers like ")
-                link("Prism Launcher", MinecraftLauncher.PrismLauncher.link)
-                text(
-                    " doesn't store the download URL of the mod and it's needed by the script in order to download and " +
-                        "sync the mods. This utility will attempt to send a network request to ",
-                )
-                link("Curse Forge", MinecraftAssetProvider.CurseForge.link)
-                text(
-                    " API with the mods information. Curse Forge needs an API key, we created one to make the process " +
-                        "easier. We recommend using other providers like ",
-                )
+                text("Most launchers do not store the download URLs for mods downloaded from Curse Forge. ")
+                text("The application attempts to retrieve this information by sending a network request to the ")
+                link(labelText = "Curse Forge", linkUrl = MinecraftAssetProvider.CurseForge.link)
+                text(" API. Curse Forge needs an API key, we created one to make the process easier. ")
+                text("For a faster, offline experience with fewer errors and no reliance on network connectivity, ")
+                text("we recommend using alternative providers like ")
                 link("Modrinth", MinecraftAssetProvider.Modrinth.link)
-                text(" to make this process faster, offline with fewer errors, and without using the network.")
             }.padding(10, 10, 10, 10),
             JButton("Convert")
                 .onClick {
@@ -298,16 +292,19 @@ private class ConversionInputDialog(
                                         newLine()
                                         newLine()
 
-                                        text("Do you agree to ")
+                                        boldText("Do you agree to ")
                                         link(
                                             labelText = "Curse Forge API Terms of Service",
                                             linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
                                         )
-                                        text("?")
+                                        boldText("?")
                                         newLine()
                                         text("The link can also be found here:")
                                         newLine()
-                                        text(AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL)
+                                        link(
+                                            labelText = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
+                                            linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
+                                        )
                                     },
                                 parentComponent = this@ConversionInputDialog,
                                 messageType = SwingDialogManager.MessageType.Question,

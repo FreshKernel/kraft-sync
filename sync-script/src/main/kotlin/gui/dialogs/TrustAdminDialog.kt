@@ -20,13 +20,13 @@ object TrustAdminDialog {
                 message =
                     HtmlTextWithLinks {
                         text("It appears this is your first time using ")
-                        link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE)
+                        link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE_URL)
                         text(" from this ")
                         link("source", ScriptConfig.getInstanceOrThrow().syncInfoUrl)
                         newLine()
 
                         text("Although ")
-                        link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.REPOSITORY_LINK)
+                        link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.REPOSITORY_URL)
                         text(" is secure and open-source, be cautious")
                         newLine()
 
@@ -50,7 +50,7 @@ object TrustAdminDialog {
                         text("and the assets can be changed by the administration at anytime.")
                         newLines(2)
 
-                        text("Can we count on your trust in the administration regarding this matter?")
+                        boldText("Can we count on your trust in the administration regarding this matter?")
                     },
                 parentComponent = null,
                 optionType = SwingDialogManager.ConfirmDialogOptionType.YesNo,
