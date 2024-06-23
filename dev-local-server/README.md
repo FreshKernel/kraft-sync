@@ -1,13 +1,11 @@
 # 🛠️ Development Local Server
 
-This module has one task, which is to provide a minimal local server that has a local file that
-will be used for development only.
+This module has one task, which is to provide a minimal local server to host files
+that will be used during development.
 
-Create a file called `file.json` in this module directory, and start the server using:
-
-```./gradlew dev-local-server:run```
-
-> If you're on **Microsoft Windows**, replace `gradlew` with `gradlew.bat`.
-
-If you're using any other way to start the server, change the working directory
-to `dev-local-server/devWorkingDirectory` instead of the root project folder.
+1. Create the file with any name (e.g., `sync-info.json`) in `dev-local-server/devWorkingDirectory` folder
+2. Run using IntelliJ IDEA shared run configurations or change the working directory
+   to `dev-local-server/devWorkingDirectory` instead of the root project folder
+   Create a file called `file.json` in this module directory, if you're running the server in a different way:
+3. You should now be able to send GET request to `http://localhost:8080/sync-info.json`, replace `sync-info.json`
+   with the file path.

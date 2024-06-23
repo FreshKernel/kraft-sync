@@ -8,26 +8,28 @@ import kotlin.concurrent.thread
 fun main() {
     println("📂 Current Directory: ${System.getProperty("user.dir")}")
 
-    val fileName = "file.json"
-    val file = File(fileName)
-    println("ℹ\uFE0F File Path: ${file.absolutePath}")
-
-    if (!file.exists()) {
-        println("❌ The file to host in localhost does not exist: $fileName")
-        return
-    }
-
     val serverPort = System.getenv("PORT")?.toInt() ?: 8080
     val server = HttpServer.create(InetSocketAddress(serverPort), 0)
 
     server.createContext("/") { exchange ->
-        if (exchange.requestMethod.equals("GET", ignoreCase = true)) {
-            val responseText = file.readText()
-            exchange.sendResponseHeaders(200, responseText.toByteArray().size.toLong())
-            val outputStream: OutputStream = exchange.responseBody
-            outputStream.use { it.write(responseText.toByteArray()) }
-        } else {
-            exchange.sendResponseHeaders(405, -1)
+        when {
+            exchange.requestMethod.equals("GET", ignoreCase = true) -> {
+                val path = exchange.requestURI.path
+                val requestedFile = File(path.substring(1))
+
+                if (requestedFile.exists() && requestedFile.isFile) {
+                    val responseText = requestedFile.readText()
+                    exchange.sendResponseHeaders(200, responseText.toByteArray().size.toLong())
+                    val outputStream: OutputStream = exchange.responseBody
+                    outputStream.use { it.write(responseText.toByteArray()) }
+                } else {
+                    exchange.sendResponseHeaders(404, -1)
+                }
+            }
+
+            else -> {
+                exchange.sendResponseHeaders(405, -1)
+            }
         }
     }
 
