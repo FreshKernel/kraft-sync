@@ -48,10 +48,9 @@ data class ScriptConfig(
     val theme: Theme = Theme.Auto,
     /**
      * When the script doesn't successfully finish for some reason or the user closed the script
-     * should we exit with error so the launcher you are using will stop launching the game to indicate there is error
+     * should we exit with error, so the launcher you are using will stop launching the game to indicate there is error
      * or continue and launch it which can result in unexpected behavior or un-synced content or not in a correct way
      * can be fixed by launching the script again
-     * // TODO: Should I move this to the [SyncInfo] or allow to override it from there?
      * */
     val launchOnError: Boolean = Constants.LAUNCH_ON_ERROR_DEFAULT,
     /**

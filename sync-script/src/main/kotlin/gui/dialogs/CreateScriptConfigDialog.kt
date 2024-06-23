@@ -20,9 +20,6 @@ import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JTextField
 
-// TODO: When the user enter incorrect url or doesn't return the expected result, I should handle it to use this dialog again
-// TODO: Allow the user to enter a different url in case if it's not found ot return unexpected/incorrect response
-
 /**
  * Enter only the required data to create the [ScriptConfig] in addition to optional data that will usually be configured
  * by the admin such as [ScriptConfig.environment], the player usually doesn't need to configure it
@@ -68,8 +65,7 @@ class CreateScriptConfigDialog : JDialog() {
                         .apply {
                             Environment.entries.forEach { addItem(it) }
                             selectedItem = Environment.Client
-                        }
-                        .also { environmentComboBox = it },
+                        }.also { environmentComboBox = it },
             ),
             JButton("Continue").onClick {
                 // TODO: Extract all the logic in here to support non GUI mode

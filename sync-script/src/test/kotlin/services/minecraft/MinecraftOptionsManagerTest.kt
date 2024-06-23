@@ -143,16 +143,12 @@ class MinecraftOptionsManagerTest {
     private fun buildPropertyFileEntry(
         property: MinecraftOptionsManager.Property,
         value: String,
-    ): String {
-        return "${property.key}:$value"
-    }
+    ): String = "${property.key}:$value"
 
     private fun buildPropertyFileEntry(
         property: MinecraftOptionsManager.Property,
         list: List<String>,
-    ): String {
-        return buildPropertyFileEntry(property = property, value = Json.encodeToString<List<String>>(list))
-    }
+    ): String = buildPropertyFileEntry(property = property, value = Json.encodeToString<List<String>>(list))
 
     @Test
     fun `setting a property should update the file correctly`() {
@@ -263,5 +259,26 @@ class MinecraftOptionsManagerTest {
         assertTrue(testsOptionsFile.readText().isNotEmpty())
         manager.clear()
         assertTrue(testsOptionsFile.readText().isEmpty())
+    }
+
+    @Test
+    fun `reading or modifying properties before loading the file should throw exception`() {
+        manager.unloadFileForTests()
+        assertThrows<IllegalStateException> {
+            manager.readProperty(property = MinecraftOptionsManager.Property.Lang).getOrThrow()
+        }
+        assertThrows<IllegalStateException> {
+            manager.setProperty(property = MinecraftOptionsManager.Property.Lang, propertyValue = "en").getOrThrow()
+        }
+    }
+
+    @Test
+    fun `reading or modifying properties after loading the file should not throw exception`() {
+        assertDoesNotThrow {
+            manager.setProperty(property = MinecraftOptionsManager.Property.Lang, propertyValue = "en").getOrThrow()
+        }
+        assertDoesNotThrow {
+            manager.readProperty(property = MinecraftOptionsManager.Property.Lang).getOrThrow()
+        }
     }
 }

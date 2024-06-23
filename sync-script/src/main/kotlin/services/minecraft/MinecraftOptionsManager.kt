@@ -13,8 +13,8 @@ import java.io.File
 object MinecraftOptionsManager {
     private var optionsFile = SyncScriptInstanceFiles.Options.file
     private val properties: MutableMap<String, String> = mutableMapOf()
-    // TODO: Might add something like isLoaded, check if false in readProperty and load them
-    // TODO: Currently it's possible to read and write without using loadPropertiesFromFile which might cause unexpected behavior
+
+    private var isLoaded = false
 
     @VisibleForTesting
     fun setOptionsFileForTests(file: File) {
@@ -24,14 +24,27 @@ object MinecraftOptionsManager {
     @VisibleForTesting
     fun getPropertiesForTests(): Map<String, String> = properties
 
+    @VisibleForTesting
+    fun unloadFileForTests() {
+        isLoaded = false
+        clear()
+    }
+
+    private fun throwIfNotLoaded() {
+        if (isLoaded) {
+            return
+        }
+        throw IllegalStateException("The options file should be loaded first before reading or modifying it.")
+    }
+
     /**
      * Load the [properties] from [optionsFile]
      *
      * @throws IllegalArgumentException If [optionsFile] doesn't exist
      * @throws IndexOutOfBoundsException If the text of [optionsFile] is invalid
      * */
-    fun loadPropertiesFromFile(): Result<Unit> {
-        return try {
+    fun loadPropertiesFromFile(): Result<Unit> =
+        try {
             require(optionsFile.exists()) { "The file ${optionsFile.name} doesn't exist in ${optionsFile.path}" }
             if (properties.isNotEmpty()) {
                 properties.clear()
@@ -42,14 +55,16 @@ object MinecraftOptionsManager {
                 val trimmedValue = value.trim()
                 properties[trimmedKey] = trimmedValue
             }
+            isLoaded = true
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 
-    enum class Property(val key: String) {
+    enum class Property(
+        val key: String,
+    ) {
         ResourcePacks("resourcePacks"),
         IncompatibleResourcePacks("incompatibleResourcePacks"),
         Lang("lang"),
@@ -59,8 +74,10 @@ object MinecraftOptionsManager {
      * Should call [loadPropertiesFromFile] before calling this
      * @IllegalArgumentException If the property doesn't exist in [optionsFile]
      * */
-    fun readProperty(property: Property): Result<String> {
-        return try {
+    fun readProperty(property: Property): Result<String> =
+        try {
+            throwIfNotLoaded()
+
             val propertyKey = property.key
             val propertyValue = properties[propertyKey]
             requireNotNull(
@@ -71,7 +88,6 @@ object MinecraftOptionsManager {
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
     private fun readAsList(property: Property): List<String>? {
         val resourcePacksAsString = readProperty(property).getOrNull() ?: return null
@@ -86,8 +102,10 @@ object MinecraftOptionsManager {
     fun setProperty(
         property: Property,
         propertyValue: String,
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> =
+        try {
+            throwIfNotLoaded()
+
             properties[property.key] = propertyValue
 
             optionsFile.bufferedWriter().use { bufferedWriter ->
@@ -99,29 +117,31 @@ object MinecraftOptionsManager {
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
     private fun setPropertyAsList(
         property: Property,
         propertyValue: List<String>,
-    ): Result<Unit> {
-        return setProperty(property, Json.encodeToString<List<String>>(propertyValue))
-    }
+    ): Result<Unit> = setProperty(property, Json.encodeToString<List<String>>(propertyValue))
 
-    sealed class ResourcePack(private val value: String) {
-        data class File(val resourcePackZipFileName: String) : ResourcePack(value = resourcePackZipFileName)
+    sealed class ResourcePack(
+        private val value: String,
+    ) {
+        data class File(
+            val resourcePackZipFileName: String,
+        ) : ResourcePack(value = resourcePackZipFileName)
 
-        data class BuiltIn(val builtInResourcePackName: String) : ResourcePack(value = builtInResourcePackName)
+        data class BuiltIn(
+            val builtInResourcePackName: String,
+        ) : ResourcePack(value = builtInResourcePackName)
 
         /**
          * Return Minecraft specific value of key [Property.ResourcePacks]
          * */
-        fun toValue(): String {
-            return when (this) {
+        fun toValue(): String =
+            when (this) {
                 is BuiltIn -> value
                 is File -> "file/$value"
             }
-        }
 
         override fun toString(): String = toValue()
 
@@ -138,19 +158,26 @@ object MinecraftOptionsManager {
         }
     }
 
-    fun readResourcePacks(): List<ResourcePack>? {
-        return readAsList(Property.ResourcePacks)?.map { ResourcePack.getByValue(it) }
-    }
+    fun readResourcePacks(): List<ResourcePack>? = readAsList(Property.ResourcePacks)?.map { ResourcePack.getByValue(it) }
 
-    fun setResourcePacks(resourcePacks: List<ResourcePack>): Result<Unit> {
-        return setPropertyAsList(Property.ResourcePacks, resourcePacks.map { it.toValue() })
-    }
+    fun setResourcePacks(resourcePacks: List<ResourcePack>): Result<Unit> =
+        setPropertyAsList(
+            Property.ResourcePacks,
+            resourcePacks.map {
+                it.toValue()
+            },
+        )
 
-    fun readIncompatibleResourcePacks(): List<ResourcePack>? {
-        return readAsList(Property.IncompatibleResourcePacks)?.map { ResourcePack.getByValue(it) }
-    }
+    fun readIncompatibleResourcePacks(): List<ResourcePack>? =
+        readAsList(Property.IncompatibleResourcePacks)?.map {
+            ResourcePack.getByValue(it)
+        }
 
-    fun setIncompatibleResourcePacks(resourcePacks: List<ResourcePack>): Result<Unit> {
-        return setPropertyAsList(Property.IncompatibleResourcePacks, resourcePacks.map { it.toValue() })
-    }
+    fun setIncompatibleResourcePacks(resourcePacks: List<ResourcePack>): Result<Unit> =
+        setPropertyAsList(
+            Property.IncompatibleResourcePacks,
+            resourcePacks.map {
+                it.toValue()
+            },
+        )
 }

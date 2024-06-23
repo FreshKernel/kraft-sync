@@ -38,7 +38,6 @@ data class Mod(
     /**
      * The mod name (optional) for now will be only used in the gui, if you don't specify it, then will get
      * the file name from [mod]
-     * // TODO: Might rename this to title
      * */
     val name: String? = null,
     /**

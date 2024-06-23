@@ -2,7 +2,6 @@ package launchers
 
 enum class MinecraftLauncher(
     private val launcherName: String,
-    // TODO: Might move this somewhere else
     val hasModDownloadSupport: Boolean,
     val link: String,
 ) {
