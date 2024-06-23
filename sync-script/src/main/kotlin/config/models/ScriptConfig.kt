@@ -21,19 +21,21 @@ data class ScriptConfig(
      * */
     val syncInfoUrl: String,
     /**
-     * Should we use GUI (for the errors, download indicator etc...)?
-     * By default, will get the value from [Constants.DISABLE_GUI_ARG_NAME]
-     * in the launching options as we might need this before loading the script config
-     * in the [isGuiEnabledOverride] property
-     * can be used to override it and will **only take effect** after loading the [ScriptConfig]
+     * Override the value set using launch arguments, by default,
+     * the script will use [Constants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT] if GUI mode supported.
+     *
+     * If not, then will automatically disable the GUI mode.
+     *
+     * If you want to explicit disable the GUI mode, use [Constants.DISABLE_GUI_ARG_NAME] instead of overriding it
+     * in here because if an error occurred while loading [ScriptConfig] from the file,
+     * we will fall back to use the one from application arguments if set,
+     * if not then will use [Constants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT]
+     * if GUI is supported, otherwise will disable the GUI.
+     *
+     * This will **only take effect** after loading the [ScriptConfig].
      *
      * If you are using [Environment.Server] and the server doesn't support graphical interface
-     * then consider disabling the GUI mode
-     *
-     * TODO: Update the outdated docs once the script handle the disable automatically
-     *
-     * unless you need this, it's better to always it in the java launch arguments, by default gui will be used
-     * pass [Constants.DISABLE_GUI_ARG_NAME] and it should disable the GUI
+     * it should be automatically disabled.
      *
      * */
     val isGuiEnabledOverride: Boolean? = null,
@@ -48,7 +50,7 @@ data class ScriptConfig(
     val theme: Theme = Theme.Auto,
     /**
      * When the script doesn't successfully finish for some reason or the user closed the script
-     * should we exit with error, so the launcher you are using will stop launching the game to indicate there is error
+     * should we exit with error, so the launcher you are using will stop launching the game to indicate there is an error
      * or continue and launch it which can result in unexpected behavior or un-synced content or not in a correct way
      * can be fixed by launching the script again
      * */

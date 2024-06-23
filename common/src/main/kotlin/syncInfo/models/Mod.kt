@@ -7,23 +7,7 @@ import kotlinx.serialization.Serializable
 // data from other launchers data format if possible
 
 /**
- * The mod data, we initially wanted to use **sealed class** to use different providers:
- *
- * ```kotlin
- * sealed class Mod {
- *     data class Custom(val downloadUrl: String): ModProvider()
- *     data class CurseForge(val modId :String, val fileId: String): ModProvider()
- *     data class Modrinth(val modId: String, val fileId: String): ModProvider()
- * }
- * ```
- *
- * except then we have to send http requests for each mod based on the provider api,
- * and there might not be a support for a route for getting
- * all the mod download urls by mod ids.
- * It's requiring more time to run the script before launching the game
- *
- * And the api for some asset providers can be strict and require an API key
- *
+ * The mod info that will be used by the script to download and validate it
  * */
 @Serializable
 data class Mod(
@@ -74,7 +58,7 @@ data class Mod(
      *
      * @see SyncInfo.shouldVerifyModFilesIntegrity for more details.
      * */
-    val overrideShouldVerifyFileIntegrity: Boolean? = null,
+    val shouldVerifyFileIntegrityOverride: Boolean? = null,
 ) {
     @Serializable
     enum class ModSupport {

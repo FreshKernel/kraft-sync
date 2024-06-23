@@ -11,9 +11,7 @@ import kotlin.system.exitProcess
  * will use the [Mod.name] which is the mod display name / title
  * will use [getFileNameFromUrlOrError] as an alternative if it's not available
  * */
-fun Mod.getDisplayName(): String {
-    return name ?: getFileNameFromUrlOrError(downloadUrl)
-}
+fun Mod.getDisplayName(): String = name ?: getFileNameFromUrlOrError(downloadUrl)
 
 /**
  * If this mod should be downloaded on the current [Environment].
@@ -42,13 +40,12 @@ fun Mod.shouldSyncOnCurrentEnvironment(): Boolean {
 /**
  * Allow overriding the value for a specific mod, or all the mods, or use a global value for all the assets.
  * */
-fun Mod.shouldVerifyFileIntegrity(): Boolean {
-    return overrideShouldVerifyFileIntegrity ?: SyncInfo.instance.shouldVerifyModFilesIntegrity
+fun Mod.shouldVerifyFileIntegrity(): Boolean =
+    shouldVerifyFileIntegrityOverride ?: SyncInfo.instance.shouldVerifyModFilesIntegrity
         ?: SyncInfo.instance.shouldVerifyAssetFilesIntegrity
-}
 
-suspend fun Mod.hasValidFileIntegrityOrError(modFile: File): Boolean? {
-    return this.fileIntegrityInfo.hasValidIntegrity(file = modFile).getOrElse {
+suspend fun Mod.hasValidFileIntegrityOrError(modFile: File): Boolean? =
+    this.fileIntegrityInfo.hasValidIntegrity(file = modFile).getOrElse {
         showErrorMessageAndTerminate(
             title = "File Integrity Validation Error ⚠️",
             message = "An error occurred while validating the integrity of the mod file (${modFile.name}) \uD83D\uDCC1.",
@@ -56,4 +53,3 @@ suspend fun Mod.hasValidFileIntegrityOrError(modFile: File): Boolean? {
         // This will never reach due to the previous statement stopping the application
         exitProcess(0)
     }
-}
