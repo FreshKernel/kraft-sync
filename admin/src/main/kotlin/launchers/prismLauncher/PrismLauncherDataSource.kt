@@ -52,7 +52,7 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    override suspend fun isValidInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
         try {
             getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             Result.success(Unit)

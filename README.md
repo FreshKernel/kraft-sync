@@ -6,8 +6,8 @@
 ![Build and test](https://github.com/ellet0/kraft-sync/actions/workflows/build.yml/badge.svg?branch=main)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ellet0/kraft-sync)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ellet0/kraft-sync)
-![JAR Size](https://img.shields.io/badge/JAR_Size-4.56_MB-blue)
-![Minimized JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.53_MB-blue)
+![JAR Size](https://img.shields.io/badge/JAR_Size-4.57_MB-blue)
+![Minimized JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.54_MB-blue)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ellet0/kraft-sync/total)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
 
@@ -81,7 +81,7 @@ List the key features of the script
 ## Features
 
 - 🛠️ Easy to use and customizable.
-- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or completely the file integrity validation.
+- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or disable the file integrity validation.
 - 🖥️ Simple GUI for download indicators and errors for both dark and light with different themes (can be disabled).
 - 🚫 Handles different errors.
 - 🌐 Multiplatform: Works using JVM, which means you don't need different binaries for different desktop platforms.
@@ -393,7 +393,7 @@ There are some reasons preventing us from providing support to
 2. Lack of asset provider support for the Bedrock edition
 3. The bedrock edition already has a way to sync the resource packs and behavior packs to all the players; it's much
    easier, all you have to enter the IP address join as a player, and click continue
-4. Require refactoring almost all the logic and abstracting it to different editions of Minecraft
+4. Requires refactoring almost all the logic and abstracting it to different editions of Minecraft
 5. It will require Java JRE installed on the machine since the script now will use JVM as Minecraft Java already needs
    it installed on the launcher/system, the script will use the same Java installation to run, if players are only
    interested in playing a Minecraft Bedrock edition, installing Java on the system might not be preferred,

@@ -23,7 +23,7 @@ class ModrinthLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun isValidInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
         try {
             getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             Result.success(Unit)

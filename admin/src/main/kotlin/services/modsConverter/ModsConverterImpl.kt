@@ -33,7 +33,8 @@ class ModsConverterImpl : ModsConverter {
             }
             val launcherDataSource: LauncherDataSource = LauncherDataSourceFactory.getHandler(selectedLauncher)
 
-            launcherDataSource.isValidInstanceDirectory(launcherInstanceDirectory = launcherInstanceDirectory)
+            launcherDataSource
+                .validateInstanceDirectory(launcherInstanceDirectory = launcherInstanceDirectory)
                 .getOrElse {
                     return ModsConvertResult.Failure(
                         error =
@@ -60,18 +61,19 @@ class ModsConverterImpl : ModsConverter {
                 return ModsConvertResult.NeedToAcceptCurseForgeForStudiosTermsOfUse
             }
             val mods =
-                launcherDataSource.getMods(
-                    launcherInstanceDirectory = launcherInstanceDirectory,
-                    overrideCurseForgeApiKey = overrideCurseForgeApiKey?.ifBlank { null },
-                ).getOrElse {
-                    return ModsConvertResult.Failure(
-                        error =
-                            ModsConvertError.CouldNotConvertMods(
-                                message = it.message.toString(),
-                                exception = it,
-                            ),
-                    )
-                }
+                launcherDataSource
+                    .getMods(
+                        launcherInstanceDirectory = launcherInstanceDirectory,
+                        overrideCurseForgeApiKey = overrideCurseForgeApiKey?.ifBlank { null },
+                    ).getOrElse {
+                        return ModsConvertResult.Failure(
+                            error =
+                                ModsConvertError.CouldNotConvertMods(
+                                    message = it.message.toString(),
+                                    exception = it,
+                                ),
+                        )
+                    }
 
             if (mods.isEmpty()) {
                 return ModsConvertResult.Failure(error = ModsConvertError.ModsUnavailable)

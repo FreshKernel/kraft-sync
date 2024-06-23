@@ -11,13 +11,12 @@ import java.io.File
 interface LauncherDataSource {
     /**
      * Check if the provided path is valid and contain valid expected data
-     * it doesn't return a boolean as the name indicates, instead it will return [Result.failure]
+     * it doesn't return a [Boolean], instead it will return [Result.failure]
      * it will attempt to parse the data and find it, if anything goes wrong, it will return [Result.failure]
      * with an exception.
      * @return [Result.success] if valid, otherwise [Result.failure]
-     * TODO: Might refactor this to return boolean and validate instead or trying to parse, also update implementations and usages
      * */
-    suspend fun isValidInstanceDirectory(launcherInstanceDirectory: File): Result<Unit>
+    suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit>
 
     /**
      * If an HTTP get request is needed to convert all the mods, this will be true if

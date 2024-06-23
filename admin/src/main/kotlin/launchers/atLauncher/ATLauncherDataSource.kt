@@ -36,7 +36,7 @@ class ATLauncherDataSource : LauncherDataSource {
         instance.launcher.mods
             .filter { it.type == ATLauncherInstance.Launcher.Mod.Type.Mods }
 
-    override suspend fun isValidInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
         try {
             getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             Result.success(Unit)
