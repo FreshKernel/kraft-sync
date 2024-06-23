@@ -23,7 +23,8 @@ The script will sync the following:
 5. 🧩 Mods configurations (not implemented yet): These may be synced initially, since each player can have their own
    configurations.
    We have not yet found a solution for this, except by enforcing the same mod settings for all players.
-6. ⌨️ Keybindings (not implemented yet): These may be synced initially, since each player can have their own keybindings.
+6. ⌨️ Keybindings (not implemented yet): These may be synced initially, since each player can have their own
+   keybindings.
    We have not yet found a solution for this, except by enforcing the same keybindings for all players
 
 If you're a player interested in joining a server, **make sure you trust the server administration** on this
@@ -207,8 +208,9 @@ answer.
 <summary id="q1">Why not use sync mods?</summary>
 There are some mods that are required to be installed on both the client and server-side
 and it will simply sync the mods when you join a server by downloading the mods a Minecraft server.
-while those mods work great, depending on your use case,
-you might use one of those mods or use this script
+
+While those mods work great, depending on your use case,
+you might use one of those mods or use this script.
 
 Some common issues encountered when using Minecraft mods that synchronize the mods include:
 
