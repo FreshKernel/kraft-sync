@@ -35,7 +35,7 @@ class ModrinthLauncherDataSource : LauncherDataSource {
 
     override suspend fun getMods(
         launcherInstanceDirectory: File,
-        overrideCurseForgeApiKey: String?,
+        curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()

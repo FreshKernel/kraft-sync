@@ -65,7 +65,7 @@ class ATLauncherDataSource : LauncherDataSource {
 
     override suspend fun getMods(
         launcherInstanceDirectory: File,
-        overrideCurseForgeApiKey: String?,
+        curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
@@ -92,7 +92,7 @@ class ATLauncherDataSource : LauncherDataSource {
                                     .getModFile(
                                         modId = atLauncherMod.curseForgeProjectId.toString(),
                                         fileId = atLauncherMod.curseForgeFileId.toString(),
-                                        overrideApiKey = overrideCurseForgeApiKey,
+                                        overrideApiKey = curseForgeApiKeyOverride,
                                     ).getOrThrow()
                             downloadUrl = curseForgeModFile.data.downloadUrl
                             fileIntegrityInfo = curseForgeModFile.data.getFileIntegrityInfo()

@@ -188,7 +188,7 @@ private class ConversionInputDialog(
             ),
             JButton("Continue").onClick {
                 convertMods(
-                    overrideCurseForgeApiKey = null,
+                    curseForgeApiKeyOverride = null,
                     isCurseForgeForStudiosTermsOfServiceAccepted = false,
                 )
             },
@@ -198,7 +198,7 @@ private class ConversionInputDialog(
     }
 
     private fun convertMods(
-        overrideCurseForgeApiKey: String?,
+        curseForgeApiKeyOverride: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ) {
         coroutineScope.launch {
@@ -208,7 +208,7 @@ private class ConversionInputDialog(
                     launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
                     convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
                     prettyFormat = prettyFormatCheckBox.isSelected,
-                    overrideCurseForgeApiKey = overrideCurseForgeApiKey,
+                    curseForgeApiKeyOverride = curseForgeApiKeyOverride,
                     isCurseForgeForStudiosTermsOfServiceAccepted = isCurseForgeForStudiosTermsOfServiceAccepted,
                 )
             when (result) {
@@ -330,7 +330,7 @@ private class ConversionInputDialog(
                         return@launch
                     }
                     convertMods(
-                        overrideCurseForgeApiKey = userCurseForgeApiKey,
+                        curseForgeApiKeyOverride = userCurseForgeApiKey,
                         isCurseForgeForStudiosTermsOfServiceAccepted = true,
                     )
                 }

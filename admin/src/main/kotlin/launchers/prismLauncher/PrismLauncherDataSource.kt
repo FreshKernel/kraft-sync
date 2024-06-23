@@ -79,7 +79,7 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     override suspend fun getMods(
         launcherInstanceDirectory: File,
-        overrideCurseForgeApiKey: String?,
+        curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>> =
         try {
             // TODO: use File.exist(), check of File.exist() might need to be shared to avoid duplications
@@ -108,7 +108,7 @@ class PrismLauncherDataSource : LauncherDataSource {
                                     modId =
                                         prismLauncherModMetadata.update.curseForge.projectId
                                             .toString(),
-                                    overrideApiKey = overrideCurseForgeApiKey,
+                                    overrideApiKey = curseForgeApiKeyOverride,
                                 ).getOrThrow()
                                 .data
                     }
