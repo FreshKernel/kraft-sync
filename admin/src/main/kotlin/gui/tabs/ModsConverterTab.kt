@@ -239,6 +239,14 @@ private class ConversionInputDialog(
                             )
                         }
 
+                        is ModsConvertError.ModsAvailabilityCheckError -> {
+                            GuiUtils.showErrorMessage(
+                                title = "❌ Mods availability check error",
+                                message = "An error occurred while checking if the instance has mods: ${result.error.message}️",
+                                parentComponent = this@ConversionInputDialog,
+                            )
+                        }
+
                         is ModsConvertError.CouldNotConvertMods -> {
                             GuiUtils.showErrorMessage(
                                 title = "❌ Error Converting Mods",
@@ -247,11 +255,16 @@ private class ConversionInputDialog(
                             )
                         }
 
-                        ModsConvertError.ModsUnavailable -> {
+                        is ModsConvertError.ModsUnavailable -> {
                             GuiUtils.showErrorMessage(
                                 title = "Mods Data Unavailable",
                                 message =
-                                    "The mods' info couldn't be found. Double check to see if you have some mods installed" +
+                                    if (result.error.happenedWhileConvertingMods) {
+                                        "Could not find the mods' info while converting the mods"
+                                    } else {
+                                        "The mods' info couldn't be found"
+                                    } +
+                                        ". Double-check to see if you have some mods installed" +
                                         " on the selected instance.",
                                 parentComponent = this@ConversionInputDialog,
                             )

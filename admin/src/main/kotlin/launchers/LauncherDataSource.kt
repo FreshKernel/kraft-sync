@@ -7,10 +7,12 @@ import java.io.File
 /**
  * An interface that abstract dealing with the launcher data, like converting mods from the launcher data format
  * into the script data format
+ * // TODO: Might rename this to InstanceLauncherDataSource or something
+ *     similar as it's specific to the instance data
  * */
 interface LauncherDataSource {
     /**
-     * Check if the provided path is valid and contain valid expected data
+     * Check if the provided path is valid and contain expected common folders and files
      * it doesn't return a [Boolean], instead it will return [Result.failure]
      * it will attempt to parse the data and find it, if anything goes wrong, it will return [Result.failure]
      * with an exception.
@@ -25,8 +27,14 @@ interface LauncherDataSource {
      * like [MinecraftAssetProvider.Modrinth]
      * 3. Other reasons that are specific to the launcher implementation, if the download url or related info wasn't available
      * for some reason and a request to Curse Forge API is needed to get the info, this should return true
+     * // TODO: Might refactor this function name as it's not very specific after recent changes
      * */
     suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean>
+
+    /**
+     * Check if the instance has mods installed (not empty).
+     * */
+    suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean>
 
     /**
      * @return A list of [Mod] which contains the information about the mod, converting it from the specified launcher

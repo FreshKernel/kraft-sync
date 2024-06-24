@@ -1,7 +1,6 @@
 package launchers.atLauncher
 
 import curseForgeDataSource
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -22,13 +21,13 @@ class ATLauncherDataSource : LauncherDataSource {
         const val INSTANCE_FILE_NAME = "instance.json"
     }
 
-    private fun getInstanceFile(launcherInstanceDirectory: File): File =
+    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File =
         Paths.get(launcherInstanceDirectory.path, INSTANCE_FILE_NAME).toFile()
 
     private fun getInstance(launcherInstanceDirectory: File): Result<ATLauncherInstance> {
         return try {
-            val instanceFile = getInstanceFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            val atLauncherInstance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceFile.readText())
+            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            val atLauncherInstance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceConfigFile.readText())
             return Result.success(atLauncherInstance)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -46,14 +45,21 @@ class ATLauncherDataSource : LauncherDataSource {
         instance.launcher.mods
             .filter { it.type == ATLauncherInstance.Launcher.Mod.Type.Mods }
 
-    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
-        try {
-            getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
+        return try {
+            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            if (!instanceConfigFile.exists()) {
+                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
+            }
+            if (!instanceConfigFile.isFile) {
+                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }
+    }
 
     private fun isCurseForgeApiRequestNeededForMod(atLauncherMod: ATLauncherInstance.Launcher.Mod): Boolean {
         val modrinthFile = atLauncherMod.modrinthVersion?.files?.firstOrNull()
@@ -70,6 +76,17 @@ class ATLauncherDataSource : LauncherDataSource {
             Result.success(isCurseForgeApiRequestNeeded)
         } catch (e: Exception) {
             e.printStackTrace()
+            Result.failure(e)
+        }
+
+    override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> =
+        try {
+            val atLauncherMods =
+                getATLauncherMods(
+                    instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow(),
+                )
+            Result.success(atLauncherMods.isNotEmpty())
+        } catch (e: Exception) {
             Result.failure(e)
         }
 
@@ -138,9 +155,9 @@ class ATLauncherDataSource : LauncherDataSource {
         launcherInstanceDirectory: File,
     ): Result<Unit> =
         try {
-            val instanceFile = getInstanceFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
 
-            val instanceJsonObject: JsonObject = Json.parseToJsonElement(instanceFile.readText()).jsonObject
+            val instanceJsonObject: JsonObject = Json.parseToJsonElement(instanceConfigFile.readText()).jsonObject
 
             val launcherJsonKey = ATLauncherInstance::launcher.name
             val preLaunchCommandJsonKey = ATLauncherInstance.Launcher::preLaunchCommand.name
@@ -172,7 +189,7 @@ class ATLauncherDataSource : LauncherDataSource {
                         this[launcherJsonKey] = updatedLauncher
                     }.let { JsonObject(it) }
 
-            instanceFile.writeText(
+            instanceConfigFile.writeText(
                 text =
                     JsonPrettyPrint.encodeToString(
                         JsonObject.serializer(),

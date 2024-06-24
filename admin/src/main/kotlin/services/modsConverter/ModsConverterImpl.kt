@@ -45,6 +45,26 @@ class ModsConverterImpl : ModsConverter {
                     )
                 }
 
+            val hasMods =
+                launcherDataSource.hasMods(launcherInstanceDirectory = launcherInstanceDirectory).getOrElse {
+                    return ModsConvertResult.Failure(
+                        error =
+                            ModsConvertError.ModsAvailabilityCheckError(
+                                message = it.message.toString(),
+                                exception = it,
+                            ),
+                    )
+                }
+
+            if (!hasMods) {
+                return ModsConvertResult.Failure(
+                    error =
+                        ModsConvertError.ModsUnavailable(
+                            happenedWhileConvertingMods = false,
+                        ),
+                )
+            }
+
             val isCurseForgeApiRequestNeeded =
                 launcherDataSource
                     .isCurseForgeApiRequestNeeded(launcherInstanceDirectory)
@@ -76,7 +96,12 @@ class ModsConverterImpl : ModsConverter {
                     }
 
             if (mods.isEmpty()) {
-                return ModsConvertResult.Failure(error = ModsConvertError.ModsUnavailable)
+                return ModsConvertResult.Failure(
+                    error =
+                        ModsConvertError.ModsUnavailable(
+                            happenedWhileConvertingMods = false,
+                        ),
+                )
             }
 
             val json = if (prettyFormat) JsonPrettyPrint else Json

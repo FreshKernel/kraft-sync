@@ -201,7 +201,7 @@ class SyncScriptInstallerTab : Tab() {
                 SyncScriptInstallationResult.Success -> {
                     SwingDialogManager.showMessageDialog(
                         title = "Success",
-                        message = "The task has been successfully finished.",
+                        message = "You can launch the the game using the provided instance/profile.",
                         parentComponent = this@SyncScriptInstallerTab,
                     )
                 }

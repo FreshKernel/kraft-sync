@@ -15,12 +15,19 @@ sealed class ModsConvertError {
         val exception: Throwable,
     ) : ModsConvertError()
 
+    data class ModsAvailabilityCheckError(
+        val message: String,
+        val exception: Throwable,
+    ) : ModsConvertError()
+
     data class CouldNotConvertMods(
         val message: String,
         val exception: Throwable,
     ) : ModsConvertError()
 
-    data object ModsUnavailable : ModsConvertError()
+    data class ModsUnavailable(
+        val happenedWhileConvertingMods: Boolean,
+    ) : ModsConvertError()
 
     data class UnknownError(
         val message: String,

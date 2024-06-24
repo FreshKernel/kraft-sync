@@ -32,7 +32,26 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    private fun getInstanceFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
+    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
+
+    // TODO(outdated): Broken, decode which directory should we choose, either .minecraft or prism launcher root folder,
+    //  also this only work for mods, doesn't work if we want the directory to install sync script
+    //  might refactor this function to return true or false to validate the folders in it instead
+    //  for all implementations or maybe for this only, also might avoid to read twice by using the error that will be thrown,
+    //  see how this affect the validation and the message
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
+        val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+        if (!instanceConfigFile.exists()) {
+            return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
+        }
+        if (!instanceConfigFile.isFile) {
+            return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+        }
+        return Result.success(Unit)
+    }
+
+    private fun isCurseForgeApiRequestNeededForMod(prismLauncherModMetadata: PrismLauncherModMetadata): Boolean =
+        prismLauncherModMetadata.download.url.isBlank() && prismLauncherModMetadata.update.curseForge != null
 
     private fun getModsMetaDataFolder(launcherInstanceDirectory: File): File =
         File(
@@ -64,22 +83,6 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    // TODO: Broken, decode which directory should we choose, either .minecraft or prism launcher root folder,
-    //  also this only work for mods, doesn't work if we want the directory to install sync script
-    //  might refactor this function to return true or false to validate the folders in it instead
-    //  for all implementations or maybe for this only, also might avoid to read twice by using the error that will be thrown
-    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> =
-        try {
-            getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
-        }
-
-    private fun isCurseForgeApiRequestNeededForMod(prismLauncherModMetadata: PrismLauncherModMetadata): Boolean =
-        prismLauncherModMetadata.download.url.isBlank() && prismLauncherModMetadata.update.curseForge != null
-
     override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> =
         try {
             val prismLauncherModsMetadata =
@@ -92,6 +95,28 @@ class PrismLauncherDataSource : LauncherDataSource {
         } catch (e: Exception) {
             Result.failure(e)
         }
+
+    override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> {
+        return try {
+            val modsMetaDataFolder =
+                getModsMetaDataFolder(
+                    launcherInstanceDirectory = launcherInstanceDirectory,
+                )
+            if (!modsMetaDataFolder.exists()) {
+                return Result.success(false)
+            }
+            if (!modsMetaDataFolder.isDirectory) {
+                return Result.failure(
+                    IllegalArgumentException("The file (${modsMetaDataFolder.absolutePath} should be a folder/directory."),
+                )
+            }
+            val prismLauncherModsMetadata =
+                getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            Result.success(prismLauncherModsMetadata.isNotEmpty())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun getMods(
         launcherInstanceDirectory: File,
@@ -150,7 +175,7 @@ class PrismLauncherDataSource : LauncherDataSource {
             val preLaunchCommand =
                 readInstanceProperty(
                     propertyKey = PropertyKey.PRE_LAUNCH_COMMAND,
-                    instanceFileLines = getInstanceFile(launcherInstanceDirectory = launcherInstanceDirectory).readLines(),
+                    instanceFileLines = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory).readLines(),
                 )
             return Result.success(preLaunchCommand)
         } catch (e: Exception) {
@@ -213,30 +238,30 @@ class PrismLauncherDataSource : LauncherDataSource {
     ): Result<Unit> =
         try {
             // Manually update the file instead of Properties
-            val instanceFile = getInstanceFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            val instanceFileLines = instanceFile.readLines().toMutableList()
+            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            val instanceConfigFileLines = instanceConfigFile.readLines().toMutableList()
 
             setInstancePropertyInGeneralSection(
                 propertyKey = PropertyKey.PRE_LAUNCH_COMMAND,
                 propertyValue = command,
-                instanceFileLines = instanceFileLines,
+                instanceFileLines = instanceConfigFileLines,
             )
             if (command != null) {
                 setInstancePropertyInGeneralSection(
                     propertyKey = PropertyKey.OVERRIDE_COMMANDS,
                     propertyValue = "true",
-                    instanceFileLines = instanceFileLines,
+                    instanceFileLines = instanceConfigFileLines,
                 )
             } else {
                 val postExistCommand =
                     readInstanceProperty(
                         propertyKey = PropertyKey.POT_EXIT_COMMAND,
-                        instanceFileLines = instanceFileLines,
+                        instanceFileLines = instanceConfigFileLines,
                     )
                 val wrapperCommand =
                     readInstanceProperty(
                         propertyKey = PropertyKey.WRAPPER_COMMAND,
-                        instanceFileLines = instanceFileLines,
+                        instanceFileLines = instanceConfigFileLines,
                     )
                 // The user might use other commands like post-exit command,
                 // make sure we don't touch this key if they are used
@@ -246,12 +271,12 @@ class PrismLauncherDataSource : LauncherDataSource {
                     setInstancePropertyInGeneralSection(
                         propertyKey = PropertyKey.OVERRIDE_COMMANDS,
                         propertyValue = null,
-                        instanceFileLines = instanceFileLines,
+                        instanceFileLines = instanceConfigFileLines,
                     )
                 }
             }
 
-            instanceFile.writeText(text = instanceFileLines.joinToString("\n"))
+            instanceConfigFile.writeText(text = instanceConfigFileLines.joinToString("\n"))
 
             Result.success(Unit)
         } catch (e: Exception) {
