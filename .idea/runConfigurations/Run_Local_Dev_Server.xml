@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Local Dev Server" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="MainKt" />
+    <module name="kraft-sync.dev-local-server.main" />
+    <shortenClasspath name="NONE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/dev-local-server/devWorkingDirectory" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
