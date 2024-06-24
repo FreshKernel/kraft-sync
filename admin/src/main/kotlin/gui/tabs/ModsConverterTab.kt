@@ -5,6 +5,7 @@ import constants.ProjectInfoConstants
 import gui.Tab
 import gui.components.HintTextField
 import gui.components.HtmlTextWithLinks
+import gui.components.filePicker
 import gui.components.labeledInputPanel
 import gui.utils.GuiUtils
 import gui.utils.SwingDialogManager
@@ -98,15 +99,15 @@ private class ConversionInputDialog(
         private const val PREFERRED_LABEL_WIDTH = 140
     }
 
-    private fun getContent(): JComponent {
-        return column(
+    private fun getContent(): JComponent =
+        column(
             labeledInputPanel(
                 labelText = "Launcher",
                 tooltipText = "The Minecraft launcher to convert the info from.",
                 inputComponent =
                     JComboBox<MinecraftLauncher>()
                         .apply {
-                            MinecraftLauncher.entriesWithModDownloadSupport().forEach { addItem(it) }
+                            MinecraftLauncher.entriesWithBuiltInModDownloadSupport().forEach { addItem(it) }
                         }.also { launcherComboBox = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
@@ -114,32 +115,22 @@ private class ConversionInputDialog(
                 labelText = "Instance directory",
                 tooltipText = "The Minecraft instance directory that has the mods folder inside it.",
                 inputComponent =
-                    row(
-                        HintTextField(hintText = "Path").also { launcherInstanceDirectoryTextField = it },
-                        JButton("Browse").onClick {
-                            val instanceDirectoryChooser = JFileChooser()
-                            instanceDirectoryChooser.dialogTitle = "Choose the instance directory"
-                            instanceDirectoryChooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-
-                            val result = instanceDirectoryChooser.showOpenDialog(this)
-                            when (result) {
-                                JFileChooser.CANCEL_OPTION -> {
-                                    return@onClick
-                                }
-
-                                JFileChooser.ERROR_OPTION -> {
-                                    GuiUtils.showErrorMessage(
-                                        title = "Unexpected Error",
-                                        message = "An error occurred while trying to pick the launcher instance directory.",
-                                        parentComponent = this@ConversionInputDialog,
-                                    )
-                                }
-                            }
-
-                            val launcherInstanceDirectory =
-                                instanceDirectoryChooser.selectedFile
-
-                            launcherInstanceDirectoryTextField.text = launcherInstanceDirectory.path
+                    filePicker(
+                        filePathTextField =
+                            HintTextField(hintText = "Path").also {
+                                launcherInstanceDirectoryTextField = it
+                            },
+                        fileChooser =
+                            JFileChooser().apply {
+                                dialogTitle = "Choose the instance directory"
+                                fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+                            },
+                        onErrorWhileChoosingFile = {
+                            GuiUtils.showErrorMessage(
+                                title = "Unexpected Error",
+                                message = "An error occurred while trying to pick the launcher instance directory.",
+                                parentComponent = this@ConversionInputDialog,
+                            )
                         },
                     ),
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
@@ -195,7 +186,6 @@ private class ConversionInputDialog(
         ) {
             padding(10, 10, 10, 10)
         }
-    }
 
     private fun convertMods(
         curseForgeApiKeyOverride: String?,
@@ -204,7 +194,7 @@ private class ConversionInputDialog(
         coroutineScope.launch {
             val result =
                 ModsConverterInstance.convertMods(
-                    selectedLauncher = launcherComboBox.getSelectedItemOrThrow(),
+                    launcher = launcherComboBox.getSelectedItemOrThrow(),
                     launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
                     convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
                     prettyFormat = prettyFormatCheckBox.isSelected,
@@ -214,7 +204,7 @@ private class ConversionInputDialog(
             when (result) {
                 is ModsConvertResult.Failure -> {
                     when (result.error) {
-                        ModsConvertError.EmptyLauncherInstanceDirectory -> {
+                        ModsConvertError.EmptyLauncherInstanceDirectoryPath -> {
                             GuiUtils.showErrorMessage(
                                 title = "🚫 Empty Directory Path",
                                 message = "The instance directory path is needed to proceed.",
@@ -277,7 +267,7 @@ private class ConversionInputDialog(
                     }
                 }
 
-                ModsConvertResult.NeedToAcceptCurseForgeForStudiosTermsOfUse -> {
+                ModsConvertResult.RequiresAcceptanceOfCurseForgeForStudiosTermsOfUse -> {
                     val hasUserAcceptedCurseForgeForStudiosTermsOfUse =
                         SwingDialogManager
                             .showConfirmDialog(

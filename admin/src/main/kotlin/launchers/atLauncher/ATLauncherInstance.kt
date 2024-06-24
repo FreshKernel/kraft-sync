@@ -15,6 +15,10 @@ data class ATLauncherInstance(
     @Serializable
     data class Launcher(
         val mods: List<Mod>,
+        val enableCommands: Boolean = false,
+        val preLaunchCommand: String? = null,
+        val postExitCommand: String? = null,
+        val wrapperCommand: String? = null,
     ) {
         /**
          * ATLauncher identify the resource-packs, shaders, JAR mods and others as a mods

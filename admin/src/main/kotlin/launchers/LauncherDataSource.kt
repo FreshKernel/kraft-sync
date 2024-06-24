@@ -36,4 +36,25 @@ interface LauncherDataSource {
         launcherInstanceDirectory: File,
         curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>>
+
+    /**
+     * Get the Pre Launch command that is set in the instance settings to configure a command to run
+     * before launching the game.
+     *
+     * @return Null if it's not set
+     * */
+    suspend fun getPreLaunchCommand(launcherInstanceDirectory: File): Result<String?>
+
+    /**
+     * Update the Pre Launch command.
+     *
+     * Will also enable the commands/hooks if [command] is not null, otherwise will disable it only if
+     * the user doesn't use other commands/hooks
+     *
+     * @param command The command to set, pass null to disable or delete it.
+     * */
+    suspend fun setPreLaunchCommand(
+        command: String?,
+        launcherInstanceDirectory: File,
+    ): Result<Unit>
 }

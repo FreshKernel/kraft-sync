@@ -6,10 +6,10 @@ import syncInfo.models.Mod
 
 interface ModsConverter {
     /**
-     * Convert the mods from [selectedLauncher] into the project format [Mod]
+     * Convert the mods from [launcher] into the project format [Mod]
      * */
     suspend fun convertMods(
-        selectedLauncher: MinecraftLauncher,
+        launcher: MinecraftLauncher,
         launcherInstanceDirectoryPath: String,
         convertMode: ModsConvertMode,
         prettyFormat: Boolean,

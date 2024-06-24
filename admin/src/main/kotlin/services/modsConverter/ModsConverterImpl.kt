@@ -12,7 +12,7 @@ import java.io.File
 
 class ModsConverterImpl : ModsConverter {
     override suspend fun convertMods(
-        selectedLauncher: MinecraftLauncher,
+        launcher: MinecraftLauncher,
         launcherInstanceDirectoryPath: String,
         convertMode: ModsConvertMode,
         prettyFormat: Boolean,
@@ -22,7 +22,7 @@ class ModsConverterImpl : ModsConverter {
         return try {
             if (launcherInstanceDirectoryPath.isBlank()) {
                 return ModsConvertResult.Failure(
-                    error = ModsConvertError.EmptyLauncherInstanceDirectory,
+                    error = ModsConvertError.EmptyLauncherInstanceDirectoryPath,
                 )
             }
             val launcherInstanceDirectory = File(launcherInstanceDirectoryPath)
@@ -31,7 +31,7 @@ class ModsConverterImpl : ModsConverter {
                     error = ModsConvertError.LauncherInstanceDirectoryNotFound,
                 )
             }
-            val launcherDataSource: LauncherDataSource = LauncherDataSourceFactory.getHandler(selectedLauncher)
+            val launcherDataSource: LauncherDataSource = LauncherDataSourceFactory.getHandler(launcher)
 
             launcherDataSource
                 .validateInstanceDirectory(launcherInstanceDirectory = launcherInstanceDirectory)
@@ -58,7 +58,7 @@ class ModsConverterImpl : ModsConverter {
                         )
                     }
             if (isCurseForgeApiRequestNeeded && !isCurseForgeForStudiosTermsOfServiceAccepted) {
-                return ModsConvertResult.NeedToAcceptCurseForgeForStudiosTermsOfUse
+                return ModsConvertResult.RequiresAcceptanceOfCurseForgeForStudiosTermsOfUse
             }
             val mods =
                 launcherDataSource

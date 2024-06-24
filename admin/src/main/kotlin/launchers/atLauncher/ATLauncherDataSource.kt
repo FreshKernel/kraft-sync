@@ -1,9 +1,16 @@
 package launchers.atLauncher
 
 import curseForgeDataSource
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
 import launchers.LauncherDataSource
 import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
+import utils.JsonPrettyPrint
 import java.io.File
 import java.nio.file.Paths
 
@@ -15,9 +22,12 @@ class ATLauncherDataSource : LauncherDataSource {
         const val INSTANCE_FILE_NAME = "instance.json"
     }
 
+    private fun getInstanceFile(launcherInstanceDirectory: File): File =
+        Paths.get(launcherInstanceDirectory.path, INSTANCE_FILE_NAME).toFile()
+
     private fun getInstance(launcherInstanceDirectory: File): Result<ATLauncherInstance> {
         return try {
-            val instanceFile = Paths.get(launcherInstanceDirectory.path, INSTANCE_FILE_NAME).toFile()
+            val instanceFile = getInstanceFile(launcherInstanceDirectory = launcherInstanceDirectory)
             val atLauncherInstance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceFile.readText())
             return Result.success(atLauncherInstance)
         } catch (e: Exception) {
@@ -111,6 +121,65 @@ class ATLauncherDataSource : LauncherDataSource {
                         )
                     }
             Result.success(mods)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun getPreLaunchCommand(launcherInstanceDirectory: File): Result<String?> =
+        try {
+            val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            Result.success(instance.launcher.preLaunchCommand)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun setPreLaunchCommand(
+        command: String?,
+        launcherInstanceDirectory: File,
+    ): Result<Unit> =
+        try {
+            val instanceFile = getInstanceFile(launcherInstanceDirectory = launcherInstanceDirectory)
+
+            val instanceJsonObject: JsonObject = Json.parseToJsonElement(instanceFile.readText()).jsonObject
+
+            val launcherJsonKey = ATLauncherInstance::launcher.name
+            val preLaunchCommandJsonKey = ATLauncherInstance.Launcher::preLaunchCommand.name
+            val enableCommandsJsonKey = ATLauncherInstance.Launcher::enableCommands.name
+
+            val updatedLauncher =
+                (instanceJsonObject.jsonObject[launcherJsonKey]?.jsonObject?.toMutableMap() ?: mutableMapOf())
+                    .apply {
+                        if (command != null) {
+                            this[preLaunchCommandJsonKey] = JsonPrimitive(command)
+                            this[enableCommandsJsonKey] = JsonPrimitive(true)
+                        } else {
+                            this.remove(preLaunchCommandJsonKey)
+                            // The user might use other commands like post-exit command,
+                            // make sure we don't touch this key if they are used
+                            val instance: ATLauncherInstance = JsonIgnoreUnknownKeys.decodeFromJsonElement(instanceJsonObject)
+                            if (instance.launcher.postExitCommand == null && instance.launcher.wrapperCommand == null) {
+                                // The instance settings do not have any other commands,
+                                // remove overriding enable commands for this instance
+                                this.remove(enableCommandsJsonKey)
+                            }
+                        }
+                    }.let { JsonObject(it) }
+
+            val updatedInstance =
+                instanceJsonObject.jsonObject
+                    .toMutableMap()
+                    .apply {
+                        this[launcherJsonKey] = updatedLauncher
+                    }.let { JsonObject(it) }
+
+            instanceFile.writeText(
+                text =
+                    JsonPrettyPrint.encodeToString(
+                        JsonObject.serializer(),
+                        updatedInstance,
+                    ),
+            )
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }

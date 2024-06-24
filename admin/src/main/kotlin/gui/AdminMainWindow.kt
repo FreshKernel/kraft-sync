@@ -4,7 +4,7 @@ import constants.ProjectInfoConstants
 import gui.components.BaseJFrame
 import gui.tabs.ModsConverterTab
 import gui.tabs.SettingsTab
-import gui.tabs.SetupTab
+import gui.tabs.SyncScriptInstallerTab
 import java.awt.Dimension
 import javax.swing.JTabbedPane
 
@@ -18,7 +18,7 @@ class AdminMainWindow : BaseJFrame() {
         val tabbedPane = JTabbedPane()
 
         tabbedPane.addTab("Mods Info Converter", ModsConverterTab())
-        tabbedPane.addTab("Setup", SetupTab())
+        tabbedPane.addTab("Installer", SyncScriptInstallerTab())
         tabbedPane.addTab("Settings", SettingsTab())
 
         add(tabbedPane)

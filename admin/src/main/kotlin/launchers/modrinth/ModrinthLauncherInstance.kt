@@ -13,6 +13,7 @@ data class ModrinthLauncherInstance(
     val path: String,
     val metadata: Metadata,
     val projects: Map<String, ModrinthLauncherProject>,
+    val hooks: Hooks? = null,
 ) {
     @Serializable
     data class Metadata(
@@ -22,7 +23,7 @@ data class ModrinthLauncherInstance(
         val gameVersion: String,
         val loader: String,
         @SerialName("loader_version")
-        val loaderVersion: LoaderVersion,
+        val loaderVersion: LoaderVersion? = null,
         @SerialName("date_created")
         val dateCreated: String,
         @SerialName("date_modified")
@@ -77,4 +78,13 @@ data class ModrinthLauncherInstance(
             val files: List<VersionFile>,
         )
     }
+
+    @Serializable
+    data class Hooks(
+        @SerialName("pre_launch")
+        val preLaunch: String? = null,
+        val wrapper: String? = null,
+        @SerialName("post_exit")
+        val postExit: String? = null,
+    )
 }
