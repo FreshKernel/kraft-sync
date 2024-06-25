@@ -67,170 +67,172 @@ class SyncScriptInstallerTab : Tab() {
             ).padding(bottom = 24),
             row(
                 JButton("Install").onClick {
-                    configureInstallation(
-                        installationConfig =
-                            SyncScriptInstallationConfig.Install(
-                                getSyncScriptJarFilePath = {
-                                    val fileChooser =
-                                        JFileChooser().apply {
-                                            dialogTitle = "Choose the JAR File for the sync script."
-                                            fileSelectionMode = JFileChooser.FILES_ONLY
-                                            fileFilter = FileNameExtensionFilter("JAR Files", "jar")
+                    coroutineScope.launch {
+                        configureInstallation(
+                            installationConfig =
+                                SyncScriptInstallationConfig.Install(
+                                    getSyncScriptJarFilePath = {
+                                        val fileChooser =
+                                            JFileChooser().apply {
+                                                dialogTitle = "Choose the JAR File for the sync script."
+                                                fileSelectionMode = JFileChooser.FILES_ONLY
+                                                fileFilter = FileNameExtensionFilter("JAR Files", "jar")
+                                            }
+                                        fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
+                                        if (fileChooser.selectedFile == null) {
+                                            return@Install null
                                         }
-                                    fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
-                                    if (fileChooser.selectedFile == null) {
-                                        return@Install null
-                                    }
-                                    fileChooser.selectedFile.path
-                                },
-                            ),
-                        confirmReplaceExistingPreLaunchCommand = false,
-                    )
+                                        fileChooser.selectedFile.path
+                                    },
+                                ),
+                            confirmReplaceExistingPreLaunchCommand = false,
+                        )
+                    }
                 },
                 JButton("Uninstall").onClick {
-                    configureInstallation(
-                        installationConfig = SyncScriptInstallationConfig.UnInstall,
-                        confirmReplaceExistingPreLaunchCommand = false,
-                    )
+                    coroutineScope.launch {
+                        configureInstallation(
+                            installationConfig = SyncScriptInstallationConfig.UnInstall,
+                            confirmReplaceExistingPreLaunchCommand = false,
+                        )
+                    }
                 },
             ),
         )
 
-    private fun configureInstallation(
+    private suspend fun configureInstallation(
         installationConfig: SyncScriptInstallationConfig,
         confirmReplaceExistingPreLaunchCommand: Boolean,
     ) {
-        coroutineScope.launch {
-            val result =
-                SyncScriptInstallerInstance.configureInstallation(
-                    installationConfig = installationConfig,
-                    launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
-                    launcher = launcherComboBox.getSelectedItemOrThrow(),
-                    confirmReplaceExistingPreLaunchCommand = confirmReplaceExistingPreLaunchCommand,
-                )
-            when (result) {
-                is SyncScriptInstallationResult.Failure -> {
-                    when (result.error) {
-                        SyncScriptInstallationError.EmptyLauncherInstanceDirectoryPath -> {
-                            GuiUtils.showErrorMessage(
-                                title = "🚫 Empty Directory Path",
-                                message = "The instance directory path is needed to proceed.",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+        val result =
+            SyncScriptInstallerInstance.configureInstallation(
+                installationConfig = installationConfig,
+                launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
+                launcher = launcherComboBox.getSelectedItemOrThrow(),
+                confirmReplaceExistingPreLaunchCommand = confirmReplaceExistingPreLaunchCommand,
+            )
+        when (result) {
+            is SyncScriptInstallationResult.Failure -> {
+                when (result.error) {
+                    SyncScriptInstallationError.EmptyLauncherInstanceDirectoryPath -> {
+                        GuiUtils.showErrorMessage(
+                            title = "🚫 Empty Directory Path",
+                            message = "The instance directory path is needed to proceed.",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        SyncScriptInstallationError.LauncherInstanceDirectoryNotFound -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Directory Not Found",
-                                message = "It seems like the selected instance directory doesn't exist. 📁",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    SyncScriptInstallationError.LauncherInstanceDirectoryNotFound -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Directory Not Found",
+                            message = "It seems like the selected instance directory doesn't exist. 📁",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        is SyncScriptInstallationError.InvalidLauncherInstanceDirectory -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Incorrect instance path",
-                                message =
-                                    "It seems that the provided instance path might be incorrect: ${result.error.message}",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    is SyncScriptInstallationError.InvalidLauncherInstanceDirectory -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Incorrect instance path",
+                            message =
+                                "It seems that the provided instance path might be incorrect: ${result.error.message}",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        SyncScriptInstallationError.EmptySyncScriptJarFilePath -> {
-                            GuiUtils.showErrorMessage(
-                                title = "🚫 Empty Directory Path",
-                                message = "The sync script JAR file path is needed to proceed.",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    SyncScriptInstallationError.EmptySyncScriptJarFilePath -> {
+                        GuiUtils.showErrorMessage(
+                            title = "🚫 Empty Directory Path",
+                            message = "The sync script JAR file path is needed to proceed.",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        SyncScriptInstallationError.SyncScriptJarFileNotFound -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ File Not Found",
-                                message = "It seems like the selected sync script JAR file doesn't exist. 📁",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    SyncScriptInstallationError.SyncScriptJarFileNotFound -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ File Not Found",
+                            message = "It seems like the selected sync script JAR file doesn't exist. 📁",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Unexpected error",
-                                message = "An error occurred while deleting the sync script JAR file.",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Unexpected error",
+                            message = "An error occurred while deleting the sync script JAR file.",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Unexpected error",
-                                message = "An error occurred while deleting the sync script data \uD83D\uDCC1.",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Unexpected error",
+                            message = "An error occurred while deleting the sync script data \uD83D\uDCC1.",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        is SyncScriptInstallationError.CouldNotSetPreLaunchCommand -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Unexpected error",
-                                message =
-                                    "An error occurred while updating the Pre Launch command/hook: \uD83D\uDEE0: ${result.error.message}",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    is SyncScriptInstallationError.CouldNotSetPreLaunchCommand -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Unexpected error",
+                            message =
+                                "An error occurred while updating the Pre Launch command/hook: \uD83D\uDEE0: ${result.error.message}",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
+                    }
 
-                        is SyncScriptInstallationError.UnknownError -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Unexpected error",
-                                message = "A unknown error occurred: ${result.error.message}\uFE0F",
-                                parentComponent = this@SyncScriptInstallerTab,
-                            )
-                        }
+                    is SyncScriptInstallationError.UnknownError -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Unexpected error",
+                            message = "A unknown error occurred: ${result.error.message}\uFE0F",
+                            parentComponent = this@SyncScriptInstallerTab,
+                        )
                     }
                 }
-
-                SyncScriptInstallationResult.Success -> {
-                    SwingDialogManager.showMessageDialog(
-                        title = "Success",
-                        message =
-                            when (installationConfig) {
-                                is SyncScriptInstallationConfig.Install ->
-                                    "You can launch the the game using the provided instance/profile."
-
-                                SyncScriptInstallationConfig.UnInstall ->
-                                    "${ProjectInfoConstants.DISPLAY_NAME} has been removed form the provided instance/profile."
-                            },
-                        parentComponent = this@SyncScriptInstallerTab,
-                    )
-                }
-
-                is SyncScriptInstallationResult.RequiresUserConfirmationToReplacePreLaunchCommand -> {
-                    val hasConfirmedPreLaunchCommandReplacement =
-                        SwingDialogManager
-                            .showConfirmDialog(
-                                title = "Pre-Launch Command Conflict",
-                                message =
-                                    buildHtml {
-                                        text("Pre-Launch command is already set.")
-                                        newLine()
-                                        text("Current Command: ${result.existingCommand}")
-                                        newLine()
-                                        text("New command: ${result.newCommand}")
-                                        newLines(2)
-                                        boldText("Would you like to replace it with the new one?")
-                                    }.buildBodyAsText(),
-                                parentComponent = this@SyncScriptInstallerTab,
-                                messageType = SwingDialogManager.MessageType.Question,
-                            ).isConfirmed()
-                    if (!hasConfirmedPreLaunchCommandReplacement) {
-                        return@launch
-                    }
-                    configureInstallation(
-                        installationConfig = installationConfig,
-                        confirmReplaceExistingPreLaunchCommand = true,
-                    )
-                }
-
-                SyncScriptInstallationResult.Cancelled -> Unit
             }
+
+            SyncScriptInstallationResult.Success -> {
+                SwingDialogManager.showMessageDialog(
+                    title = "Success",
+                    message =
+                        when (installationConfig) {
+                            is SyncScriptInstallationConfig.Install ->
+                                "You can launch the the game using the provided instance/profile."
+
+                            SyncScriptInstallationConfig.UnInstall ->
+                                "${ProjectInfoConstants.DISPLAY_NAME} has been removed form the provided instance/profile."
+                        },
+                    parentComponent = this@SyncScriptInstallerTab,
+                )
+            }
+
+            is SyncScriptInstallationResult.RequiresUserConfirmationToReplacePreLaunchCommand -> {
+                val hasConfirmedPreLaunchCommandReplacement =
+                    SwingDialogManager
+                        .showConfirmDialog(
+                            title = "Pre-Launch Command Conflict",
+                            message =
+                                buildHtml {
+                                    text("Pre-Launch command is already set.")
+                                    newLine()
+                                    text("Current Command: ${result.existingCommand}")
+                                    newLine()
+                                    text("New command: ${result.newCommand}")
+                                    newLines(2)
+                                    boldText("Would you like to replace it with the new one?")
+                                }.buildBodyAsText(),
+                            parentComponent = this@SyncScriptInstallerTab,
+                            messageType = SwingDialogManager.MessageType.Question,
+                        ).isConfirmed()
+                if (!hasConfirmedPreLaunchCommandReplacement) {
+                    return
+                }
+                configureInstallation(
+                    installationConfig = installationConfig,
+                    confirmReplaceExistingPreLaunchCommand = true,
+                )
+            }
+
+            SyncScriptInstallationResult.Cancelled -> Unit
         }
     }
 }

@@ -110,210 +110,210 @@ class ModsConverterTab : Tab() {
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
             JButton("Continue").onClick {
-                convertMods(
-                    curseForgeApiKeyOverride = null,
-                    isCurseForgeForStudiosTermsOfServiceAccepted = false,
-                )
+                coroutineScope.launch {
+                    convertMods(
+                        curseForgeApiKeyOverride = null,
+                        isCurseForgeForStudiosTermsOfServiceAccepted = false,
+                    )
+                }
             },
         )
 
-    private fun convertMods(
+    private suspend fun convertMods(
         curseForgeApiKeyOverride: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ) {
-        coroutineScope.launch {
-            val result =
-                ModsConverterInstance.convertMods(
-                    launcher = launcherComboBox.getSelectedItemOrThrow(),
-                    launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
-                    convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
-                    prettyFormat = prettyFormatCheckBox.isSelected,
-                    curseForgeApiKeyOverride = curseForgeApiKeyOverride,
-                    isCurseForgeForStudiosTermsOfServiceAccepted = isCurseForgeForStudiosTermsOfServiceAccepted,
-                )
-            when (result) {
-                is ModsConvertResult.Failure -> {
-                    when (result.error) {
-                        ModsConvertError.EmptyLauncherInstanceDirectoryPath -> {
-                            GuiUtils.showErrorMessage(
-                                title = "🚫 Empty Directory Path",
-                                message = "The instance directory path is needed to proceed.",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        ModsConvertError.LauncherInstanceDirectoryNotFound -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Directory Not Found",
-                                message = "It seems like the selected instance directory doesn't exist. 📁",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        is ModsConvertError.InvalidLauncherInstanceDirectory -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Incorrect instance path",
-                                message =
-                                    "It seems that the provided instance path might be incorrect: ${result.error.message}",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        is ModsConvertError.CurseForgeApiCheckError -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Unexpected error",
-                                message =
-                                    "An error occurred while checking if Curse Forge API HTTP request is needed " +
-                                        "\uD83D\uDEE0: ${result.error.message}️",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        is ModsConvertError.ModsAvailabilityCheckError -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Mods availability check error",
-                                message = "An error occurred while checking if the instance has mods: ${result.error.message}️",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        is ModsConvertError.CouldNotConvertMods -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Error Converting Mods",
-                                message = "An error occurred while converting the mods \uD83D\uDEE0: ${result.error.message}️",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        is ModsConvertError.ModsUnavailable -> {
-                            GuiUtils.showErrorMessage(
-                                title = "Mods Data Unavailable",
-                                message =
-                                    buildHtml {
-                                        if (result.error.happenedWhileConvertingMods) {
-                                            text("Could not find the mods' info while converting the mods.")
-                                        } else {
-                                            text("The mods' info couldn't be found.")
-                                        }
-                                        newLine()
-                                        text(
-                                            "Double-check to see if you have some mods installed" +
-                                                " on the selected instance.",
-                                        )
-                                        newLines(2)
-                                        text(
-                                            "Some launchers might save the changes after closing the launcher/app.",
-                                        )
-                                        newLine()
-                                        text("If you created the instance/profile recently, try closing the launcher and try again.")
-                                    }.buildBodyAsText(),
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-
-                        is ModsConvertError.UnknownError -> {
-                            GuiUtils.showErrorMessage(
-                                title = "❌ Unexpected error",
-                                message = "A unknown error occurred: ${result.error.message}\uFE0F",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        }
-                    }
-                }
-
-                ModsConvertResult.RequiresAcceptanceOfCurseForgeForStudiosTermsOfUse -> {
-                    val hasAcceptedCurseForgeForStudiosTermsOfUse =
-                        SwingDialogManager
-                            .showConfirmDialog(
-                                title = "CurseForge for Studios Terms of Use",
-                                message =
-                                    HtmlTextWithLinks {
-                                        text(
-                                            "You're using Curse Forge mods in the launcher, a network request must sent to Curse Forge API",
-                                        )
-                                        newLine()
-                                        text("to fetch the mods data as the selected launcher doesn't store the mod download URLs.")
-                                        newLine()
-                                        newLine()
-
-                                        boldText("Do you agree to ")
-                                        link(
-                                            labelText = "Curse Forge API Terms of Service",
-                                            linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
-                                        )
-                                        boldText("?")
-                                        newLine()
-                                        text("The link can also be found here:")
-                                        newLine()
-                                        link(
-                                            labelText = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
-                                            linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
-                                        )
-                                    },
-                                parentComponent = this@ModsConverterTab,
-                                messageType = SwingDialogManager.MessageType.Question,
-                            ).isConfirmed()
-                    if (!hasAcceptedCurseForgeForStudiosTermsOfUse) {
-                        return@launch
-                    }
-                    val userCurseForgeApiKey: String? =
-                        SwingDialogManager.showInputDialog(
-                            title = "Curse Forge API Key",
-                            message =
-                                "Most launchers doesn't store the download url of the mods and instead store the project " +
-                                    "and file id of the mod on Curse Forge. will attempt to send request to Curse Forge API to " +
-                                    "get the info about the mod, the API key will needed to authenticate with Curse Forge. " +
-                                    "We already provide an API key of our account to make the process easier with " +
-                                    "less required steps. You can override the API Key if needed.",
+        val result =
+            ModsConverterInstance.convertMods(
+                launcher = launcherComboBox.getSelectedItemOrThrow(),
+                launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
+                convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
+                prettyFormat = prettyFormatCheckBox.isSelected,
+                curseForgeApiKeyOverride = curseForgeApiKeyOverride,
+                isCurseForgeForStudiosTermsOfServiceAccepted = isCurseForgeForStudiosTermsOfServiceAccepted,
+            )
+        when (result) {
+            is ModsConvertResult.Failure -> {
+                when (result.error) {
+                    ModsConvertError.EmptyLauncherInstanceDirectoryPath -> {
+                        GuiUtils.showErrorMessage(
+                            title = "🚫 Empty Directory Path",
+                            message = "The instance directory path is needed to proceed.",
                             parentComponent = this@ModsConverterTab,
-                            selectionValues = null,
-                            initialSelectionValue = null,
                         )
-                    if (userCurseForgeApiKey == null) {
-                        // User canceled the process
-                        return@launch
                     }
-                    convertMods(
-                        curseForgeApiKeyOverride = userCurseForgeApiKey,
-                        isCurseForgeForStudiosTermsOfServiceAccepted = true,
-                    )
+
+                    ModsConvertError.LauncherInstanceDirectoryNotFound -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Directory Not Found",
+                            message = "It seems like the selected instance directory doesn't exist. 📁",
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
+
+                    is ModsConvertError.InvalidLauncherInstanceDirectory -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Incorrect instance path",
+                            message =
+                                "It seems that the provided instance path might be incorrect: ${result.error.message}",
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
+
+                    is ModsConvertError.CurseForgeApiCheckError -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Unexpected error",
+                            message =
+                                "An error occurred while checking if Curse Forge API HTTP request is needed " +
+                                    "\uD83D\uDEE0: ${result.error.message}️",
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
+
+                    is ModsConvertError.ModsAvailabilityCheckError -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Mods availability check error",
+                            message = "An error occurred while checking if the instance has mods: ${result.error.message}️",
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
+
+                    is ModsConvertError.CouldNotConvertMods -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Error Converting Mods",
+                            message = "An error occurred while converting the mods \uD83D\uDEE0: ${result.error.message}️",
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
+
+                    is ModsConvertError.ModsUnavailable -> {
+                        GuiUtils.showErrorMessage(
+                            title = "Mods Data Unavailable",
+                            message =
+                                buildHtml {
+                                    if (result.error.happenedWhileConvertingMods) {
+                                        text("Could not find the mods' info while converting the mods.")
+                                    } else {
+                                        text("The mods' info couldn't be found.")
+                                    }
+                                    newLine()
+                                    text(
+                                        "Double-check to see if you have some mods installed" +
+                                            " on the selected instance.",
+                                    )
+                                    newLines(2)
+                                    text(
+                                        "Some launchers might save the changes after closing the launcher/app.",
+                                    )
+                                    newLine()
+                                    text("If you created the instance/profile recently, try closing the launcher and try again.")
+                                }.buildBodyAsText(),
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
+
+                    is ModsConvertError.UnknownError -> {
+                        GuiUtils.showErrorMessage(
+                            title = "❌ Unexpected error",
+                            message = "A unknown error occurred: ${result.error.message}\uFE0F",
+                            parentComponent = this@ModsConverterTab,
+                        )
+                    }
                 }
+            }
 
-                is ModsConvertResult.Success -> {
-                    when (outputModeComboBox.getSelectedItemOrThrow()) {
-                        ModsConvertOutputOption.CopyToClipboard -> {
-                            result.modsOutputText.copyToClipboard()
-                        }
+            ModsConvertResult.RequiresAcceptanceOfCurseForgeForStudiosTermsOfUse -> {
+                val hasAcceptedCurseForgeForStudiosTermsOfUse =
+                    SwingDialogManager
+                        .showConfirmDialog(
+                            title = "CurseForge for Studios Terms of Use",
+                            message =
+                                HtmlTextWithLinks {
+                                    text(
+                                        "You're using Curse Forge mods in the launcher, a network request must sent to Curse Forge API",
+                                    )
+                                    newLine()
+                                    text("to fetch the mods data as the selected launcher doesn't store the mod download URLs.")
+                                    newLine()
+                                    newLine()
 
-                        ModsConvertOutputOption.SaveAsFile -> {
-                            val outputFileChooser = JFileChooser()
-                            outputFileChooser.dialogTitle = "The location where the file will be saved"
-                            outputFileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
-                            outputFileChooser.fileFilter = FileNameExtensionFilter("JSON Files", "json")
-                            val dialogResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
-                            if (dialogResult != JFileChooser.APPROVE_OPTION) {
-                                return@launch
-                            }
-                            val outputFile = outputFileChooser.selectedFile
-                            try {
-                                outputFile.writeText(result.modsOutputText)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                GuiUtils.showErrorMessage(
-                                    title = "Error Saving File ❌",
-                                    message = "An error occurred while saving the file \uD83D\uDEE0: ${e.message}️",
-                                    parentComponent = this@ModsConverterTab,
-                                )
-                                return@launch
-                            }
-                        }
-                    }
-                    SwingDialogManager.showMessageDialog(
-                        title = "Success",
-                        message = "The task has been successfully finished.",
+                                    boldText("Do you agree to ")
+                                    link(
+                                        labelText = "Curse Forge API Terms of Service",
+                                        linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
+                                    )
+                                    boldText("?")
+                                    newLine()
+                                    text("The link can also be found here:")
+                                    newLine()
+                                    link(
+                                        labelText = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
+                                        linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
+                                    )
+                                },
+                            parentComponent = this@ModsConverterTab,
+                            messageType = SwingDialogManager.MessageType.Question,
+                        ).isConfirmed()
+                if (!hasAcceptedCurseForgeForStudiosTermsOfUse) {
+                    return
+                }
+                val userCurseForgeApiKey: String? =
+                    SwingDialogManager.showInputDialog(
+                        title = "Curse Forge API Key",
+                        message =
+                            "Most launchers don't store the download URL of the mods and instead store the project " +
+                                "and file id of the mod on Curse Forge. will attempt to send a request to Curse Forge API to " +
+                                "get the info about the mod, the API key will needed to authenticate with Curse Forge. " +
+                                "We already provided an API key to make the process easier with " +
+                                "less required steps. You can override the API Key if needed.",
                         parentComponent = this@ModsConverterTab,
+                        selectionValues = null,
+                        initialSelectionValue = null,
                     )
+                if (userCurseForgeApiKey == null) {
+                    // User canceled the process
+                    return
                 }
+                convertMods(
+                    curseForgeApiKeyOverride = userCurseForgeApiKey,
+                    isCurseForgeForStudiosTermsOfServiceAccepted = true,
+                )
+            }
+
+            is ModsConvertResult.Success -> {
+                when (outputModeComboBox.getSelectedItemOrThrow()) {
+                    ModsConvertOutputOption.CopyToClipboard -> {
+                        result.modsOutputText.copyToClipboard()
+                    }
+
+                    ModsConvertOutputOption.SaveAsFile -> {
+                        val outputFileChooser = JFileChooser()
+                        outputFileChooser.dialogTitle = "The location where the file will be saved"
+                        outputFileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
+                        outputFileChooser.fileFilter = FileNameExtensionFilter("JSON Files", "json")
+                        val dialogResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
+                        if (dialogResult != JFileChooser.APPROVE_OPTION) {
+                            return
+                        }
+                        val outputFile = outputFileChooser.selectedFile
+                        try {
+                            outputFile.writeText(result.modsOutputText)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            GuiUtils.showErrorMessage(
+                                title = "Error Saving File ❌",
+                                message = "An error occurred while saving the file \uD83D\uDEE0: ${e.message}️",
+                                parentComponent = this@ModsConverterTab,
+                            )
+                            return
+                        }
+                    }
+                }
+                SwingDialogManager.showMessageDialog(
+                    title = "Success",
+                    message = "The task has been successfully finished.",
+                    parentComponent = this@ModsConverterTab,
+                )
             }
         }
     }
