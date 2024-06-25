@@ -207,7 +207,7 @@ class SyncScriptInstallerTab : Tab() {
                 }
 
                 is SyncScriptInstallationResult.RequiresUserConfirmationToReplacePreLaunchCommand -> {
-                    val hasUserConfirmedToReplaceExistingPreLaunchCommand =
+                    val hasConfirmedPreLaunchCommandReplacement =
                         SwingDialogManager
                             .showConfirmDialog(
                                 title = "Pre-Launch Command Conflict",
@@ -224,7 +224,7 @@ class SyncScriptInstallerTab : Tab() {
                                 parentComponent = this@SyncScriptInstallerTab,
                                 messageType = SwingDialogManager.MessageType.Question,
                             ).isConfirmed()
-                    if (!hasUserConfirmedToReplaceExistingPreLaunchCommand) {
+                    if (!hasConfirmedPreLaunchCommandReplacement) {
                         return@launch
                     }
                     configureInstallation(

@@ -57,7 +57,6 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                             error = SyncScriptInstallationError.SyncScriptJarFileNotFound,
                         )
                     }
-                    // TODO: Unrelated: also might rename hasUserConfirmedToReplaceExistingPreLaunchCommand and hasUserAcceptedCurseForgeForStudiosTermsOfUse
                     providedSyncScriptJarFile.copyTo(
                         syncScriptJarFile,
                         overwrite = true,

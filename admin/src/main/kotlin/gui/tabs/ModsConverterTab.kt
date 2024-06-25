@@ -281,7 +281,7 @@ private class ConversionInputDialog(
                 }
 
                 ModsConvertResult.RequiresAcceptanceOfCurseForgeForStudiosTermsOfUse -> {
-                    val hasUserAcceptedCurseForgeForStudiosTermsOfUse =
+                    val hasAcceptedCurseForgeForStudiosTermsOfUse =
                         SwingDialogManager
                             .showConfirmDialog(
                                 title = "CurseForge for Studios Terms of Use",
@@ -312,7 +312,7 @@ private class ConversionInputDialog(
                                 parentComponent = this@ConversionInputDialog,
                                 messageType = SwingDialogManager.MessageType.Question,
                             ).isConfirmed()
-                    if (!hasUserAcceptedCurseForgeForStudiosTermsOfUse) {
+                    if (!hasAcceptedCurseForgeForStudiosTermsOfUse) {
                         return@launch
                     }
                     val userCurseForgeApiKey: String? =
