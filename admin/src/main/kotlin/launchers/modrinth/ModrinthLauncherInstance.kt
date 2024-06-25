@@ -29,7 +29,7 @@ data class ModrinthLauncherInstance(
         @SerialName("date_modified")
         val dateModified: String,
         @SerialName("last_played")
-        val lastPlayed: String,
+        val lastPlayed: String? = null,
         @SerialName("submitted_time_played")
         val submittedTimePlayed: Int,
         @SerialName("recent_time_played")

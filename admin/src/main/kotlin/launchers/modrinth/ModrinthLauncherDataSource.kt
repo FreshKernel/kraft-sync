@@ -58,7 +58,7 @@ class ModrinthLauncherDataSource : LauncherDataSource {
     override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> {
         return try {
             val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            if (instanceConfigFile.exists()) {
+            if (!instanceConfigFile.exists()) {
                 return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
             }
             if (!instanceConfigFile.isFile) {

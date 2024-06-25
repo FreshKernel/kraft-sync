@@ -21,6 +21,7 @@ import services.modsConverter.ModsConvertResult
 import services.modsConverter.ModsConverterInstance
 import services.modsConverter.models.ModsConvertMode
 import services.modsConverter.models.ModsConvertOutputOption
+import utils.buildHtml
 import utils.copyToClipboard
 import javax.swing.JButton
 import javax.swing.JCheckBox
@@ -188,13 +189,24 @@ class ModsConverterTab : Tab() {
                             GuiUtils.showErrorMessage(
                                 title = "Mods Data Unavailable",
                                 message =
-                                    if (result.error.happenedWhileConvertingMods) {
-                                        "Could not find the mods' info while converting the mods"
-                                    } else {
-                                        "The mods' info couldn't be found"
-                                    } +
-                                        ". Double-check to see if you have some mods installed" +
-                                        " on the selected instance.",
+                                    buildHtml {
+                                        if (result.error.happenedWhileConvertingMods) {
+                                            text("Could not find the mods' info while converting the mods.")
+                                        } else {
+                                            text("The mods' info couldn't be found.")
+                                        }
+                                        newLine()
+                                        text(
+                                            "Double-check to see if you have some mods installed" +
+                                                " on the selected instance.",
+                                        )
+                                        newLines(2)
+                                        text(
+                                            "Some launchers might save the changes after closing the launcher/app.",
+                                        )
+                                        newLine()
+                                        text("If you created the instance/profile recently, try closing the launcher and try again.")
+                                    }.buildBodyAsText(),
                                 parentComponent = this@ModsConverterTab,
                             )
                         }
