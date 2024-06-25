@@ -84,18 +84,23 @@ class SyncScriptInstallerTab : Tab() {
                 JButton("Install").onClick {
                     // TODO: Currently will always request the JAR file before the validation process, might create
                     //  separate function for the validation as a solution, if you do, update ModsConverter too
-                    val fileChooser =
-                        JFileChooser().apply {
-                            dialogTitle = "Choose the JAR File for the sync script."
-                            fileSelectionMode = JFileChooser.FILES_ONLY
-                            fileFilter = FileNameExtensionFilter("JAR Files", "jar")
-                        }
-                    fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
-                    if (fileChooser.selectedFile == null) {
-                        return@onClick
-                    }
                     configureInstallation(
-                        installationConfig = SyncScriptInstallationConfig.Install(syncScriptJarFilePath = fileChooser.selectedFile.path),
+                        installationConfig =
+                            SyncScriptInstallationConfig.Install(
+                                getSyncScriptJarFilePath = {
+                                    val fileChooser =
+                                        JFileChooser().apply {
+                                            dialogTitle = "Choose the JAR File for the sync script."
+                                            fileSelectionMode = JFileChooser.FILES_ONLY
+                                            fileFilter = FileNameExtensionFilter("JAR Files", "jar")
+                                        }
+                                    fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
+                                    if (fileChooser.selectedFile == null) {
+                                        return@Install null
+                                    }
+                                    fileChooser.selectedFile.path
+                                },
+                            ),
                         confirmReplaceExistingPreLaunchCommand = false,
                     )
                 },
@@ -232,6 +237,8 @@ class SyncScriptInstallerTab : Tab() {
                         confirmReplaceExistingPreLaunchCommand = true,
                     )
                 }
+
+                SyncScriptInstallationResult.Cancelled -> Unit
             }
         }
     }

@@ -5,7 +5,10 @@ sealed class SyncScriptInstallationConfig {
      * Install the sync script
      * */
     data class Install(
-        val syncScriptJarFilePath: String,
+        /**
+         * Null if the user canceled the operation
+         * */
+        val getSyncScriptJarFilePath: () -> String?,
     ) : SyncScriptInstallationConfig()
 
     /**

@@ -15,4 +15,6 @@ sealed class SyncScriptInstallationResult {
         val existingCommand: String,
         val newCommand: String,
     ) : SyncScriptInstallationResult()
+
+    data object Cancelled : SyncScriptInstallationResult()
 }

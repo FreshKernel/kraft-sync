@@ -46,12 +46,14 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
 
             when (installationConfig) {
                 is SyncScriptInstallationConfig.Install -> {
-                    if (installationConfig.syncScriptJarFilePath.isBlank()) {
+                    val providedSyncScriptJarFilePath =
+                        installationConfig.getSyncScriptJarFilePath() ?: return SyncScriptInstallationResult.Cancelled
+                    if (providedSyncScriptJarFilePath.isBlank()) {
                         return SyncScriptInstallationResult.Failure(
                             error = SyncScriptInstallationError.EmptySyncScriptJarFilePath,
                         )
                     }
-                    val providedSyncScriptJarFile = File(installationConfig.syncScriptJarFilePath)
+                    val providedSyncScriptJarFile = File(providedSyncScriptJarFilePath)
                     if (!providedSyncScriptJarFile.exists()) {
                         return SyncScriptInstallationResult.Failure(
                             error = SyncScriptInstallationError.SyncScriptJarFileNotFound,
