@@ -131,22 +131,56 @@ The process is straightforward; don't get confused by the required steps.
 
 [//]: # (TODO: Add supported launchers section)
 
-The easiest way to use the script 🚀:
+[//]: # (TODO: Share the common steps between the manual and automated way)
+Use the manual or automated method to get started 🚀:
+
+<details>
+<summary>The automated way to use the script</summary>
+
+1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#-admin-utility)
+2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
+   launcher, and hooks/custom commands feature.
+3. **Create a new instance**, choose the version, mod loader and download the mods you want to use.
+
+   Consider using [Modrinth] **as asset provider** to make the process easier and faster with a smaller possibility of
+   errors for the utility as it will be an offline task
+4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, and upload the new file
+   you get from the admin application to somewhere public, like [GitHub](https://github.com/)
+5. To prepare the instance that will be used by the players, **create a new instance**, choose the same version
+   and mod loader as the previous instance while refraining from downloading the mods.
+   This instance will be configured to use the script.
+
+   The previous one will be used by [Admin Utility] to convert the mods' info to the script format.
+6. Use the [Admin Utility] to install the script into the new instance, navigate
+   to [Admin Script Installer](./admin/README.md#-script-installer) for details.
+7. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
+   that from **Step 4**.
+   Enter it and then wait for the sync process to finish, the game will launch with the new synced
+   content.
+8. To make this process easier for all the players, export the instance from **Step 5** that's configured
+   to use the script, make sure to include the used JAR file and the `kraft-sync-data` folder
+   and exclude the content that will be synced like the `mods` as the script will download them once the player import
+   the instance and launch the instance, you can include them though, the script will sync them if they're outdated.
+
+</details>
+
+<details>
+<summary>The manual way to use the script</summary>
 
 1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#-admin-utility)
 2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
    launcher.
 
-   Consider using [Modrinth] as it will make the process easier, and faster with a smaller possibility of errors
-   for the utility as it will be an offline task
-3. **Create a new instance**, choose the version, mod loader, create it, and download the mods you want to use
+   Consider using [Modrinth] **as asset provider** to make the process easier and faster with a smaller possibility of
+   errors for the utility as it will be an offline task
+3. **Create a new instance**, choose the version, mod loader, and download the mods you want to use
 4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, and upload the new file
-   you get from the utility program to somewhere public, like [GitHub](https://github.com/)
+   you get from the admin application to somewhere public, like [GitHub](https://github.com/)
 5. To prepare the instance that the players will use, **create a new instance**, choose the same version
    and mod loader as the previous instance while refraining from downloading the mods.
-   This instance will be configured to use the script and download them.
+   This instance will be configured to use the script.
 
-   The previous one will be used by [Admin Utility] to convert the info format
+   The previous one will be used by [Admin Utility] to convert the mods' info to the script format
 6. Move the downloaded script JAR file to the instance directory where it has the `mods` and other folders
 7. Go to the settings of the newly created instance, try to find the section of the custom commands,
    or the command to run before launching the game.
@@ -164,17 +198,14 @@ The easiest way to use the script 🚀:
 9. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
    that from **Step 4**. Enter it and then wait for the sync process to finish, the game will launch with the new synced
    content
-10. To make this process much easier for all the players, export the instance from **Step 5** that's configured
+10. To make this process easier for all the players, export the instance from **Step 5** that's configured
     to use the script, make sure to include the used JAR file and the `kraft-sync-data` folder
     and exclude the content that will be synced like the `mods` as the script will download them once the player import
     the instance and launch the instance, you can include them though, the script will sync them if they're outdated.
 
-We do plan on easing the process when possible and provide instructions for different launchers or maybe even
-extend the [Admin Utility] program to automatically do all of that, like uploading to GitHub or different providers,
-creating the instance, which would otherwise limit support to certain launchers; instead, we will provide both the
-automated and manual methods.
+</details>
 
-This section is incomplete and should be updated in the future.
+This section will be updated in the future for improvements.
 
 [//]: # (TODO: Update or rework this section)
 

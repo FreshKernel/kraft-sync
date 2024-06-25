@@ -39,11 +39,17 @@ to [Curse Forge API](https://docs.curseforge.com/) which requires an API key
 and has a rate limit.
 To make the process easier, we already included a default `API_KEY` and the option to override it.
 
-When possible, consider using alternatives such as [Modrinth](https://www.modrinth.com/) 
+When possible, consider using alternatives such as [Modrinth](https://www.modrinth.com/)
 for downloading mods in your
-Minecraft launcher as this will make the process easier and faster with fewer errors 
+Minecraft launcher as this will make the process easier and faster with fewer errors
 as it doesn't require sending any requests using the **network**.
 
 Some launchers store the download URL from the **Modrinth** provider, even if the mod is downloaded from Curse Forge.
 If a mod is not available on Modrinth, the launcher may only store the Curse Forge project and file ID. In such cases,
 the application retrieves the necessary information by sending a GET request as described earlier.
+
+## 🛠️ Script Installer
+
+You can use this application to install/uninstall the sync script to any instance to the supported Minecraft
+launchers, you can start the application, go to `Installer` tab, follow the instructions and once done, you
+can launch the game, and you will have the script installed.
