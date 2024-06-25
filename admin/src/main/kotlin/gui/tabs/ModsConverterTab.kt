@@ -55,13 +55,11 @@ class ModsConverterTab : Tab() {
     override fun getTabContent(): JPanel =
         column(
             HtmlTextWithLinks {
-                text("With ")
                 link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE_URL)
                 text(
-                    " Admin, you can create an instance in your favorite Minecraft launcher and download your desired " +
-                        "mods. Simply select the launcher and instance, and the utility will convert " +
-                        "the mods' metadata into script format.",
+                    " Admin can convert the downloaded mods' info from your Minecraft Launcher into the script format. ",
                 )
+                boldText("Ensure the launcher is closed, as some launchers save changes upon exiting.")
             },
             labeledInputPanel(
                 labelText = "Launcher",

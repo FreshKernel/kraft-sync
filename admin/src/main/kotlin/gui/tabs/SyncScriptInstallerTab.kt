@@ -48,8 +48,13 @@ class SyncScriptInstallerTab : Tab() {
 
     override fun getTabContent(): JComponent =
         column(
-            JLabel("Install or uninstall the sync script. Make sure the launcher is closed to avoid losing the changes.")
-                .padding(bottom = 16),
+            JLabel(
+                buildHtml {
+                    text("Install or uninstall the sync script.")
+                    newLine()
+                    boldText("Make sure the launcher is closed to avoid losing the changes.")
+                }.buildBodyAsText(),
+            ).padding(bottom = 16),
             labeledInputPanel(
                 labelText = "Launcher",
                 tooltipText = "The Minecraft launcher to convert the info from.",
