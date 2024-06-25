@@ -54,7 +54,7 @@ Use one of the shared run configurations of IntelliJ IDEA in `.idea` which will 
 
 1. Edit the Run/Debug configurations of IntelliJ IDEA, click on the add plus
 2. Choose the JAR Application, name it, and choose the JAR file path which is usually located under
-   the [sync-script/build/dist](./sync-script/build/dist),
+   the [dist](./dist),
    also, change the working directory to a directory other than the current or somewhere that is in `.gitignore` like
    like `testScript`
 3. In before launch add two Gradle tasks, first `clean` and then `shadowJar` (in order) or only `shadowJar`.
@@ -183,7 +183,8 @@ discussed above
   this is not necessarily a bug, and it's related to how Java 9 modules work;
   the Kotlin compiler won't give you compile error instead it will cause runtime error `java.lang.NoSuchMethodError`,
   a workaround would be to double-check to use different package or file name,
-  for more [details](https://youtrack.jetbrains.com/issue/KT-64744/NoSuchMethodError-on-some-but-not-all-methods-from-another-Gradle-module).
+  for
+  more [details](https://youtrack.jetbrains.com/issue/KT-64744/NoSuchMethodError-on-some-but-not-all-methods-from-another-Gradle-module).
 
   The issue will be caused once running the application, which is a good thing
   to catch the error earlier rather than having it affecting some functionalities.

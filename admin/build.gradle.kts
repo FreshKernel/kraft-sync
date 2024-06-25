@@ -26,7 +26,11 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.java.get().toInt())
+    jvmToolchain(
+        libs.versions.java
+            .get()
+            .toInt(),
+    )
 }
 
 application {
@@ -37,7 +41,7 @@ tasks.shadowJar {
     val scriptJarFileNameWithoutExtension = rootProject.name
     // If you change the file name or destination directory, also update it from the README.md and other markdown files
     archiveFileName.set("$scriptJarFileNameWithoutExtension-admin.jar")
-    destinationDirectory = layout.buildDirectory.dir("dist")
+    destinationDirectory = project.rootDir.resolve("dist")
     description = "A admin utility program for $scriptJarFileNameWithoutExtension script."
     minimize {
         // Exclude the entire FlatLaf dependency from minimization to fix `no ComponentUI class for: javax.swing.<component>`

@@ -44,6 +44,7 @@ bin/
 ### Kotlin ###
 .kotlin
 
-### Script ###
+### Project ###
 sync-script/devWorkingDirectory/
 dev-local-server/devWorkingDirectory/
+dist/

@@ -11,5 +11,6 @@ object ProjectInfoConstants {
     const val LIBS_VERSIONS_TOML_FILE_URL =
         "https://raw.githubusercontent.com/ellet0/kraft-sync/main/gradle/libs.versions.toml"
 
+    // TODO: This will always download the latest pre-release, will need to update the URL later
     const val LATEST_SYNC_SCRIPT_JAR_FILE_URL = "https://github.com/ellet0/kraft-sync/releases/download/latest/kraft-sync.min.jar"
 }
