@@ -36,12 +36,21 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
 
-    private fun getDotMinecraftFolder(launcherInstanceDirectory: File): File =
-        Paths
-            .get(launcherInstanceDirectory.path, DOT_MINECRAFT_FOLDER_NAME)
-            .toFile()
-
     override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
+        val dotMinecraftFolder = File(launcherInstanceDirectory.parentFile, DOT_MINECRAFT_FOLDER_NAME)
+
+        if (!dotMinecraftFolder.exists()) {
+            return Result.failure(
+                IllegalArgumentException(
+                    "The file (${dotMinecraftFolder.absolutePath}) does not exist. It seems that this " +
+                        "is the root instance folder for Prism Launcher, the path should be to '.minecraft' folder.",
+                ),
+            )
+        }
+        if (!dotMinecraftFolder.isDirectory) {
+            return Result.failure(IllegalArgumentException("The file (${dotMinecraftFolder.absolutePath}) should be a folder."))
+        }
+
         val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
 
         if (!instanceConfigFile.exists()) {
@@ -51,14 +60,6 @@ class PrismLauncherDataSource : LauncherDataSource {
             return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
         }
 
-        val dotMinecraftFolder = getDotMinecraftFolder(launcherInstanceDirectory = launcherInstanceDirectory)
-
-        if (!dotMinecraftFolder.exists()) {
-            return Result.failure(IllegalArgumentException("The file (${dotMinecraftFolder.absolutePath}) does not exist."))
-        }
-        if (!dotMinecraftFolder.isDirectory) {
-            return Result.failure(IllegalArgumentException("The file (${dotMinecraftFolder.absolutePath}) should be a folder."))
-        }
         return Result.success(Unit)
     }
 
