@@ -1,5 +1,6 @@
 package gui.tabs
 
+import constants.ProjectInfoConstants
 import gui.Tab
 import gui.components.HintTextField
 import gui.components.instanceDirectoryLabeledInput
@@ -189,7 +190,14 @@ class SyncScriptInstallerTab : Tab() {
                 SyncScriptInstallationResult.Success -> {
                     SwingDialogManager.showMessageDialog(
                         title = "Success",
-                        message = "You can launch the the game using the provided instance/profile.",
+                        message =
+                            when (installationConfig) {
+                                is SyncScriptInstallationConfig.Install ->
+                                    "You can launch the the game using the provided instance/profile."
+
+                                SyncScriptInstallationConfig.UnInstall ->
+                                    "${ProjectInfoConstants.DISPLAY_NAME} has been removed form the provided instance/profile."
+                            },
                         parentComponent = this@SyncScriptInstallerTab,
                     )
                 }
