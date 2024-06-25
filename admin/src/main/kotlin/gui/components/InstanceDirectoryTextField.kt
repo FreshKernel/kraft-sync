@@ -17,9 +17,15 @@ fun instanceDirectoryLabeledInput(
             buildHtml {
                 text("The launcher instance directory.")
                 newLine()
-                text("The same path when you click ")
+                text("Usually it's same path when you click ")
                 boldText("Open Instance Folder")
                 text(" for the selected instance in the launcher.")
+                newLines(2)
+                text("If the root instance folder does not have Minecraft specific files and folders")
+                newLine()
+                text("like mods, options.txt, resourcepacks and others. Navigate to ")
+                boldText(".minecraft")
+                text(" folder which is usually inside the instance/profile folder.")
             }.buildBodyAsText(),
         inputComponent =
             filePicker(

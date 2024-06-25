@@ -34,7 +34,7 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.resolve("instance.cfg")
+    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
 
     private fun getDotMinecraftFolder(launcherInstanceDirectory: File): File =
         Paths
@@ -67,10 +67,7 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     private fun getModsMetaDataFolder(launcherInstanceDirectory: File): File =
         File(
-            File(
-                getDotMinecraftFolder(launcherInstanceDirectory = launcherInstanceDirectory),
-                MinecraftInstanceNames.MODS_FOLDER,
-            ),
+            Paths.get(launcherInstanceDirectory.path, MinecraftInstanceNames.MODS_FOLDER).toFile(),
             MODS_METADATA_FOLDER_NAME,
         )
 
