@@ -42,7 +42,7 @@ interface LauncherDataSource {
      * @return A list of [Mod] which contains the information about the mod, converting it from the specified launcher
      * into the script data format
      * */
-    suspend fun getMods(
+    suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
         curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>>

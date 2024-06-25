@@ -27,8 +27,8 @@ class ATLauncherDataSource : LauncherDataSource {
     private fun getInstance(launcherInstanceDirectory: File): Result<ATLauncherInstance> {
         return try {
             val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            val atLauncherInstance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceConfigFile.readText())
-            return Result.success(atLauncherInstance)
+            val instance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceConfigFile.readText())
+            return Result.success(instance)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
@@ -41,7 +41,7 @@ class ATLauncherDataSource : LauncherDataSource {
      *
      * @see ATLauncherInstance.Launcher.Mod.Type
      * */
-    private fun getATLauncherMods(instance: ATLauncherInstance): List<ATLauncherInstance.Launcher.Mod> =
+    private fun getMods(instance: ATLauncherInstance): List<ATLauncherInstance.Launcher.Mod> =
         instance.launcher.mods
             .filter { it.type == ATLauncherInstance.Launcher.Mod.Type.Mods }
 
@@ -61,17 +61,17 @@ class ATLauncherDataSource : LauncherDataSource {
         }
     }
 
-    private fun isCurseForgeApiRequestNeededForMod(atLauncherMod: ATLauncherInstance.Launcher.Mod): Boolean {
-        val modrinthFile = atLauncherMod.modrinthVersion?.files?.firstOrNull()
-        return modrinthFile == null && (atLauncherMod.curseForgeProjectId != null && atLauncherMod.curseForgeFileId != null)
+    private fun isCurseForgeApiRequestNeededForMod(mod: ATLauncherInstance.Launcher.Mod): Boolean {
+        val modrinthFile = mod.modrinthVersion?.files?.firstOrNull()
+        return modrinthFile == null && (mod.curseForgeProjectId != null && mod.curseForgeFileId != null)
     }
 
     override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             val isCurseForgeApiRequestNeeded =
-                getATLauncherMods(instance).any { atLauncherMod ->
-                    isCurseForgeApiRequestNeededForMod(atLauncherMod = atLauncherMod)
+                getMods(instance).any { atLauncherMod ->
+                    isCurseForgeApiRequestNeededForMod(mod = atLauncherMod)
                 }
             Result.success(isCurseForgeApiRequestNeeded)
         } catch (e: Exception) {
@@ -81,24 +81,24 @@ class ATLauncherDataSource : LauncherDataSource {
 
     override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> =
         try {
-            val atLauncherMods =
-                getATLauncherMods(
+            val mods =
+                getMods(
                     instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow(),
                 )
-            Result.success(atLauncherMods.isNotEmpty())
+            Result.success(mods.isNotEmpty())
         } catch (e: Exception) {
             Result.failure(e)
         }
 
-    override suspend fun getMods(
+    override suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
         curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+
             val mods =
-                instance.launcher.mods
-                    .filter { it.type == ATLauncherInstance.Launcher.Mod.Type.Mods }
+                getMods(instance = instance)
                     .map { atLauncherMod ->
                         val modrinthFile = atLauncherMod.modrinthVersion?.files?.firstOrNull()
                         val modrinthProject = atLauncherMod.modrinthProject
@@ -112,7 +112,7 @@ class ATLauncherDataSource : LauncherDataSource {
 
                         // ATLauncher always store Modrinth data even if the mod downloaded
                         // from Curse Forge if available on both.
-                        if (isCurseForgeApiRequestNeededForMod(atLauncherMod = atLauncherMod)) {
+                        if (isCurseForgeApiRequestNeededForMod(mod = atLauncherMod)) {
                             // Handle the case when the mod is exclusively found on Curse Forge, not on Modrinth
                             val curseForgeModFile =
                                 curseForgeDataSource
@@ -173,7 +173,8 @@ class ATLauncherDataSource : LauncherDataSource {
                             this.remove(preLaunchCommandJsonKey)
                             // The user might use other commands like post-exit command,
                             // make sure we don't touch this key if they are used
-                            val instance: ATLauncherInstance = JsonIgnoreUnknownKeys.decodeFromJsonElement(instanceJsonObject)
+                            val instance: ATLauncherInstance =
+                                JsonIgnoreUnknownKeys.decodeFromJsonElement(instanceJsonObject)
                             if (instance.launcher.postExitCommand == null && instance.launcher.wrapperCommand == null) {
                                 // The instance settings do not have any other commands,
                                 // remove overriding enable commands for this instance

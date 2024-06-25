@@ -64,20 +64,20 @@ class ModrinthLauncherDataSource : LauncherDataSource {
             if (!instanceConfigFile.isFile) {
                 return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
             }
-            val atLauncherMods =
+            val mods =
                 getModrinthLauncherProjects(
                     instance =
                         getInstance(
                             launcherInstanceDirectory = launcherInstanceDirectory,
                         ).getOrThrow(),
                 )
-            Result.success(atLauncherMods.isNotEmpty())
+            Result.success(mods.isNotEmpty())
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getMods(
+    override suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
         curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>> =

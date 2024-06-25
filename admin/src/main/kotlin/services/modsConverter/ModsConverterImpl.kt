@@ -82,7 +82,7 @@ class ModsConverterImpl : ModsConverter {
             }
             val mods =
                 launcherDataSource
-                    .getMods(
+                    .getLauncherInstanceMods(
                         launcherInstanceDirectory = launcherInstanceDirectory,
                         curseForgeApiKeyOverride = curseForgeApiKeyOverride?.ifBlank { null },
                     ).getOrElse {

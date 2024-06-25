@@ -140,7 +140,7 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    override suspend fun getMods(
+    override suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
         curseForgeApiKeyOverride: String?,
     ): Result<List<Mod>> =
