@@ -50,7 +50,8 @@ class ModrinthLauncherDataSource : LauncherDataSource {
         }
     }
 
-    override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> = Result.success(false)
+    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
+        Result.success(false)
 
     private fun getModrinthLauncherProjects(instance: ModrinthLauncherInstance): Map<String, ModrinthLauncherProject> = instance.projects
 

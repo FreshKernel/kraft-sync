@@ -66,7 +66,7 @@ class ATLauncherDataSource : LauncherDataSource {
         return modrinthFile == null && (atLauncherMod.curseForgeProjectId != null && atLauncherMod.curseForgeFileId != null)
     }
 
-    override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> =
+    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             val isCurseForgeApiRequestNeeded =

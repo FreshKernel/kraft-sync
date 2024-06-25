@@ -67,7 +67,7 @@ class ModsConverterImpl : ModsConverter {
 
             val isCurseForgeApiRequestNeeded =
                 launcherDataSource
-                    .isCurseForgeApiRequestNeeded(launcherInstanceDirectory)
+                    .isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory)
                     .getOrElse {
                         return ModsConvertResult.Failure(
                             error =

@@ -83,7 +83,7 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    override suspend fun isCurseForgeApiRequestNeeded(launcherInstanceDirectory: File): Result<Boolean> =
+    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
         try {
             val prismLauncherModsMetadata =
                 getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
