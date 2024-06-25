@@ -461,7 +461,7 @@ If you want to build from source for the latest version:
 
 1. Install the [Requirements](./CONTRIBUTING.md#-requirements)
 2. Run `./gradlew assemble` or `./gradlew.bat assemble` on **Microsoft Windows**
-3. Navigate to [sync-script/build/dist](./sync-script/build/dist) folder where you should find the Jar
+3. Navigate to [dist](./dist) folder where you should find the Jar
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)

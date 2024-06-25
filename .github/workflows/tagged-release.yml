@@ -39,5 +39,5 @@ jobs:
         uses: AButler/upload-release-assets@v3.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          files: "LICENSE;sync-script/build/dist/*;admin/build/dist/*"
+          files: "LICENSE;dist/*"
           release-tag: ${{ github.ref_name }}

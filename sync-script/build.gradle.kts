@@ -47,12 +47,21 @@ application {
         )
 }
 
+val distFolder
+    get() = project.rootDir.resolve("dist")
+
+tasks.clean {
+    doFirst {
+        delete(distFolder)
+    }
+}
+
 // Shadow JAR for building the fat JAR file
 
 tasks.shadowJar {
     // If you change the file name or destination directory, also update it from the README.md and other markdown files
     archiveFileName.set("${rootProject.name}.jar")
-    destinationDirectory = layout.buildDirectory.dir("dist")
+    destinationDirectory = distFolder
     description =
         "A script that allows to sync mods, resource packs, shaders, and more seamlessly before launching the game."
     minimize {

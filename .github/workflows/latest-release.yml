@@ -44,5 +44,4 @@ jobs:
           title: "🔥 Unstable Edition 🔥"
           files: |
             LICENSE
-            sync-script/build/dist/*
-            admin/build/dist/*
+            dist/*
