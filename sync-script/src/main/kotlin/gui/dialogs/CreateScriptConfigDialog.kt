@@ -73,7 +73,7 @@ class CreateScriptConfigDialog : JDialog() {
                 if (syncInfoUrlTextField.text.isBlank()) {
                     GuiUtils.showErrorMessage(
                         title = "🚫 Empty URL",
-                        message = "We need a URL to continue 🌐",
+                        message = "Provide the sync URL to proceed 🌐",
                         parentComponent = this,
                     )
                     return@onClick
