@@ -72,7 +72,7 @@ class PrismLauncherDataSource : LauncherDataSource {
             MODS_METADATA_FOLDER_NAME,
         )
 
-    private fun getPrismLauncherModsMetadata(launcherInstanceDirectory: File): Result<List<PrismLauncherModMetadata>> {
+    private fun getPrismLauncherModMetadataFiles(launcherInstanceDirectory: File): Result<List<File>> {
         return try {
             val modsMetaDataFolder = getModsMetaDataFolder(launcherInstanceDirectory = launcherInstanceDirectory)
             val modMetadataFiles =
@@ -81,9 +81,19 @@ class PrismLauncherDataSource : LauncherDataSource {
                 }
             if (modMetadataFiles == null) {
                 return Result.failure(
-                    IllegalArgumentException("(${modsMetaDataFolder.path}) might not be a directory or an I/O error occurred."),
+                    IllegalArgumentException("(${modsMetaDataFolder.absolutePath}) might not be a directory or an I/O error occurred."),
                 )
             }
+            Result.success(modMetadataFiles)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private fun getPrismLauncherModsMetadata(launcherInstanceDirectory: File): Result<List<PrismLauncherModMetadata>> =
+        try {
+            val modMetadataFiles =
+                getPrismLauncherModMetadataFiles(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
             val modsMetadata =
                 modMetadataFiles.map {
                     val fileText = it.readText()
@@ -94,7 +104,6 @@ class PrismLauncherDataSource : LauncherDataSource {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 
     override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
         try {
@@ -123,9 +132,9 @@ class PrismLauncherDataSource : LauncherDataSource {
                     IllegalArgumentException("The file (${modsMetaDataFolder.absolutePath} should be a folder/directory."),
                 )
             }
-            val prismLauncherModsMetadata =
-                getPrismLauncherModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
-            Result.success(prismLauncherModsMetadata.isNotEmpty())
+            val modMetadataFiles =
+                getPrismLauncherModMetadataFiles(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            Result.success(modMetadataFiles.isNotEmpty())
         } catch (e: Exception) {
             Result.failure(e)
         }
