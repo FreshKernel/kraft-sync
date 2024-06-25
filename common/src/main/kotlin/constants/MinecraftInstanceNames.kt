@@ -19,4 +19,6 @@ object MinecraftInstanceNames {
     const val SERVERS_FILE = "servers.dat"
 
     // 'servers.essential.dat' is not supported yet
+
+    const val SYNC_SCRIPT_FOLDER = "${ProjectInfoConstants.NORMALIZED_NAME}-data"
 }

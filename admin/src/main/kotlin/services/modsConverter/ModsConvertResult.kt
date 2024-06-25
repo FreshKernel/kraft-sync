@@ -1,5 +1,6 @@
 package services.modsConverter
 
+import constants.AdminConstants
 import syncInfo.models.Mod
 
 sealed class ModsConvertResult {
@@ -8,7 +9,12 @@ sealed class ModsConvertResult {
         val modsOutputText: String,
     ) : ModsConvertResult()
 
-    data class Failure(val error: ModsConvertError) : ModsConvertResult()
+    data class Failure(
+        val error: ModsConvertError,
+    ) : ModsConvertResult()
 
-    data object NeedToAcceptCurseForgeForStudiosTermsOfUse : ModsConvertResult()
+    /**
+     * Need to accept Curse Forge Terms of Service [AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL]
+     * */
+    data object RequiresAcceptanceOfCurseForgeForStudiosTermsOfUse : ModsConvertResult()
 }

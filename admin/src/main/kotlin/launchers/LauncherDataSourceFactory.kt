@@ -7,10 +7,10 @@ import launchers.prismLauncher.PrismLauncherDataSource
 object LauncherDataSourceFactory {
     private val handlers = mutableMapOf<MinecraftLauncher, LauncherDataSource>()
 
-    fun getHandler(minecraftLauncher: MinecraftLauncher): LauncherDataSource {
+    fun getHandler(launcher: MinecraftLauncher): LauncherDataSource {
         // TODO: Implement missing and add support for more later
-        return handlers.computeIfAbsent(minecraftLauncher) {
-            when (minecraftLauncher) {
+        return handlers.computeIfAbsent(launcher) {
+            when (launcher) {
                 MinecraftLauncher.Official -> TODO()
                 MinecraftLauncher.MultiMc -> TODO()
                 MinecraftLauncher.GDLauncher -> TODO()

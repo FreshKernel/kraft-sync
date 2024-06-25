@@ -59,7 +59,8 @@ class CreateScriptConfigDialog : JDialog() {
                 labelText = "Environment",
                 tooltipText =
                     "Will be used to have different sync logic, for example shaders and resource-packs is " +
-                        "not supported on the server.",
+                        "not supported on the server. Depending on the admin configuration, the script also might install" +
+                        " mods for the selected environment only.",
                 inputComponent =
                     JComboBox<Environment>()
                         .apply {
@@ -72,7 +73,7 @@ class CreateScriptConfigDialog : JDialog() {
                 if (syncInfoUrlTextField.text.isBlank()) {
                     GuiUtils.showErrorMessage(
                         title = "🚫 Empty URL",
-                        message = "We need a URL to continue 🌐",
+                        message = "Provide the sync URL to proceed 🌐",
                         parentComponent = this,
                     )
                     return@onClick

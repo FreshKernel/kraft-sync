@@ -8,7 +8,9 @@ import java.io.File
  *
  * This should be only used by the script that syncs the content
  * */
-sealed class SyncScriptInstanceFiles(val file: File) {
+sealed class SyncScriptInstanceFiles(
+    val file: File,
+) {
     data object Mods : SyncScriptInstanceFiles(File(MinecraftInstanceNames.MODS_FOLDER))
 
     data object ResourcePacks : SyncScriptInstanceFiles(File(MinecraftInstanceNames.RESOURCE_PACKS_FOLDER))
@@ -33,7 +35,7 @@ sealed class SyncScriptInstanceFiles(val file: File) {
     /**
      * This folder will be created and managed by the script, it's specific to it
      * */
-    data object SyncScriptData : SyncScriptInstanceFiles(File("${ProjectInfoConstants.NORMALIZED_NAME}-data")) {
+    data object SyncScriptData : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SYNC_SCRIPT_FOLDER)) {
         /**
          * The script needs a config file that contains required data and other optional to configure it
          * */
