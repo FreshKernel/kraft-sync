@@ -122,6 +122,10 @@ class ModrinthLauncherDataSource : LauncherDataSource {
             // we will load it using a json element and modify it using the data class then merge it
             val instanceJsonElement: JsonElement = Json.parseToJsonElement(instanceConfigFile.readText())
             val instance: ModrinthLauncherInstance = JsonIgnoreUnknownKeys.decodeFromJsonElement(instanceJsonElement)
+
+            // TODO The current implementation does not disable
+            //  the hooks if the new pre-launch command is null
+            //  and the other commands like post-exist command is null
             val newInstance: ModrinthLauncherInstance =
                 instance.copy(
                     hooks =
