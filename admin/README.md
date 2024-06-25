@@ -40,9 +40,9 @@ and has a rate limit.
 To make the process easier, we already included a default `API_KEY` and the option to override it.
 
 When possible, consider using alternatives such as [Modrinth](https://www.modrinth.com/) 
-when possible for downloading mods in your
+for downloading mods in your
 Minecraft launcher as this will make the process easier and faster with fewer errors 
-as it doesn't require sending any request using the **network**.
+as it doesn't require sending any requests using the **network**.
 
 Some launchers store the download URL from the **Modrinth** provider, even if the mod is downloaded from Curse Forge.
 If a mod is not available on Modrinth, the launcher may only store the Curse Forge project and file ID. In such cases,
