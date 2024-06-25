@@ -10,68 +10,27 @@ import gui.components.labeledInputPanel
 import gui.utils.GuiUtils
 import gui.utils.SwingDialogManager
 import gui.utils.column
-import gui.utils.getCurrentWindowFrame
 import gui.utils.getSelectedItemOrThrow
 import gui.utils.onClick
-import gui.utils.padding
-import gui.utils.row
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import launchers.MinecraftLauncher
-import minecraftAssetProviders.MinecraftAssetProvider
 import services.modsConverter.ModsConvertError
 import services.modsConverter.ModsConvertResult
 import services.modsConverter.ModsConverterInstance
 import services.modsConverter.models.ModsConvertMode
 import services.modsConverter.models.ModsConvertOutputOption
 import utils.copyToClipboard
-import java.awt.Dimension
-import java.awt.Frame
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JDialog
 import javax.swing.JFileChooser
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.filechooser.FileNameExtensionFilter
 
 class ModsConverterTab : Tab() {
-    init {
-        setupTabContent()
-    }
-
-    override fun getTabContent(): JPanel =
-        row(
-            HtmlTextWithLinks {
-                text("With ")
-                link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE_URL)
-                text(
-                    " Admin, you can create an instance in your favorite Minecraft launcher and download your desired " +
-                        "mods. Simply select the launcher and instance, and the utility will convert " +
-                        "the mods' metadata into script format.",
-                )
-                newLines(2)
-                text("Most launchers do not store the download URLs for mods downloaded from Curse Forge. ")
-                text("The application attempts to retrieve this information by sending a network request to the ")
-                link(labelText = "Curse Forge", linkUrl = MinecraftAssetProvider.CurseForge.link)
-                text(" API. Curse Forge needs an API key, we created one to make the process easier. ")
-                text("For a faster, offline experience with fewer errors and no reliance on network connectivity, ")
-                text("we recommend using alternative providers like ")
-                link("Modrinth", MinecraftAssetProvider.Modrinth.link)
-            }.padding(10, 10, 10, 10),
-            JButton("Convert")
-                .onClick {
-                    ConversionInputDialog(this.getCurrentWindowFrame()).isVisible = true
-                },
-        )
-}
-
-private class ConversionInputDialog(
-    owner: Frame,
-) : JDialog(owner) {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private lateinit var launcherComboBox: JComboBox<MinecraftLauncher>
@@ -80,16 +39,9 @@ private class ConversionInputDialog(
     private lateinit var outputModeComboBox: JComboBox<ModsConvertOutputOption>
 
     private lateinit var prettyFormatCheckBox: JCheckBox
-    private lateinit var closeDialogOnCompletionCheckBox: JCheckBox
 
     init {
-        title = "Convert Mods Info"
-        defaultCloseOperation = DISPOSE_ON_CLOSE
-        minimumSize = Dimension(400, 275)
-        maximumSize = Dimension(600, 300)
-        add(getContent())
-        setLocationRelativeTo(owner)
-        pack()
+        setupTabContent()
     }
 
     companion object {
@@ -99,8 +51,17 @@ private class ConversionInputDialog(
         private const val PREFERRED_LABEL_WIDTH = 140
     }
 
-    private fun getContent(): JComponent =
+    override fun getTabContent(): JPanel =
         column(
+            HtmlTextWithLinks {
+                text("With ")
+                link(ProjectInfoConstants.DISPLAY_NAME, ProjectInfoConstants.WEBSITE_URL)
+                text(
+                    " Admin, you can create an instance in your favorite Minecraft launcher and download your desired " +
+                        "mods. Simply select the launcher and instance, and the utility will convert " +
+                        "the mods' metadata into script format.",
+                )
+            },
             labeledInputPanel(
                 labelText = "Launcher",
                 tooltipText = "The Minecraft launcher to convert the info from.",
@@ -129,7 +90,7 @@ private class ConversionInputDialog(
                             GuiUtils.showErrorMessage(
                                 title = "Unexpected Error",
                                 message = "An error occurred while trying to pick the launcher instance directory.",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         },
                     ),
@@ -166,26 +127,13 @@ private class ConversionInputDialog(
                 inputComponent = JCheckBox().also { prettyFormatCheckBox = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            labeledInputPanel(
-                labelText = "Close Dialog",
-                tooltipText =
-                    "Check to close the dialog once the conversation finishes. This option doesn't affect the converted data.",
-                inputComponent =
-                    JCheckBox().apply {
-                        isSelected = true
-                        closeDialogOnCompletionCheckBox = this
-                    },
-                preferredLabelWidth = PREFERRED_LABEL_WIDTH,
-            ),
             JButton("Continue").onClick {
                 convertMods(
                     curseForgeApiKeyOverride = null,
                     isCurseForgeForStudiosTermsOfServiceAccepted = false,
                 )
             },
-        ) {
-            padding(10, 10, 10, 10)
-        }
+        )
 
     private fun convertMods(
         curseForgeApiKeyOverride: String?,
@@ -208,7 +156,7 @@ private class ConversionInputDialog(
                             GuiUtils.showErrorMessage(
                                 title = "🚫 Empty Directory Path",
                                 message = "The instance directory path is needed to proceed.",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -216,7 +164,7 @@ private class ConversionInputDialog(
                             GuiUtils.showErrorMessage(
                                 title = "❌ Directory Not Found",
                                 message = "It seems like the selected instance directory doesn't exist. 📁",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -225,7 +173,7 @@ private class ConversionInputDialog(
                                 title = "❌ Incorrect instance path",
                                 message =
                                     "It seems that the provided instance path might be incorrect: ${result.error.message}",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -235,7 +183,7 @@ private class ConversionInputDialog(
                                 message =
                                     "An error occurred while checking if Curse Forge API HTTP request is needed " +
                                         "\uD83D\uDEE0: ${result.error.message}️",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -243,7 +191,7 @@ private class ConversionInputDialog(
                             GuiUtils.showErrorMessage(
                                 title = "❌ Mods availability check error",
                                 message = "An error occurred while checking if the instance has mods: ${result.error.message}️",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -251,7 +199,7 @@ private class ConversionInputDialog(
                             GuiUtils.showErrorMessage(
                                 title = "❌ Error Converting Mods",
                                 message = "An error occurred while converting the mods \uD83D\uDEE0: ${result.error.message}️",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -266,7 +214,7 @@ private class ConversionInputDialog(
                                     } +
                                         ". Double-check to see if you have some mods installed" +
                                         " on the selected instance.",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
 
@@ -274,7 +222,7 @@ private class ConversionInputDialog(
                             GuiUtils.showErrorMessage(
                                 title = "❌ Unexpected error",
                                 message = "A unknown error occurred: ${result.error.message}\uFE0F",
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                             )
                         }
                     }
@@ -309,7 +257,7 @@ private class ConversionInputDialog(
                                             linkUrl = AdminConstants.CURSE_FORGE_FOR_STUDIOS_TERMS_OF_SERVICE_URL,
                                         )
                                     },
-                                parentComponent = this@ConversionInputDialog,
+                                parentComponent = this@ModsConverterTab,
                                 messageType = SwingDialogManager.MessageType.Question,
                             ).isConfirmed()
                     if (!hasAcceptedCurseForgeForStudiosTermsOfUse) {
@@ -324,7 +272,7 @@ private class ConversionInputDialog(
                                     "get the info about the mod, the API key will needed to authenticate with Curse Forge. " +
                                     "We already provide an API key of our account to make the process easier with " +
                                     "less required steps. You can override the API Key if needed.",
-                            parentComponent = this@ConversionInputDialog,
+                            parentComponent = this@ModsConverterTab,
                             selectionValues = null,
                             initialSelectionValue = null,
                         )
@@ -349,7 +297,7 @@ private class ConversionInputDialog(
                             outputFileChooser.dialogTitle = "The location where the file will be saved"
                             outputFileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
                             outputFileChooser.fileFilter = FileNameExtensionFilter("JSON Files", "json")
-                            val dialogResult = outputFileChooser.showSaveDialog(this@ConversionInputDialog)
+                            val dialogResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
                             if (dialogResult != JFileChooser.APPROVE_OPTION) {
                                 return@launch
                             }
@@ -361,7 +309,7 @@ private class ConversionInputDialog(
                                 GuiUtils.showErrorMessage(
                                     title = "Error Saving File ❌",
                                     message = "An error occurred while saving the file \uD83D\uDEE0: ${e.message}️",
-                                    parentComponent = this@ConversionInputDialog,
+                                    parentComponent = this@ModsConverterTab,
                                 )
                                 return@launch
                             }
@@ -370,11 +318,8 @@ private class ConversionInputDialog(
                     SwingDialogManager.showMessageDialog(
                         title = "Success",
                         message = "The task has been successfully finished.",
-                        parentComponent = this@ConversionInputDialog,
+                        parentComponent = this@ModsConverterTab,
                     )
-                    if (closeDialogOnCompletionCheckBox.isSelected) {
-                        dispose()
-                    }
                 }
             }
         }

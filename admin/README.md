@@ -31,14 +31,18 @@ free to submit a feature request in the [issues](https://github.com/ellet0/kraft
 
 ### ⭐️ Important for mods uploaded to Curse Forge:
 
-Most Minecraft launchers doesn't store Curse Forge CDN Download URL anymore, they usually store the project and the file
-id, the script will send an HTTP GET request to [Curse Forge API](https://docs.curseforge.com/) which require an API key
-and have a limit for how many times we send a request, we could require a `API_KEY` so you have to register first in
-their website and then get it.
+Most Minecraft launchers don't store Curse Forge CDN Download URL anymore, they usually store the project and the file
+id.
 
-To make the process easier we already included a default `API_KEY`, try to use other providers
-like [Modrinth](https://www.modrinth.com/) when possible for downloading mods in your Minecraft launcher as this will
-make the process easier, faster with fewer errors as it doesn't require sending any request using the **network**.
+The application will send an HTTP GET request
+to [Curse Forge API](https://docs.curseforge.com/) which requires an API key
+and has a rate limit.
+To make the process easier, we already included a default `API_KEY` and the option to override it.
+
+When possible, consider using alternatives such as [Modrinth](https://www.modrinth.com/) 
+when possible for downloading mods in your
+Minecraft launcher as this will make the process easier and faster with fewer errors 
+as it doesn't require sending any request using the **network**.
 
 Some launchers store the download URL from the **Modrinth** provider, even if the mod is downloaded from Curse Forge.
 If a mod is not available on Modrinth, the launcher may only store the Curse Forge project and file ID. In such cases,
