@@ -21,6 +21,8 @@ class PrismLauncherDataSource : LauncherDataSource {
          * */
         const val MOD_METADATA_FILE_EXTENSION = "toml"
 
+        const val DOT_MINECRAFT_FOLDER_NAME = ".minecraft"
+
         object PropertyKey {
             const val OVERRIDE_COMMANDS = "OverrideCommands"
 
@@ -32,20 +34,30 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
+    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.resolve("instance.cfg")
 
-    // TODO(outdated): Broken, decode which directory should we choose, either .minecraft or prism launcher root folder,
-    //  also this only work for mods, doesn't work if we want the directory to install sync script
-    //  might refactor this function to return true or false to validate the folders in it instead
-    //  for all implementations or maybe for this only, also might avoid to read twice by using the error that will be thrown,
-    //  see how this affect the validation and the message
+    private fun getDotMinecraftFolder(launcherInstanceDirectory: File): File =
+        Paths
+            .get(launcherInstanceDirectory.path, DOT_MINECRAFT_FOLDER_NAME)
+            .toFile()
+
     override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
         val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+
         if (!instanceConfigFile.exists()) {
             return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
         }
         if (!instanceConfigFile.isFile) {
             return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+        }
+
+        val dotMinecraftFolder = getDotMinecraftFolder(launcherInstanceDirectory = launcherInstanceDirectory)
+
+        if (!dotMinecraftFolder.exists()) {
+            return Result.failure(IllegalArgumentException("The file (${dotMinecraftFolder.absolutePath}) does not exist."))
+        }
+        if (!dotMinecraftFolder.isDirectory) {
+            return Result.failure(IllegalArgumentException("The file (${dotMinecraftFolder.absolutePath}) should be a folder."))
         }
         return Result.success(Unit)
     }
@@ -55,7 +67,10 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     private fun getModsMetaDataFolder(launcherInstanceDirectory: File): File =
         File(
-            Paths.get(launcherInstanceDirectory.path, MinecraftInstanceNames.MODS_FOLDER).toFile(),
+            File(
+                getDotMinecraftFolder(launcherInstanceDirectory = launcherInstanceDirectory),
+                MinecraftInstanceNames.MODS_FOLDER,
+            ),
             MODS_METADATA_FOLDER_NAME,
         )
 

@@ -5,7 +5,7 @@ import constants.ProjectInfoConstants
 import gui.Tab
 import gui.components.HintTextField
 import gui.components.HtmlTextWithLinks
-import gui.components.filePicker
+import gui.components.instanceDirectoryLabeledInput
 import gui.components.labeledInputPanel
 import gui.utils.GuiUtils
 import gui.utils.SwingDialogManager
@@ -72,29 +72,10 @@ class ModsConverterTab : Tab() {
                         }.also { launcherComboBox = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            labeledInputPanel(
-                labelText = "Instance directory",
-                tooltipText = "The Minecraft instance directory that has the mods folder inside it.",
-                inputComponent =
-                    filePicker(
-                        filePathTextField =
-                            HintTextField(hintText = "Path").also {
-                                launcherInstanceDirectoryTextField = it
-                            },
-                        fileChooser =
-                            JFileChooser().apply {
-                                dialogTitle = "Choose the instance directory"
-                                fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-                            },
-                        onErrorWhileChoosingFile = {
-                            GuiUtils.showErrorMessage(
-                                title = "Unexpected Error",
-                                message = "An error occurred while trying to pick the launcher instance directory.",
-                                parentComponent = this@ModsConverterTab,
-                            )
-                        },
-                    ),
+            instanceDirectoryLabeledInput(
+                textField = HintTextField(hintText = "Path").also { launcherInstanceDirectoryTextField = it },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
+                parentComponent = this@ModsConverterTab,
             ),
             labeledInputPanel(
                 labelText = "Convert mode",
