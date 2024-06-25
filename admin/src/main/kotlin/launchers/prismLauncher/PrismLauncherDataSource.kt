@@ -42,7 +42,7 @@ class PrismLauncherDataSource : LauncherDataSource {
         if (!dotMinecraftFolder.exists()) {
             return Result.failure(
                 IllegalArgumentException(
-                    "The file (${dotMinecraftFolder.absolutePath}) does not exist. It seems that this " +
+                    "The file (${dotMinecraftFolder.absolutePath}) does not exist. If this " +
                         "is the root instance folder for Prism Launcher, the path should be to '.minecraft' folder.",
                 ),
             )
