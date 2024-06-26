@@ -20,6 +20,8 @@ object SystemInfoProvider {
 
     fun getKdeFullSession(): String? = System.getenv(SystemConstants.EnvironmentVariables.KDE_FULL_SESSION)
 
+    fun getWindowsAppDataDirectory(): String? = System.getenv(SystemConstants.EnvironmentVariables.WINDOWS_APPDATA)
+
     /**
      * Some constants might be specific to Java or JVM like the [SystemConstants.Properties]
      * */
@@ -35,6 +37,7 @@ object SystemInfoProvider {
         object EnvironmentVariables {
             const val CURRENT_LINUX_DESKTOP_ENVIRONMENT = "XDG_CURRENT_DESKTOP"
             const val KDE_FULL_SESSION = "KDE_FULL_SESSION"
+            const val WINDOWS_APPDATA = "APPDATA"
         }
     }
 }

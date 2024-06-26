@@ -97,20 +97,44 @@ fun <T : JButton> T.onClick(onClick: (event: ActionEvent) -> Unit): T {
     return this
 }
 
-inline fun <reified T> JComboBox<T>.onItemSelected(crossinline onItemSelected: (item: T, event: ActionEvent) -> Unit): JComboBox<T> {
-    addActionListener { event ->
+inline fun <reified T> JComboBox<T>.onItemSelected(crossinline onItemSelected: (item: T?, event: ItemEvent) -> Unit): JComboBox<T> {
+    this.addItemListener { event ->
+        if (event.stateChange != ItemEvent.SELECTED) {
+            return@addItemListener
+        }
+        if (this.selectedItem == null || this.selectedItem !is T) {
+            onItemSelected(null, event)
+            return@addItemListener
+        }
         onItemSelected(this.getSelectedItemOrThrow(), event)
     }
     return this
 }
 
-/**
- * If the [JComboBox.isEditable] set to true, if the value doesn't match the type of [T], you will get
- * [ClassCastException]
- * */
-inline fun <reified T> JComboBox<T>.getSelectedItemOrThrow(): T {
-    return this.selectedItem as T
+inline fun <reified T> JComboBox<T>.onItemChanged(crossinline onItemChanged: (item: T, event: ActionEvent) -> Unit): JComboBox<T> {
+    this.addActionListener { event ->
+        onItemChanged(this.getSelectedItemOrThrow(), event)
+    }
+    return this
 }
+
+/**
+ *
+ * @throws ClassCastException If [JComboBox.isEditable] is set to true, and the value doesn't match
+ * the type of [T]
+ *
+ * @throws NullPointerException When calling [JComboBox.removeAllItems]
+ * */
+inline fun <reified T> JComboBox<T>.getSelectedItemOrThrow(): T =
+    kotlin.runCatching { this.selectedItem as T }.getOrElse {
+        if (it is ClassCastException) {
+            throw ClassCastException("Can't cast the selected JComboBox item (${this.selectedItem}): ${it.message}")
+        }
+        if (it is NullPointerException) {
+            throw NullPointerException("The selected JComboBox item is null: ${it.message}")
+        }
+        throw it
+    }
 
 /**
  * Same as [JComboBox.selectingItem] except will enforce the type safety when setting the new item.
@@ -134,7 +158,9 @@ fun JLabel.fontSize(value: Float): JLabel {
     return this
 }
 
-enum class FontStyle(val swingFontStyle: Int) {
+enum class FontStyle(
+    val swingFontStyle: Int,
+) {
     Plain(0),
     Bold(1),
     Italic(2),
@@ -148,9 +174,7 @@ fun <T : JLabel> T.fontStyle(fontStyle: FontStyle): T {
 fun spacer(
     width: Int,
     height: Int,
-): JComponent {
-    return Box.createRigidArea(Dimension(width, height)) as JComponent
-}
+): JComponent = Box.createRigidArea(Dimension(width, height)) as JComponent
 
 fun <T : JComponent> T.backgroundColor(color: Color): T {
     background = color

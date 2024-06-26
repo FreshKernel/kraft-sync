@@ -60,7 +60,7 @@ data class SyncInfo(
      * pass false to [shouldVerifyModFilesIntegrity] and will ignore
      * even if the data in the [FileIntegrityInfo] are specified
      *
-     * @see Mod.shouldVerifyFileIntegrityOverride to override this value for a specific mod
+     * @see Mod.overrideShouldVerifyFileIntegrity to override this value for a specific mod
      *
      * */
     val shouldVerifyModFilesIntegrity: Boolean? = null,

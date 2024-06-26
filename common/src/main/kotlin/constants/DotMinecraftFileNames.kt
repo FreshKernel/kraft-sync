@@ -1,11 +1,16 @@
 package constants
 
-object MinecraftInstanceNames {
-    const val MODS_FOLDER = "mods"
-    const val RESOURCE_PACKS_FOLDER = "resourcepacks"
-    const val SHADER_PACKS_FOLDER = "shaderpacks"
-    const val CONFIG_FOLDER = "config"
-    const val SAVES_FOLDER = "saves"
+object DotMinecraftFileNames {
+    const val MODS_DIRECTORY = "mods"
+    const val RESOURCE_PACKS_DIRECTORY = "resourcepacks"
+    const val SHADER_PACKS_DIRECTORY = "shaderpacks"
+    const val CONFIG_DIRECTORY = "config"
+    const val SAVES_DIRECTORY = "saves"
+
+    /**
+     * A directory that is specific to the sync script where it stores its data.
+     * */
+    const val SYNC_SCRIPT_DIRECTORY = "${ProjectInfoConstants.NORMALIZED_NAME}-data"
 
     /**
      * A txt file contains the minecraft options/settings or data like the key bindings, sound settings
@@ -19,6 +24,4 @@ object MinecraftInstanceNames {
     const val SERVERS_FILE = "servers.dat"
 
     // 'servers.essential.dat' is not supported yet
-
-    const val SYNC_SCRIPT_FOLDER = "${ProjectInfoConstants.NORMALIZED_NAME}-data"
 }

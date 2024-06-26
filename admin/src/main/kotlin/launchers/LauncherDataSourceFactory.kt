@@ -20,4 +20,8 @@ object LauncherDataSourceFactory {
             }
         }
     }
+
+    // TODO: Might remove this once implement the missing above
+    fun getHandlerOrNull(launcher: MinecraftLauncher): LauncherDataSource? =
+        kotlin.runCatching { getHandler(launcher = launcher) }.getOrNull()
 }

@@ -1,18 +1,27 @@
 package launchers.modrinth
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import launchers.Instance
 import launchers.LauncherDataSource
 import launchers.modrinth.ModrinthLauncherInstance.ModrinthLauncherProject
 import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
+import utils.SystemFileProvider
 import utils.simpleMergeJsonObjects
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isHidden
+import kotlin.io.path.name
+import kotlin.streams.toList
 
 class ModrinthLauncherDataSource : LauncherDataSource {
     companion object {
@@ -79,7 +88,7 @@ class ModrinthLauncherDataSource : LauncherDataSource {
 
     override suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>> =
         try {
             val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
@@ -151,6 +160,34 @@ class ModrinthLauncherDataSource : LauncherDataSource {
                     ),
             )
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun getInstances(): Result<List<Instance>?> =
+        try {
+            val directory =
+                SystemFileProvider
+                    .getUserApplicationDataDirectory(
+                        applicationDirectoryName = "com.modrinth.theseus",
+                    ).getOrThrow()
+            val instancesDirectory = directory?.resolve("profiles")
+            val instances =
+                instancesDirectory
+                    ?.let {
+                        withContext(Dispatchers.IO) {
+                            Files
+                                .list(it.toPath())
+                                .filter { it.isDirectory() && !it.isHidden() }
+                                .toList()
+                        }
+                    }?.map {
+                        Instance(
+                            launcherInstanceDirectory = it.toFile(),
+                            instanceName = it.name,
+                        )
+                    }
+            Result.success(instances)
         } catch (e: Exception) {
             Result.failure(e)
         }

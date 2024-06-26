@@ -38,7 +38,7 @@ data class ScriptConfig(
      * it should be automatically disabled.
      *
      * */
-    val isGuiEnabledOverride: Boolean? = null,
+    val overrideIsGuiEnabled: Boolean? = null,
     /**
      * The theme mode for the GUI, this only take effect if the GUI mode is enabled.
      * */
@@ -62,7 +62,7 @@ data class ScriptConfig(
      * The accepted values are `client` or `server`
      *
      * If you are using [Environment.Server] and the server doesn't support graphical interface
-     * then consider passing false to [isGuiEnabledOverride]
+     * then consider passing false to [overrideIsGuiEnabled]
      * */
     val environment: Environment = Environment.Client,
     /**

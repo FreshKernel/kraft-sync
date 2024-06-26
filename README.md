@@ -158,7 +158,7 @@ Use the manual or automated method to get started 🚀:
    Enter it and then wait for the sync process to finish, the game will launch with the new synced
    content.
 8. To make this process easier for all the players, export the instance from **Step 5** that's configured
-   to use the script, make sure to include the used JAR file and the `kraft-sync-data` folder
+   to use the script, make sure to include the `kraft-sync.jar` file and the `kraft-sync-data` folder
    and exclude the content that will be synced like the `mods` as the script will download them once the player import
    the instance and launch the instance, you can include them though, the script will sync them if they're outdated.
 

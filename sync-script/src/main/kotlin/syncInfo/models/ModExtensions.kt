@@ -41,7 +41,7 @@ fun Mod.shouldSyncOnCurrentEnvironment(): Boolean {
  * Allow overriding the value for a specific mod, or all the mods, or use a global value for all the assets.
  * */
 fun Mod.shouldVerifyFileIntegrity(): Boolean =
-    shouldVerifyFileIntegrityOverride ?: SyncInfo.instance.shouldVerifyModFilesIntegrity
+    overrideShouldVerifyFileIntegrity ?: SyncInfo.instance.shouldVerifyModFilesIntegrity
         ?: SyncInfo.instance.shouldVerifyAssetFilesIntegrity
 
 suspend fun Mod.hasValidFileIntegrityOrError(modFile: File): Boolean? =

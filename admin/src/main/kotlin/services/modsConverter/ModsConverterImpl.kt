@@ -16,7 +16,7 @@ class ModsConverterImpl : ModsConverter {
         launcherInstanceDirectoryPath: String,
         convertMode: ModsConvertMode,
         prettyFormat: Boolean,
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ): ModsConvertResult {
         return try {
@@ -84,7 +84,7 @@ class ModsConverterImpl : ModsConverter {
                 launcherDataSource
                     .getLauncherInstanceMods(
                         launcherInstanceDirectory = launcherInstanceDirectory,
-                        curseForgeApiKeyOverride = curseForgeApiKeyOverride?.ifBlank { null },
+                        overrideCurseForgeApiKey = overrideCurseForgeApiKey?.ifBlank { null },
                     ).getOrElse {
                         return ModsConvertResult.Failure(
                             error =

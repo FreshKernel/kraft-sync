@@ -3,18 +3,20 @@ package gui.tabs
 import constants.AdminConstants
 import constants.ProjectInfoConstants
 import gui.Tab
-import gui.components.HintTextField
 import gui.components.HtmlTextWithLinks
-import gui.components.instanceDirectoryLabeledInput
-import gui.components.labeledInputPanel
+import gui.components.instanceDirectoryInputField
+import gui.components.labeledInputField
+import gui.utils.ComboItem
 import gui.utils.GuiUtils
 import gui.utils.SwingDialogManager
 import gui.utils.column
 import gui.utils.getSelectedItemOrThrow
+import gui.utils.handleResult
 import gui.utils.onClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import launchers.Instance
 import launchers.MinecraftLauncher
 import services.modsConverter.ModsConvertError
 import services.modsConverter.ModsConvertResult
@@ -28,18 +30,17 @@ import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JFileChooser
 import javax.swing.JPanel
-import javax.swing.JTextField
 import javax.swing.filechooser.FileNameExtensionFilter
 
 class ModsConverterTab : Tab() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var launcherComboBox: JComboBox<MinecraftLauncher>
-    private lateinit var launcherInstanceDirectoryTextField: JTextField
-    private lateinit var modsConvertModeComboBox: JComboBox<ModsConvertMode>
-    private lateinit var outputModeComboBox: JComboBox<ModsConvertOutputOption>
+    private val launcherComboBox: JComboBox<MinecraftLauncher> = JComboBox()
+    private val launcherInstanceDirectoryComboBox: JComboBox<ComboItem<Instance>> = JComboBox()
+    private val modsConvertModeComboBox: JComboBox<ModsConvertMode> = JComboBox()
+    private val outputModeComboBox: JComboBox<ModsConvertOutputOption> = JComboBox()
 
-    private lateinit var prettyFormatCheckBox: JCheckBox
+    private val prettyFormatCheckBox: JCheckBox = JCheckBox()
 
     init {
         setupTabContent()
@@ -47,7 +48,7 @@ class ModsConverterTab : Tab() {
 
     companion object {
         /**
-         * For [labeledInputPanel]
+         * For [labeledInputField]
          * */
         private const val PREFERRED_LABEL_WIDTH = 140
     }
@@ -61,56 +62,57 @@ class ModsConverterTab : Tab() {
                 )
                 boldText("Ensure the launcher is closed, as some launchers save changes upon exiting.")
             },
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Launcher",
                 tooltipText = "The Minecraft launcher to convert the info from.",
                 inputComponent =
-                    JComboBox<MinecraftLauncher>()
+                    launcherComboBox
                         .apply {
                             MinecraftLauncher.entriesWithBuiltInModDownloadSupport().forEach { addItem(it) }
-                        }.also { launcherComboBox = it },
+                        },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            instanceDirectoryLabeledInput(
-                textField = HintTextField(hintText = "Path").also { launcherInstanceDirectoryTextField = it },
-                preferredLabelWidth = PREFERRED_LABEL_WIDTH,
+            instanceDirectoryInputField(
+                inputComboBox = launcherInstanceDirectoryComboBox,
+                launcherComboBox = launcherComboBox,
                 parentComponent = this@ModsConverterTab,
+                preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Convert mode",
                 tooltipText =
                     "Either copy the mods info as mods list or inside a new sync info. Notice that the " +
                         "second option is easier as it will reset the configurations if you have any.",
                 inputComponent =
-                    JComboBox<ModsConvertMode>()
+                    modsConvertModeComboBox
                         .apply {
                             ModsConvertMode.entries.forEach { addItem(it) }
-                        }.also { modsConvertModeComboBox = it },
+                        },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Output mode",
                 tooltipText =
                     "Choose to either copy the output to your clipboard or save it as a file on your local system.",
                 inputComponent =
-                    JComboBox<ModsConvertOutputOption>()
+                    outputModeComboBox
                         .apply {
                             ModsConvertOutputOption.entries.forEach { addItem(it) }
-                        }.also { outputModeComboBox = it },
+                        },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Pretty Format",
                 tooltipText =
-                    "Check if you want the format to be human-readable if you're planning on editing it manually. " +
+                    "Check if you want the file format to be human-readable if you're planning on editing it manually. " +
                         "minifying the file can save up to 10-20% for larger data.",
-                inputComponent = JCheckBox().also { prettyFormatCheckBox = it },
+                inputComponent = prettyFormatCheckBox,
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            JButton("Continue").onClick {
+            JButton("Convert").onClick {
                 coroutineScope.launch {
                     convertMods(
-                        curseForgeApiKeyOverride = null,
+                        overrideCurseForgeApiKey = null,
                         isCurseForgeForStudiosTermsOfServiceAccepted = false,
                     )
                 }
@@ -118,16 +120,19 @@ class ModsConverterTab : Tab() {
         )
 
     private suspend fun convertMods(
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ) {
         val result =
             ModsConverterInstance.convertMods(
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
-                launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
+                launcherInstanceDirectoryPath =
+                    (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
+                        "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
+                    ),
                 convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
                 prettyFormat = prettyFormatCheckBox.isSelected,
-                curseForgeApiKeyOverride = curseForgeApiKeyOverride,
+                overrideCurseForgeApiKey = overrideCurseForgeApiKey,
                 isCurseForgeForStudiosTermsOfServiceAccepted = isCurseForgeForStudiosTermsOfServiceAccepted,
             )
         when (result) {
@@ -273,7 +278,7 @@ class ModsConverterTab : Tab() {
                     return
                 }
                 convertMods(
-                    curseForgeApiKeyOverride = userCurseForgeApiKey,
+                    overrideCurseForgeApiKey = userCurseForgeApiKey,
                     isCurseForgeForStudiosTermsOfServiceAccepted = true,
                 )
             }
@@ -285,15 +290,20 @@ class ModsConverterTab : Tab() {
                     }
 
                     ModsConvertOutputOption.SaveAsFile -> {
-                        val outputFileChooser = JFileChooser()
-                        outputFileChooser.dialogTitle = "The location where the file will be saved"
-                        outputFileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
-                        outputFileChooser.fileFilter = FileNameExtensionFilter("JSON Files", "json")
-                        val dialogResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
-                        if (dialogResult != JFileChooser.APPROVE_OPTION) {
-                            return
-                        }
-                        val outputFile = outputFileChooser.selectedFile
+                        val outputFileChooser =
+                            JFileChooser().apply {
+                                dialogTitle = "The location where the file will be saved"
+                                fileSelectionMode = JFileChooser.FILES_ONLY
+                                fileFilter = FileNameExtensionFilter("JSON Files", "json")
+                            }
+
+                        val filePickResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
+
+                        val outputFile =
+                            outputFileChooser.handleResult(
+                                result = filePickResult,
+                                onErrorWhileChoosingFile = {},
+                            ) ?: return
                         try {
                             outputFile.writeText(result.modsOutputText)
                         } catch (e: Exception) {

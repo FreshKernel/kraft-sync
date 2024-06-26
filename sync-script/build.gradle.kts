@@ -47,12 +47,12 @@ application {
         )
 }
 
-val distFolder
+val distDirectory
     get() = project.rootDir.resolve("dist")
 
 tasks.clean {
     doFirst {
-        delete(distFolder)
+        delete(distDirectory)
     }
 }
 
@@ -61,7 +61,7 @@ tasks.clean {
 tasks.shadowJar {
     // If you change the file name or destination directory, also update it from the README.md and other markdown files
     archiveFileName.set("${rootProject.name}.jar")
-    destinationDirectory = distFolder
+    destinationDirectory = distDirectory
     description =
         "A script that allows to sync mods, resource packs, shaders, and more seamlessly before launching the game."
     minimize {

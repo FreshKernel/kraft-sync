@@ -44,7 +44,7 @@ interface LauncherDataSource {
      * */
     suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>>
 
     /**
@@ -67,4 +67,9 @@ interface LauncherDataSource {
         command: String?,
         launcherInstanceDirectory: File,
     ): Result<Unit>
+
+    /**
+     * @return A list of the instances for the launcher
+     * */
+    suspend fun getInstances(): Result<List<Instance>?>
 }
