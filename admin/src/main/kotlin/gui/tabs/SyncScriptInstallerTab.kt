@@ -116,8 +116,10 @@ class SyncScriptInstallerTab : Tab() {
         val result =
             SyncScriptInstallerInstance.configureInstallation(
                 installationConfig = installationConfig,
-                // TODO: Throw an exception with a readable message instead
-                launcherInstanceDirectoryPath = launcherInstanceDirectoryComboBox.selectedItem as String,
+                launcherInstanceDirectoryPath =
+                    (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
+                        "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
+                    ),
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
                 confirmReplaceExistingPreLaunchCommand = confirmReplaceExistingPreLaunchCommand,
             )

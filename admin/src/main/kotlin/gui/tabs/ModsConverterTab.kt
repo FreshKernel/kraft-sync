@@ -126,8 +126,10 @@ class ModsConverterTab : Tab() {
         val result =
             ModsConverterInstance.convertMods(
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
-                // TODO: Throw an exception with a readable message instead
-                launcherInstanceDirectoryPath = launcherInstanceDirectoryComboBox.selectedItem as String,
+                launcherInstanceDirectoryPath =
+                    (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
+                        "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
+                    ),
                 convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
                 prettyFormat = prettyFormatCheckBox.isSelected,
                 overrideCurseForgeApiKey = overrideCurseForgeApiKey,
