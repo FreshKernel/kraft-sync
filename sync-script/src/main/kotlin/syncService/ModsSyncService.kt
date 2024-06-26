@@ -21,6 +21,7 @@ import utils.showErrorMessageAndTerminate
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
@@ -33,7 +34,8 @@ import kotlin.streams.toList
 //  mods issue when allowing the user to install other mods
 
 class ModsSyncService : SyncService {
-    private val modsDirectory = SyncScriptDotMinecraftFiles.Mods.file
+    // TODO: Avoid converting to File and use the Path instead
+    private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.file.toPath()
 
     companion object {
         private const val MOD_FILE_EXTENSION = "jar"
@@ -82,12 +84,12 @@ class ModsSyncService : SyncService {
         }
 
     private fun validateModsDirectory() {
-        if (!modsDirectory.exists()) {
+        if (!modsDirectoryPath.exists()) {
             println("\uD83D\uDCC1 The mods folder doesn't exist, creating it..")
-            modsDirectory.mkdirs()
+            modsDirectoryPath.createDirectories()
         }
 
-        if (!modsDirectory.isDirectory) {
+        if (!modsDirectoryPath.isDirectory()) {
             showErrorMessageAndTerminate(
                 title = "❌ Invalid Mods Folder",
                 message =
@@ -99,11 +101,10 @@ class ModsSyncService : SyncService {
     }
 
     private fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
-        // TODO: Avoid using toPath from File once fully migrated to Path
         val localModFiles =
             try {
                 Files
-                    .list(modsDirectory.toPath())
+                    .list(modsDirectoryPath)
                     .use { stream ->
                         stream
                             .filter { !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION }
@@ -277,8 +278,7 @@ class ModsSyncService : SyncService {
                 SyncInfo.instance.modSyncMarker?.let { append(it) }
                 append(".${MOD_FILE_EXTENSION}")
             }
-        // TODO: Avoid using toPath from File once fully migrated to Path
-        return modsDirectory.resolve(modFileName).toPath()
+        return modsDirectoryPath.resolve(modFileName)
     }
 
     /**
