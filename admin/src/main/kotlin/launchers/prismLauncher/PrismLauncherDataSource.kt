@@ -160,7 +160,7 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     override suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>> =
         try {
             val modsMetadata =
@@ -188,7 +188,7 @@ class PrismLauncherDataSource : LauncherDataSource {
                                     modId =
                                         modMetadata.update.curseForge.projectId
                                             .toString(),
-                                    overrideApiKey = curseForgeApiKeyOverride,
+                                    overrideApiKey = overrideCurseForgeApiKey,
                                 ).getOrThrow()
                                 .data
                     }

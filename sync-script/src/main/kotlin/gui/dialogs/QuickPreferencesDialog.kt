@@ -31,7 +31,7 @@ import javax.swing.JDialog
 class QuickPreferencesDialog : JDialog() {
     private val themeComboBox: JComboBox<Theme> = JComboBox()
     private val themeModeComboBox: JComboBox<ThemeMode> = JComboBox()
-    private val isGuiEnabledOverrideCheckBox: JCheckBox = JCheckBox()
+    private val overrideIsGuiEnabledCheckBox: JCheckBox = JCheckBox()
 
     init {
         title = "Preferences"
@@ -102,7 +102,7 @@ class QuickPreferencesDialog : JDialog() {
                         text("The GUI mode will be automatically disabled if the system doesn't support it.")
                     }.buildAsText(),
                 inputComponent =
-                    isGuiEnabledOverrideCheckBox.apply { isSelected = GuiState.isGuiEnabled },
+                    overrideIsGuiEnabledCheckBox.apply { isSelected = GuiState.isGuiEnabled },
             ),
             JButton("Continue").onClick { dispose() },
         ) {
@@ -117,13 +117,13 @@ class QuickPreferencesDialog : JDialog() {
         return ScriptConfig.getInstanceOrThrow().copy(
             theme = themeComboBox.getSelectedItemOrThrow(),
             themeMode = themeModeComboBox.getSelectedItemOrThrow(),
-            isGuiEnabledOverride = getIsGuiEnabledOverride(),
+            overrideIsGuiEnabled = getOverrideIsGuiEnabled(),
         )
     }
 
-    private fun getIsGuiEnabledOverride(): Boolean? {
-        if (isGuiEnabledOverrideCheckBox.isSelected != GuiState.isGuiEnabled) {
-            return isGuiEnabledOverrideCheckBox.isSelected
+    private fun getOverrideIsGuiEnabled(): Boolean? {
+        if (overrideIsGuiEnabledCheckBox.isSelected != GuiState.isGuiEnabled) {
+            return overrideIsGuiEnabledCheckBox.isSelected
         }
         // If the new value is the same as the current value, there will
         // be no need to explicitly define this in the config file

@@ -44,7 +44,7 @@ interface LauncherDataSource {
      * */
     suspend fun getLauncherInstanceMods(
         launcherInstanceDirectory: File,
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>>
 
     /**

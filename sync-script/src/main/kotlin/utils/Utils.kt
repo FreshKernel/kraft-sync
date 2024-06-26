@@ -8,14 +8,14 @@ import java.awt.Component
 import kotlin.system.exitProcess
 
 /**
- * If [ScriptConfig.isGuiEnabledOverride] is true, will use [GuiUtils.showErrorMessage]
+ * If [ScriptConfig.overrideIsGuiEnabled] is true, will use [GuiUtils.showErrorMessage]
  * otherwise will just print an error message to the log
  *
  * @param guiParentComponent The Java Swing parent component that created/showed this error message
  * the [terminateWithOrWithoutError] will decide to exit with error or as normal exit
  *
  *
- * Whatever if it should use GUI to show error or not, will use [ScriptConfig.isGuiEnabledOverride],
+ * Whatever if it should use GUI to show error or not, will use [ScriptConfig.overrideIsGuiEnabled],
  * we might call [showErrorMessageAndTerminate] when having error while loading the [ScriptConfig]
  * (for example), which is why we can't [ScriptConfig.getInstanceOrThrow] because we will get not initialized error
  * while showing an error message

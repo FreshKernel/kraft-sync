@@ -112,7 +112,7 @@ class ModsConverterTab : Tab() {
             JButton("Convert").onClick {
                 coroutineScope.launch {
                     convertMods(
-                        curseForgeApiKeyOverride = null,
+                        overrideCurseForgeApiKey = null,
                         isCurseForgeForStudiosTermsOfServiceAccepted = false,
                     )
                 }
@@ -120,7 +120,7 @@ class ModsConverterTab : Tab() {
         )
 
     private suspend fun convertMods(
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ) {
         val result =
@@ -130,7 +130,7 @@ class ModsConverterTab : Tab() {
                 launcherInstanceDirectoryPath = launcherInstanceDirectoryComboBox.selectedItem as String,
                 convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
                 prettyFormat = prettyFormatCheckBox.isSelected,
-                curseForgeApiKeyOverride = curseForgeApiKeyOverride,
+                overrideCurseForgeApiKey = overrideCurseForgeApiKey,
                 isCurseForgeForStudiosTermsOfServiceAccepted = isCurseForgeForStudiosTermsOfServiceAccepted,
             )
         when (result) {
@@ -276,7 +276,7 @@ class ModsConverterTab : Tab() {
                     return
                 }
                 convertMods(
-                    curseForgeApiKeyOverride = userCurseForgeApiKey,
+                    overrideCurseForgeApiKey = userCurseForgeApiKey,
                     isCurseForgeForStudiosTermsOfServiceAccepted = true,
                 )
             }

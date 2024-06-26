@@ -13,7 +13,7 @@ interface ModsConverter {
         launcherInstanceDirectoryPath: String,
         convertMode: ModsConvertMode,
         prettyFormat: Boolean,
-        curseForgeApiKeyOverride: String?,
+        overrideCurseForgeApiKey: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ): ModsConvertResult
 }

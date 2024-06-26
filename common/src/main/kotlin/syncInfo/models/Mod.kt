@@ -58,7 +58,7 @@ data class Mod(
      *
      * @see SyncInfo.shouldVerifyModFilesIntegrity for more details.
      * */
-    val shouldVerifyFileIntegrityOverride: Boolean? = null,
+    val overrideShouldVerifyFileIntegrity: Boolean? = null,
 ) {
     @Serializable
     enum class ModSupport {
