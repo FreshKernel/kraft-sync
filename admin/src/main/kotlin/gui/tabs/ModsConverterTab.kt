@@ -288,10 +288,12 @@ class ModsConverterTab : Tab() {
                     }
 
                     ModsConvertOutputOption.SaveAsFile -> {
-                        val outputFileChooser = JFileChooser()
-                        outputFileChooser.dialogTitle = "The location where the file will be saved"
-                        outputFileChooser.fileSelectionMode = JFileChooser.FILES_ONLY
-                        outputFileChooser.fileFilter = FileNameExtensionFilter("JSON Files", "json")
+                        val outputFileChooser =
+                            JFileChooser().apply {
+                                dialogTitle = "The location where the file will be saved"
+                                fileSelectionMode = JFileChooser.FILES_ONLY
+                                fileFilter = FileNameExtensionFilter("JSON Files", "json")
+                            }
 
                         val filePickResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
 
