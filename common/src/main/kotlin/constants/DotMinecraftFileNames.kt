@@ -1,6 +1,6 @@
 package constants
 
-object MinecraftInstanceNames {
+object DotMinecraftFileNames {
     const val MODS_DIRECTORY = "mods"
     const val RESOURCE_PACKS_DIRECTORY = "resourcepacks"
     const val SHADER_PACKS_DIRECTORY = "shaderpacks"

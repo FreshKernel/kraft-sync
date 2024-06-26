@@ -1,7 +1,7 @@
 package launchers.prismLauncher
 
 import com.akuleshov7.ktoml.Toml
-import constants.MinecraftInstanceNames
+import constants.DotMinecraftFileNames
 import curseForgeDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +20,7 @@ import kotlin.streams.toList
 class PrismLauncherDataSource : LauncherDataSource {
     companion object {
         /**
-         * A directory inside [MinecraftInstanceNames.MODS_DIRECTORY] that contains meta-data for the mods
+         * A directory inside [DotMinecraftFileNames.MODS_DIRECTORY] that contains meta-data for the mods
          * it's specific to this implementation
          * */
         const val MODS_METADATA_DIRECTORY_NAME = ".index"
@@ -86,7 +86,7 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     private fun getModsMetaDataDirectory(launcherInstanceDirectory: File): File =
         File(
-            Paths.get(launcherInstanceDirectory.path, MinecraftInstanceNames.MODS_DIRECTORY).toFile(),
+            Paths.get(launcherInstanceDirectory.path, DotMinecraftFileNames.MODS_DIRECTORY).toFile(),
             MODS_METADATA_DIRECTORY_NAME,
         )
 

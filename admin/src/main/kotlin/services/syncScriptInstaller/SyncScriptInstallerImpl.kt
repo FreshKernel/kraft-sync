@@ -1,6 +1,6 @@
 package services.syncScriptInstaller
 
-import constants.MinecraftInstanceNames
+import constants.DotMinecraftFileNames
 import constants.ProjectInfoConstants
 import launchers.LauncherDataSource
 import launchers.LauncherDataSourceFactory
@@ -73,7 +73,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                         )
                     }
                     val isSyncScriptDataExist =
-                        File(launcherInstanceDirectory, MinecraftInstanceNames.SYNC_SCRIPT_DIRECTORY).deleteRecursively()
+                        File(launcherInstanceDirectory, DotMinecraftFileNames.SYNC_SCRIPT_DIRECTORY).deleteRecursively()
                     if (!isSyncScriptDataExist) {
                         return SyncScriptInstallationResult.Failure(
                             error = SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall,
