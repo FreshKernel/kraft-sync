@@ -111,7 +111,6 @@ inline fun <reified T> JComboBox<T>.onItemSelected(crossinline onItemSelected: (
     return this
 }
 
-// TODO: Review all usages of this and see if they need to be updated to onItemSelected()
 inline fun <reified T> JComboBox<T>.onItemChanged(crossinline onItemChanged: (item: T, event: ActionEvent) -> Unit): JComboBox<T> {
     this.addActionListener { event ->
         onItemChanged(this.getSelectedItemOrThrow(), event)
