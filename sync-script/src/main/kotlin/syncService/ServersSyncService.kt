@@ -1,9 +1,9 @@
 package syncService
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 
 class ServersSyncService : SyncService {
-    private val serversFile = SyncScriptInstanceFiles.ServersDat.file
+    private val serversFile = SyncScriptDotMinecraftFiles.ServersDat.file
 
     override suspend fun syncData() {
         TODO("Not yet implemented")

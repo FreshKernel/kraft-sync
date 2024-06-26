@@ -1,9 +1,9 @@
 package syncService
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 
 class ResourcePacksSyncService : SyncService {
-    private val resourcePacksDirectory = SyncScriptInstanceFiles.ResourcePacks.file
+    private val resourcePacksDirectory = SyncScriptDotMinecraftFiles.ResourcePacks.file
 
     override suspend fun syncData() {
         TODO("Not yet implemented")

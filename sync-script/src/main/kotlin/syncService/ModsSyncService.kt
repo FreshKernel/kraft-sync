@@ -1,6 +1,6 @@
 package syncService
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import gui.dialogs.LoadingIndicatorDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,7 +23,7 @@ import java.io.File
 //  mods issue when allowing the user to install other mods
 
 class ModsSyncService : SyncService {
-    private val modsDirectory = SyncScriptInstanceFiles.Mods.file
+    private val modsDirectory = SyncScriptDotMinecraftFiles.Mods.file
 
     companion object {
         private const val MOD_FILE_EXTENSION = "jar"
@@ -82,7 +82,7 @@ class ModsSyncService : SyncService {
                 title = "❌ Invalid Mods Folder",
                 message =
                     "\uD83D\uDEE0 Mods must be stored in a directory/folder \uD83D\uDCC2 called " +
-                        "`${SyncScriptInstanceFiles.Mods.file.name}`" +
+                        "`${SyncScriptDotMinecraftFiles.Mods.file.name}`" +
                         ", a file was found instead.",
             )
         }

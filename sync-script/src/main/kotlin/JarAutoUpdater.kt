@@ -1,5 +1,5 @@
 import constants.ProjectInfoConstants
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import generated.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,7 +19,7 @@ object JarAutoUpdater {
     private suspend fun downloadLatestJarFile(): Result<File> =
         try {
             val newJarFile =
-                SyncScriptInstanceFiles.SyncScriptData.Temp.file
+                SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file
                     .resolve("${ProjectInfoConstants.NORMALIZED_NAME}-new.jar")
             if (newJarFile.exists()) {
                 newJarFile.delete()
@@ -116,7 +116,7 @@ object JarAutoUpdater {
             OperatingSystem.Windows -> {
                 // On Windows, we can't rename, delete or modify the current running JAR file due to file locking
                 val updateBatScriptFile =
-                    SyncScriptInstanceFiles.SyncScriptData.Temp.file
+                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file
                         .resolve("update.bat")
                 withContext(Dispatchers.IO) {
                     updateBatScriptFile.parentFile.mkdirs()

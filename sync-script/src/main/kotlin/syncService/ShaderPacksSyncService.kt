@@ -1,9 +1,9 @@
 package syncService
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 
 class ShaderPacksSyncService : SyncService {
-    private val shaderPacksDirectory = SyncScriptInstanceFiles.ShaderPacks.file
+    private val shaderPacksDirectory = SyncScriptDotMinecraftFiles.ShaderPacks.file
 
     override suspend fun syncData() {
         TODO("Not yet implemented")

@@ -1,17 +1,17 @@
 package services.minecraft
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.annotations.VisibleForTesting
 import java.io.File
 
 /**
- * Helper class for reading [SyncScriptInstanceFiles.Options] file which contains Minecraft settings
+ * Helper class for reading [SyncScriptDotMinecraftFiles.Options] file which contains Minecraft settings
  * for reading and getting the properties or set them if it doesn't exist
  * */
 object MinecraftOptionsManager {
-    private var optionsFile = SyncScriptInstanceFiles.Options.file
+    private var optionsFile = SyncScriptDotMinecraftFiles.Options.file
     private val properties: MutableMap<String, String> = mutableMapOf()
 
     private var isLoaded = false

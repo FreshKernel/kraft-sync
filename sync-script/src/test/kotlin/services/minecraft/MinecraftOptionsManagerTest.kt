@@ -1,6 +1,6 @@
 package services.minecraft
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -33,8 +33,8 @@ class MinecraftOptionsManagerTest {
     fun setUp() {
         testsOptionsFile =
             File.createTempFile(
-                SyncScriptInstanceFiles.Options.file.nameWithoutExtension,
-                ".${SyncScriptInstanceFiles.Options.file.extension}",
+                SyncScriptDotMinecraftFiles.Options.file.nameWithoutExtension,
+                ".${SyncScriptDotMinecraftFiles.Options.file.extension}",
             )
         testsOptionsFile.deleteOnExit()
 

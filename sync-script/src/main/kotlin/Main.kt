@@ -2,7 +2,7 @@ import config.data.LocalJsonScriptConfigDataSource
 import config.data.ScriptConfigDataSource
 import config.models.ScriptConfig
 import constants.Constants
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import generated.BuildConfig
 import gui.GuiState
 import gui.dialogs.CreateScriptConfigDialog
@@ -59,7 +59,7 @@ suspend fun main(args: Array<String>) {
         }.also { println(it) }
     }
 
-    SyncScriptInstanceFiles.SyncScriptData.Temp.file.apply {
+    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.apply {
         if (exists()) {
             println(
                 "ℹ\uFE0F The temporary folder: $path exist. " +
@@ -88,7 +88,7 @@ suspend fun main(args: Array<String>) {
 
     // Loading the script config file from json file
 
-    val scriptConfigFile = SyncScriptInstanceFiles.SyncScriptData.ScriptConfig.file
+    val scriptConfigFile = SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig.file
     if (!scriptConfigFile.exists()) {
         if (GuiState.isGuiEnabled) {
             println(
@@ -158,7 +158,7 @@ suspend fun main(args: Array<String>) {
 
     // TODO: Plan if we should implement this in non GUI mode
     if (GuiState.isGuiEnabled &&
-        !SyncScriptInstanceFiles.SyncScriptData.IsPreferencesConfigured.file
+        !SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.file
             .exists()
     ) {
         val newScriptConfig = QuickPreferencesDialog().showDialog()
@@ -177,7 +177,7 @@ suspend fun main(args: Array<String>) {
         GuiState.updateIsGuiEnabled()
 
         withContext(Dispatchers.IO) {
-            SyncScriptInstanceFiles.SyncScriptData.IsPreferencesConfigured.file
+            SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.file
                 .createNewFile()
         }
     }
@@ -251,7 +251,7 @@ suspend fun main(args: Array<String>) {
 
     // The temporary folder usually contains the downloaded files which will be moved once finished
     // after finish syncing the contents successfully, we don't need it anymore.
-    SyncScriptInstanceFiles.SyncScriptData.Temp.file.apply {
+    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.apply {
         if (exists()) {
             println("\uD83D\uDEAB Deleting the temporary folder: '$path' (no longer needed).")
             deleteRecursively()

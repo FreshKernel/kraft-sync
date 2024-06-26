@@ -1,6 +1,6 @@
 package utils
 
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
@@ -60,7 +60,7 @@ class FileDownloader(
                 // We could use File.createTempFile from JVM, to avoid creating
                 // files on the user system we will handle it manually
                 val tempFile =
-                    SyncScriptInstanceFiles.SyncScriptData.Temp.file.resolve(
+                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.resolve(
                         "${targetFile.nameWithoutExtension}-${System.currentTimeMillis()}.${targetFile.extension}",
                     )
                 if (!tempFile.exists()) {
@@ -107,7 +107,7 @@ class FileDownloader(
                 e.printStackTrace()
                 showErrorMessageAndTerminate(
                     title = "🚫 Couldn't download the file",
-                    message = "An unknown error occurred while downloading the file: ${e.message} from the url: $downloadUrl",
+                    message = "An unknown error occurred while downloading the file ($downloadUrl): ${e.message}:",
                 )
             }
         }

@@ -1,7 +1,7 @@
 package config.models
 
 import constants.Constants
-import constants.SyncScriptInstanceFiles
+import constants.SyncScriptDotMinecraftFiles
 import gui.theme.Theme
 import gui.theme.ThemeMode
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ import syncInfo.models.Environment
 import syncInfo.models.SyncInfo
 
 /**
- * A data class that represent the json for the [SyncScriptInstanceFiles.SyncScriptData.ScriptConfig]
+ * A data class that represent the json for the [SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig]
  * where the user can pass some data that is needed to launch the script
  * */
 @Serializable
