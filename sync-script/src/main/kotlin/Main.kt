@@ -157,8 +157,9 @@ suspend fun main(args: Array<String>) {
     }
 
     // TODO: Plan if we should implement this in non GUI mode
+    val isPreferencesConfiguredFile = SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.file
     if (GuiState.isGuiEnabled &&
-        !SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.file
+        !isPreferencesConfiguredFile
             .exists()
     ) {
         val newScriptConfig = QuickPreferencesDialog().showDialog()
@@ -177,8 +178,17 @@ suspend fun main(args: Array<String>) {
         GuiState.updateIsGuiEnabled()
 
         withContext(Dispatchers.IO) {
-            SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.file
-                .createNewFile()
+            val wasFileCreated =
+                isPreferencesConfiguredFile
+                    .createNewFile()
+            if (!wasFileCreated) {
+                showErrorMessageAndTerminate(
+                    title = "📄 File Already Exists",
+                    message =
+                        "⚠️ The file '${isPreferencesConfiguredFile.name}' already exists. We're unable to create it. " +
+                            "This might be a bug, a workaround is to delete '${isPreferencesConfiguredFile.path}'.",
+                )
+            }
         }
     }
 

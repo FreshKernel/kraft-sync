@@ -66,13 +66,12 @@ class FileDownloader(
                 if (!tempFile.exists()) {
                     tempFile.parentFile.mkdirs()
                 }
-                val wasFileDoesNotExist = tempFile.createNewFile()
-                // If the file doesn't exist, it means it created successfully
-                if (!wasFileDoesNotExist) {
+                val wasFileCreated = tempFile.createNewFile()
+                if (!wasFileCreated) {
                     showErrorMessageAndTerminate(
                         title = "📄 File Already Exists",
                         message =
-                            "⚠️ The temporary file '${tempFile.name}' already exists. We are unable to create it. " +
+                            "⚠️ The temporary file '${tempFile.name}' already exists. We're unable to create it. " +
                                 "This might be a bug," +
                                 " delete the file: ${targetFile.path} as a workaround.",
                     )
