@@ -15,7 +15,8 @@ object SystemFileProvider {
                     Paths
                         .get(
                             SystemInfoProvider.getUserHomeDirectoryPath(),
-                            "/.local/share",
+                            ".local",
+                            "share",
                         ).toFile()
 
                 OperatingSystem.MacOS ->
