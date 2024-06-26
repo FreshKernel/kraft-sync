@@ -327,7 +327,9 @@ if you have a question, use the Discussions tab instead
 
 <details>
 <summary id="q5">What happens to the old script?</summary>
-We have another script called `MC Mods Sync` which is limited to syncing the mods only, requiring the admin
+
+We have another script called [MC Mods Sync](https://github.com/ellet0/mc-mods-sync)
+which is limited to syncing the mods only, requiring the admin
 to upload the mods on GitHub and then download them,
 other than many issues we discussed like storage limitation and LICENSE
 issues, it's easier to set up and maintain yet less flexible and simpler
