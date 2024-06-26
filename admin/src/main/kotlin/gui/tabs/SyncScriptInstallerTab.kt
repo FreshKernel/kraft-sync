@@ -2,19 +2,21 @@ package gui.tabs
 
 import constants.ProjectInfoConstants
 import gui.Tab
-import gui.components.HintTextField
-import gui.components.instanceDirectoryLabeledInput
-import gui.components.labeledInputPanel
+import gui.components.instanceDirectoryInputField
+import gui.components.labeledInputField
+import gui.utils.ComboItem
 import gui.utils.GuiUtils
 import gui.utils.SwingDialogManager
 import gui.utils.column
 import gui.utils.getSelectedItemOrThrow
+import gui.utils.handleResult
 import gui.utils.onClick
 import gui.utils.padding
 import gui.utils.row
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import launchers.Instance
 import launchers.MinecraftLauncher
 import services.syncScriptInstaller.SyncScriptInstallationConfig
 import services.syncScriptInstaller.SyncScriptInstallationError
@@ -26,14 +28,13 @@ import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JLabel
-import javax.swing.JTextField
 import javax.swing.filechooser.FileNameExtensionFilter
 
 class SyncScriptInstallerTab : Tab() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var launcherInstanceDirectoryTextField: JTextField
-    private lateinit var launcherComboBox: JComboBox<MinecraftLauncher>
+    private val launcherInstanceDirectoryComboBox: JComboBox<ComboItem<Instance>> = JComboBox()
+    private val launcherComboBox: JComboBox<MinecraftLauncher> = JComboBox()
 
     init {
         setupTabContent()
@@ -41,7 +42,7 @@ class SyncScriptInstallerTab : Tab() {
 
     companion object {
         /**
-         * For [labeledInputPanel]
+         * For [labeledInputField]
          * */
         private const val PREFERRED_LABEL_WIDTH = 140
     }
@@ -55,18 +56,19 @@ class SyncScriptInstallerTab : Tab() {
                     boldText("Make sure the launcher is closed to avoid losing the changes.")
                 }.buildBodyAsText(),
             ).padding(bottom = 16),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Launcher",
                 tooltipText = "The Minecraft launcher to convert the info from.",
                 inputComponent =
-                    JComboBox<MinecraftLauncher>()
+                    launcherComboBox
                         .apply {
                             MinecraftLauncher.entriesWithOptimalDataSyncSupport().forEach { addItem(it) }
-                        }.also { launcherComboBox = it },
+                        },
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),
-            instanceDirectoryLabeledInput(
-                textField = HintTextField(hintText = "Path").also { launcherInstanceDirectoryTextField = it },
+            instanceDirectoryInputField(
+                inputComboBox = launcherInstanceDirectoryComboBox,
+                launcherComboBox = launcherComboBox,
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
                 parentComponent = this@SyncScriptInstallerTab,
             ).padding(bottom = 24),
@@ -83,11 +85,13 @@ class SyncScriptInstallerTab : Tab() {
                                                 fileSelectionMode = JFileChooser.FILES_ONLY
                                                 fileFilter = FileNameExtensionFilter("JAR Files", "jar")
                                             }
-                                        fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
-                                        if (fileChooser.selectedFile == null) {
-                                            return@Install null
-                                        }
-                                        fileChooser.selectedFile.path
+                                        val result = fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
+                                        val selectedFile =
+                                            fileChooser.handleResult(
+                                                result = result,
+                                                onErrorWhileChoosingFile = {},
+                                            ) ?: return@Install null
+                                        selectedFile.path
                                     },
                                 ),
                             confirmReplaceExistingPreLaunchCommand = false,
@@ -112,7 +116,8 @@ class SyncScriptInstallerTab : Tab() {
         val result =
             SyncScriptInstallerInstance.configureInstallation(
                 installationConfig = installationConfig,
-                launcherInstanceDirectoryPath = launcherInstanceDirectoryTextField.text,
+                // TODO: Throw an exception with a readable message instead
+                launcherInstanceDirectoryPath = launcherInstanceDirectoryComboBox.selectedItem as String,
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
                 confirmReplaceExistingPreLaunchCommand = confirmReplaceExistingPreLaunchCommand,
             )

@@ -19,9 +19,9 @@ class LoadingIndicatorDialog(
     title: String,
     private val onClose: () -> Unit = {},
 ) : BaseJFrame() {
-    private lateinit var infoLabel: JLabel
-    private lateinit var progressBar: JProgressBar
-    private lateinit var detailsLabel: JLabel
+    private val infoLabel: JLabel = JLabel("In progress")
+    private val progressBar: JProgressBar = JProgressBar(0, 100)
+    private val detailsLabel: JLabel = JLabel("Loading...")
 
     companion object {
         fun createIfGuiEnabled(
@@ -58,21 +58,20 @@ class LoadingIndicatorDialog(
         setLocationRelativeTo(null)
     }
 
-    private fun getContent(): JComponent {
-        return column(
-            JLabel("In progress").padding(top = 12).also { infoLabel = it },
-            JProgressBar(0, 100).apply {
+    private fun getContent(): JComponent =
+        column(
+            infoLabel.padding(top = 12),
+            progressBar.apply {
                 preferredSize = Dimension(200, 20)
                 padding(right = 12, left = 12, top = 12)
-            }.also { progressBar = it },
+            },
             JLabel("Loading...").apply {
                 padding(top = 12, bottom = 12)
-            }.also { detailsLabel = it },
+            },
             JButton("Cancel").onClick {
                 closeDialog()
             },
         )
-    }
 
     private fun closeDialog() {
         onClose()

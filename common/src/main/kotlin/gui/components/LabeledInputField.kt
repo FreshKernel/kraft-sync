@@ -6,14 +6,16 @@ import java.awt.Dimension
 import java.awt.GridBagConstraints
 import javax.swing.BorderFactory
 import javax.swing.JComponent
+import javax.swing.JPanel
 
-fun labeledInputPanel(
+fun labeledInputField(
     labelText: String,
     tooltipText: String,
     inputComponent: JComponent,
     preferredLabelWidth: Int = 100,
-): JComponent {
+): JPanel {
     val constraints = GridBagConstraints()
+
     return row {
         LabelWithTooltip(
             labelText = "$labelText:",

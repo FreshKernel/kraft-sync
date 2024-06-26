@@ -2,7 +2,7 @@ package gui.dialogs
 
 import config.models.ScriptConfig
 import gui.components.HintTextField
-import gui.components.labeledInputPanel
+import gui.components.labeledInputField
 import gui.utils.GuiUtils
 import gui.utils.column
 import gui.utils.getSelectedItemOrThrow
@@ -25,8 +25,8 @@ import javax.swing.JTextField
  * by the admin such as [ScriptConfig.environment], the player usually doesn't need to configure it
  * */
 class CreateScriptConfigDialog : JDialog() {
-    private lateinit var syncInfoUrlTextField: JTextField
-    private lateinit var environmentComboBox: JComboBox<Environment>
+    private val syncInfoUrlTextField: JTextField = HintTextField(hintText = "URL")
+    private val environmentComboBox: JComboBox<Environment> = JComboBox()
 
     init {
         title = "Missing Configuration"
@@ -49,24 +49,23 @@ class CreateScriptConfigDialog : JDialog() {
 
     private fun getContent(): JComponent {
         return column(
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Sync URL",
                 tooltipText = "The URL that will be used to get the information from in order to start the sync process.",
-                inputComponent =
-                    HintTextField(hintText = "URL").also { syncInfoUrlTextField = it },
+                inputComponent = syncInfoUrlTextField,
             ),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Environment",
                 tooltipText =
                     "Will be used to have different sync logic, for example shaders and resource-packs is " +
                         "not supported on the server. Depending on the admin configuration, the script also might install" +
                         " mods for the selected environment only.",
                 inputComponent =
-                    JComboBox<Environment>()
+                    environmentComboBox
                         .apply {
                             Environment.entries.forEach { addItem(it) }
                             selectedItem = Environment.Client
-                        }.also { environmentComboBox = it },
+                        },
             ),
             JButton("Continue").onClick {
                 // TODO: Extract all the logic in here to support non GUI mode

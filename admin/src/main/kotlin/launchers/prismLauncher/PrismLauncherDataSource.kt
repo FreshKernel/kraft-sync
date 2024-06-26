@@ -3,10 +3,19 @@ package launchers.prismLauncher
 import com.akuleshov7.ktoml.Toml
 import constants.MinecraftInstanceNames
 import curseForgeDataSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import launchers.Instance
 import launchers.LauncherDataSource
 import syncInfo.models.Mod
+import utils.SystemFileProvider
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isHidden
+import kotlin.io.path.name
+import kotlin.streams.toList
 
 class PrismLauncherDataSource : LauncherDataSource {
     companion object {
@@ -35,6 +44,15 @@ class PrismLauncherDataSource : LauncherDataSource {
     }
 
     private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
+
+    // TODO: We have a issue in the naming of launcherInstanceDirectory and similar names everywhere in the admin module
+    //  by this, we mean the root instance folder as some launchers might store minecraft specific folders
+    //  in sub folder that could be called (.minecraft) like in Prism Launcher and MultiMC
+    //  yet we ask for the launcherInstanceDirectory everywhere which doesn't work for launchers like MultiMC
+    //  a solution would be to review this name and call it something else like (dotMinecraftDirectory)
+    //  and still request the launcherInstanceDirectory and will provide a function that return the (dotMinecraftDirectory)
+    //  by the root instance folder (launcherInstanceDirectory), currently for this implementation, we're asking
+    //  for the `.minecraft` folder, also update the GUI instructions (InstanceDirectoryInputField.kt), and the docs if there are any references
 
     override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
         val dotMinecraftFolder = File(launcherInstanceDirectory.parentFile, DOT_MINECRAFT_FOLDER_NAME)
@@ -301,6 +319,45 @@ class PrismLauncherDataSource : LauncherDataSource {
             instanceConfigFile.writeText(text = instanceConfigFileLines.joinToString("\n"))
 
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun getInstances(): Result<List<Instance>?> =
+        try {
+            val (directory, isFlatpak) =
+                SystemFileProvider
+                    .getUserApplicationDataDirectoryWithFlatpakSupport(
+                        applicationDirectoryName = "PrismLauncher",
+                        flatpakApplicationId = "org.prismlauncher.PrismLauncher",
+                    ).getOrThrow()
+            val instancesDirectory =
+                (if (isFlatpak) directory?.resolve("PrismLauncher") else directory)
+                    ?.resolve("instances")
+            val instances =
+                instancesDirectory
+                    ?.let {
+                        withContext(Dispatchers.IO) {
+                            Files
+                                .list(it.toPath())
+                                .filter {
+                                    it.isDirectory() &&
+                                        !it.isHidden() &&
+                                        it.name !in
+                                        listOf(
+                                            ".LAUNCHER_TEMP",
+                                            ".tmp",
+                                        )
+                                }.toList()
+                        }
+                    }?.map {
+                        Instance(
+                            launcherInstanceDirectory = it.resolve(DOT_MINECRAFT_FOLDER_NAME).toFile(),
+                            instanceName = it.name,
+                        )
+                    }
+
+            Result.success(instances)
         } catch (e: Exception) {
             Result.failure(e)
         }

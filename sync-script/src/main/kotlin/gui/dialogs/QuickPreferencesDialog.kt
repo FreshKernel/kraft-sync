@@ -3,14 +3,14 @@ package gui.dialogs
 import config.models.ScriptConfig
 import constants.Constants
 import gui.GuiState
-import gui.components.labeledInputPanel
+import gui.components.labeledInputField
 import gui.theme.Theme
 import gui.theme.ThemeMode
 import gui.utils.GuiUtils
 import gui.utils.column
 import gui.utils.getSelectedItemOrThrow
 import gui.utils.onClick
-import gui.utils.onItemSelected
+import gui.utils.onItemChanged
 import gui.utils.padding
 import gui.utils.setSelectedItemSafe
 import utils.buildHtml
@@ -29,9 +29,9 @@ import javax.swing.JDialog
  * This data is optional unlike [CreateScriptConfigDialog]
  * */
 class QuickPreferencesDialog : JDialog() {
-    private lateinit var themeComboBox: JComboBox<Theme>
-    private lateinit var themeModeComboBox: JComboBox<ThemeMode>
-    private lateinit var isGuiEnabledOverrideCheckBox: JCheckBox
+    private val themeComboBox: JComboBox<Theme> = JComboBox()
+    private val themeModeComboBox: JComboBox<ThemeMode> = JComboBox()
+    private val isGuiEnabledOverrideCheckBox: JCheckBox = JCheckBox()
 
     init {
         title = "Preferences"
@@ -54,34 +54,32 @@ class QuickPreferencesDialog : JDialog() {
 
     private fun getContent(): JComponent =
         column(
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Theme",
                 tooltipText = "Choose the appearance theme.",
                 inputComponent =
-                    JComboBox<Theme>()
+                    themeComboBox
                         .apply {
                             Theme.entries.forEach { addItem(it) }
                             setSelectedItemSafe(ScriptConfig.getInstanceOrThrow().theme)
-                        }.also { themeComboBox = it }
-                        .onItemSelected { item, _ ->
+                        }.onItemChanged { item, _ ->
                             GuiUtils.applyThemeWithUiAnimatedChange(item, themeModeComboBox.getSelectedItemOrThrow())
                         },
             ),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Theme Mode",
                 tooltipText =
                     "Select the mode for the theme to use. Some themes may not support Dark mode.",
                 inputComponent =
-                    JComboBox<ThemeMode>()
+                    themeModeComboBox
                         .apply {
                             ThemeMode.entries.forEach { addItem(it) }
                             setSelectedItemSafe(ScriptConfig.getInstanceOrThrow().themeMode)
-                        }.also { themeModeComboBox = it }
-                        .onItemSelected { item, _ ->
+                        }.onItemChanged { item, _ ->
                             GuiUtils.applyThemeWithUiAnimatedChange(themeComboBox.getSelectedItemOrThrow(), item)
                         },
             ),
-            labeledInputPanel(
+            labeledInputField(
                 labelText = "Enable GUI",
                 tooltipText =
                     buildHtml {
@@ -104,7 +102,7 @@ class QuickPreferencesDialog : JDialog() {
                         text("The GUI mode will be automatically disabled if the system doesn't support it.")
                     }.buildAsText(),
                 inputComponent =
-                    JCheckBox().apply { isSelected = GuiState.isGuiEnabled }.also { isGuiEnabledOverrideCheckBox = it },
+                    isGuiEnabledOverrideCheckBox.apply { isSelected = GuiState.isGuiEnabled },
             ),
             JButton("Continue").onClick { dispose() },
         ) {

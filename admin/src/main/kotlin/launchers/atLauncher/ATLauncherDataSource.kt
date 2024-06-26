@@ -1,17 +1,26 @@
 package launchers.atLauncher
 
 import curseForgeDataSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
+import launchers.Instance
 import launchers.LauncherDataSource
 import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.JsonPrettyPrint
+import utils.SystemFileProvider
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isHidden
+import kotlin.io.path.name
+import kotlin.streams.toList
 
 class ATLauncherDataSource : LauncherDataSource {
     companion object {
@@ -198,6 +207,34 @@ class ATLauncherDataSource : LauncherDataSource {
                     ),
             )
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    override suspend fun getInstances(): Result<List<Instance>?> =
+        try {
+            val (directory, _) =
+                SystemFileProvider
+                    .getUserApplicationDataDirectoryWithFlatpakSupport(
+                        applicationDirectoryName = "ATLauncher",
+                        flatpakApplicationId = "com.atlauncher.ATLauncher",
+                    ).getOrThrow()
+            val instancesDirectory = directory?.resolve("instances")
+            val instances =
+                instancesDirectory?.let {
+                    withContext(Dispatchers.IO) {
+                        Files
+                            .list(it.toPath())
+                            .filter { it.isDirectory() && !it.isHidden() }
+                            .toList()
+                    }.map {
+                        Instance(
+                            launcherInstanceDirectory = it.toFile(),
+                            instanceName = it.name,
+                        )
+                    }
+                }
+            Result.success(instances)
         } catch (e: Exception) {
             Result.failure(e)
         }

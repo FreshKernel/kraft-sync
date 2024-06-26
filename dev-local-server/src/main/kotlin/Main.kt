@@ -3,7 +3,11 @@ import java.io.File
 import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
+import java.nio.file.Files
+import java.nio.file.Paths
 import kotlin.concurrent.thread
+import kotlin.io.path.isRegularFile
+import kotlin.streams.toList
 
 fun main() {
     println("📂 Current Directory: ${System.getProperty("user.dir")}")
@@ -38,6 +42,16 @@ fun main() {
 
     println("\n🚀 Server started at http://localhost:$serverPort/")
     println("\uD83C\uDFE0 The server can be accessed locally at http://${getLocalIpAddress()}:$serverPort/")
+
+    println("\n\uD83D\uDCC1 The files:")
+
+    Files
+        .walk(Paths.get(""))
+        .use { paths ->
+            paths.filter { it.isRegularFile() }.toList()
+        }.forEach {
+            println("\uD83C\uDF10 http://localhost:$serverPort/$it")
+        }
 
     listenForQToStop(server = server)
 }
