@@ -65,7 +65,7 @@ class LoadingIndicatorDialog(
                 preferredSize = Dimension(200, 20)
                 padding(right = 12, left = 12, top = 12)
             },
-            JLabel("Loading...").apply {
+            detailsLabel.apply {
                 padding(top = 12, bottom = 12)
             },
             JButton("Cancel").onClick {
