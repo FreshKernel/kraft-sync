@@ -15,9 +15,19 @@ import utils.ExecutionTimer
 import utils.FileDownloader
 import utils.calculateProgressByIndex
 import utils.convertBytesToReadableMegabytesAsString
+import utils.deleteExistingOrTerminate
 import utils.getFileNameFromUrlOrError
 import utils.showErrorMessageAndTerminate
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isHidden
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
+import kotlin.streams.toList
 
 // TODO: Use JarFile(modFile).manifest.mainAttributes to read the mod name, id and some info to solve the duplicating
 //  mods issue when allowing the user to install other mods
@@ -89,16 +99,23 @@ class ModsSyncService : SyncService {
     }
 
     private fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
+        // TODO: Avoid using toPath from File once fully migrated to Path
         val localModFiles =
-            (
-                modsDirectory.listFiles() ?: kotlin.run {
-                    showErrorMessageAndTerminate(
-                        title = "📁 File Listing Error",
-                        message = "⚠ Failed to list the files in the mods folder.",
-                    )
-                    return
-                }
-            ).filter { !it.isDirectory && it.extension == MOD_FILE_EXTENSION }
+            try {
+                Files
+                    .list(modsDirectory.toPath())
+                    .use { stream ->
+                        stream
+                            .filter { !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION }
+                            .toList()
+                    }
+            } catch (e: Exception) {
+                showErrorMessageAndTerminate(
+                    title = "📁 File Listing Error",
+                    message = "⚠ Failed to list the files in the mods folder: ${e.message}",
+                )
+                return
+            }
 
         // Get only the mods that are created by the script if the admin allows the player to install other mods
 
@@ -108,18 +125,21 @@ class ModsSyncService : SyncService {
          * */
         val localModFilesToProcess =
             if (syncInfo.allowUsingOtherMods) {
-                localModFiles.filter { isScriptMod(it) }
+                localModFiles.filter { isScriptModFile(it) }
             } else {
                 localModFiles.toList()
             }
 
         // Delete the old un-synced mods
 
-        val remoteModFileNames: List<String> = mods.map { getModFile(it).name }
+        val remoteModFileNames: List<String> = mods.map { getModFilePath(it).name }
         for (localModFile in localModFilesToProcess) {
             if (localModFile.name !in remoteModFileNames) {
-                println("❌ Deleting the mod '${localModFile.name}' as it's no longer on the server.")
-                localModFile.delete()
+                println("\uD83D\uDEAB Deleting the mod '${localModFile.name}' as it's no longer on the server.")
+                localModFile.deleteExistingOrTerminate(
+                    fileEntityType = "mod",
+                    reasonOfDelete = "it's no longer on the server",
+                )
             }
         }
     }
@@ -129,10 +149,13 @@ class ModsSyncService : SyncService {
             val currentEnvironmentMods =
                 mods.filter { mod ->
                     if (!mod.shouldSyncOnCurrentEnvironment()) {
-                        val modFile = getModFile(mod)
-                        if (modFile.exists()) {
-                            println("❌ Deleting the mod '${modFile.name}' as it's not needed on the current environment.")
-                            modFile.delete()
+                        val modFilePath = getModFilePath(mod)
+                        if (modFilePath.exists()) {
+                            println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
+                            modFilePath.deleteExistingOrTerminate(
+                                fileEntityType = "mod",
+                                reasonOfDelete = "it's not required on the current environment",
+                            )
                         }
                         // Exclude the mod as it's not needed in the current environment
                         return@filter false
@@ -151,8 +174,8 @@ class ModsSyncService : SyncService {
     ): List<Mod> {
         return mods.filter { mod ->
             val modFileName = getFileNameFromUrlOrError(mod.downloadUrl)
-            val modFile = getModFile(mod)
-            if (modFile.exists()) {
+            val modFilePath = getModFilePath(mod)
+            if (modFilePath.exists()) {
                 if (!mod.shouldVerifyFileIntegrity()) {
                     println("ℹ️ The mod: '$modFileName' is set to not be verified. Skipping to the next mod.")
                     return@filter false
@@ -167,7 +190,7 @@ class ModsSyncService : SyncService {
                     detailsText =
                         "Verifying the mod files integrity...",
                 )
-                val hasValidModIntegrity = mod.hasValidFileIntegrityOrError(modFile)
+                val hasValidModIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
                 if (hasValidModIntegrity == null) {
                     println("❓ The mod: '$modFileName' has an unknown integrity. Skipping to the next mod.")
                     return@filter false
@@ -180,7 +203,10 @@ class ModsSyncService : SyncService {
                     "❌ The mod: '$modFileName' has invalid integrity. Deleting the mod " +
                         "and downloading it again.",
                 )
-                modFile.delete()
+                modFilePath.deleteExistingOrTerminate(
+                    fileEntityType = "mod",
+                    reasonOfDelete = "it has invalid file integrity",
+                )
             }
 
             // Add this mod to the download list process
@@ -195,8 +221,8 @@ class ModsSyncService : SyncService {
     ) {
         for ((index, mod) in modsToDownload.withIndex()) {
             val modFileName = getFileNameFromUrlOrError(mod.downloadUrl)
-            val modFile = getModFile(mod)
-            if (modFile.exists()) {
+            val modFilePath = getModFilePath(mod)
+            if (modFilePath.exists()) {
                 println("⚠\uFE0F The mod: '$modFileName' already exists.")
             }
 
@@ -204,7 +230,8 @@ class ModsSyncService : SyncService {
 
             FileDownloader(
                 downloadUrl = mod.downloadUrl,
-                targetFile = modFile,
+                // TODO: Avoid converting to File and use the Path instead
+                targetFile = modFilePath.toFile(),
                 progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
                     loadingIndicatorDialog?.updateComponentProperties(
                         title =
@@ -223,7 +250,7 @@ class ModsSyncService : SyncService {
             ).downloadFile()
 
             // This will always validate newly downloaded mods regardless of the configurations
-            val isNewlyDownloadedFileHasValidFileIntegrity = mod.hasValidFileIntegrityOrError(modFile)
+            val isNewlyDownloadedFileHasValidFileIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
             if (isNewlyDownloadedFileHasValidFileIntegrity == false) {
                 showErrorMessageAndTerminate(
                     title = "❌ File Integrity Check Failed",
@@ -236,18 +263,22 @@ class ModsSyncService : SyncService {
     }
 
     /**
-     * @return The file that will be used, we use [SyncInfo.modSyncMarker] to support [isScriptMod]
+     * @return The file that will be used, we use [SyncInfo.modSyncMarker] to support [isScriptModFile]
      * will be the same file name from the [Mod.downloadUrl] if [SyncInfo.modSyncMarker] is null
      *
-     * @see isScriptMod
+     * @see isScriptModFile
      * */
-    private fun getModFile(mod: Mod): File {
+    private fun getModFilePath(mod: Mod): Path {
         val modFileNameWithoutExtension =
-            File(getFileNameFromUrlOrError(mod.downloadUrl)).nameWithoutExtension
-        return File(
-            modsDirectory,
-            "${modFileNameWithoutExtension}${SyncInfo.instance.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
-        )
+            Paths.get(getFileNameFromUrlOrError(mod.downloadUrl)).nameWithoutExtension
+        val modFileName =
+            buildString {
+                append(modFileNameWithoutExtension)
+                SyncInfo.instance.modSyncMarker?.let { append(it) }
+                append(".${MOD_FILE_EXTENSION}")
+            }
+        // TODO: Avoid using toPath from File once fully migrated to Path
+        return modsDirectory.resolve(modFileName).toPath()
     }
 
     /**
@@ -255,10 +286,10 @@ class ModsSyncService : SyncService {
      * it will be identified by [SyncInfo.modSyncMarker] and will always return true
      * if [SyncInfo.modSyncMarker] is null
      *
-     * @see getModFile
+     * @see getModFilePath
      * */
-    private fun isScriptMod(modFile: File): Boolean =
-        modFile.name.endsWith(
+    private fun isScriptModFile(modFilePath: Path): Boolean =
+        modFilePath.name.endsWith(
             "${SyncInfo.instance.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
         )
 

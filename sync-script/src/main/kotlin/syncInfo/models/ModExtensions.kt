@@ -3,7 +3,8 @@ package syncInfo.models
 import config.models.ScriptConfig
 import utils.getFileNameFromUrlOrError
 import utils.showErrorMessageAndTerminate
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.name
 import kotlin.system.exitProcess
 
 /**
@@ -44,11 +45,11 @@ fun Mod.shouldVerifyFileIntegrity(): Boolean =
     overrideShouldVerifyFileIntegrity ?: SyncInfo.instance.shouldVerifyModFilesIntegrity
         ?: SyncInfo.instance.shouldVerifyAssetFilesIntegrity
 
-suspend fun Mod.hasValidFileIntegrityOrError(modFile: File): Boolean? =
-    this.fileIntegrityInfo.hasValidIntegrity(file = modFile).getOrElse {
+suspend fun Mod.hasValidFileIntegrityOrError(modFilePath: Path): Boolean? =
+    this.fileIntegrityInfo.hasValidIntegrity(filePath = modFilePath).getOrElse {
         showErrorMessageAndTerminate(
             title = "File Integrity Validation Error ⚠️",
-            message = "An error occurred while validating the integrity of the mod file (${modFile.name}) \uD83D\uDCC1.",
+            message = "An error occurred while validating the integrity of the mod file (${modFilePath.name}) \uD83D\uDCC1.",
         )
         // This will never reach due to the previous statement stopping the application
         exitProcess(0)

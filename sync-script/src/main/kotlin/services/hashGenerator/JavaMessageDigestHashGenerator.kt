@@ -2,8 +2,9 @@ package services.hashGenerator
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
+import java.nio.file.Path
 import java.security.MessageDigest
+import kotlin.io.path.inputStream
 
 class JavaMessageDigestHashGenerator : HashGenerator {
     override suspend fun generateMD5(text: String): Result<String> {
@@ -17,12 +18,12 @@ class JavaMessageDigestHashGenerator : HashGenerator {
         }
     }
 
-    override suspend fun generateMD5(file: File): Result<String> {
+    override suspend fun generateMD5(filePath: Path): Result<String> {
         return try {
             val buffer = ByteArray(1024)
             val md = MessageDigest.getInstance("MD5")
 
-            file.inputStream().use { fileInputStream ->
+            filePath.inputStream().use { fileInputStream ->
                 var bytesRead: Int
                 while (fileInputStream.read(buffer).also { bytesRead = it } != -1) {
                     md.update(buffer, 0, bytesRead)
@@ -39,9 +40,9 @@ class JavaMessageDigestHashGenerator : HashGenerator {
     /**
      * @author https://www.baeldung.com/sha-256-hashing-java
      * */
-    override suspend fun generateSHA1(file: File): Result<String> {
-        return try {
-            file.inputStream().use { inputStream ->
+    override suspend fun generateSHA1(filePath: Path): Result<String> =
+        try {
+            filePath.inputStream().use { inputStream ->
                 val digest = MessageDigest.getInstance("SHA-1")
                 val buffer = ByteArray(1024)
                 var read: Int
@@ -63,14 +64,13 @@ class JavaMessageDigestHashGenerator : HashGenerator {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 
     /**
      * @author https://www.baeldung.com/sha-256-hashing-java
      * */
-    override suspend fun generateSHA256(file: File): Result<String> {
-        return try {
-            file.inputStream().use { inputStream ->
+    override suspend fun generateSHA256(filePath: Path): Result<String> =
+        try {
+            filePath.inputStream().use { inputStream ->
                 val digest = MessageDigest.getInstance("SHA-256")
                 val buffer = ByteArray(1024)
                 var read: Int
@@ -92,16 +92,15 @@ class JavaMessageDigestHashGenerator : HashGenerator {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 
     /**
      * @author https://www.baeldung.com/sha-256-hashing-java
      * */
-    override suspend fun generateSHA512(file: File): Result<String> {
-        return try {
+    override suspend fun generateSHA512(filePath: Path): Result<String> =
+        try {
             withContext(Dispatchers.IO) {
                 val digest = MessageDigest.getInstance("SHA-512")
-                file.inputStream().use { inputStream ->
+                filePath.inputStream().use { inputStream ->
                     val byteBuffer = ByteArray(1024)
                     var bytesRead: Int
                     while (inputStream.read(byteBuffer).also { bytesRead = it } != -1) {
@@ -115,5 +114,4 @@ class JavaMessageDigestHashGenerator : HashGenerator {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 }
