@@ -20,17 +20,17 @@ import kotlin.streams.toList
 class PrismLauncherDataSource : LauncherDataSource {
     companion object {
         /**
-         * A folder inside [MinecraftInstanceNames.MODS_FOLDER] that contains meta-data for the mods
+         * A directory inside [MinecraftInstanceNames.MODS_DIRECTORY] that contains meta-data for the mods
          * it's specific to this implementation
          * */
-        const val MODS_METADATA_FOLDER_NAME = ".index"
+        const val MODS_METADATA_DIRECTORY_NAME = ".index"
 
         /**
-         * Inside [MODS_METADATA_FOLDER_NAME], there will be files and each file has info about the mod
+         * Inside [MODS_METADATA_DIRECTORY_NAME], there will be files and each file has info about the mod
          * */
         const val MOD_METADATA_FILE_EXTENSION = "toml"
 
-        const val DOT_MINECRAFT_FOLDER_NAME = ".minecraft"
+        const val DOT_MINECRAFT_DIRECTORY_NAME = ".minecraft"
 
         object PropertyKey {
             const val OVERRIDE_COMMANDS = "OverrideCommands"
@@ -55,18 +55,18 @@ class PrismLauncherDataSource : LauncherDataSource {
     //  for the `.minecraft` folder, also update the GUI instructions (InstanceDirectoryInputField.kt), and the docs if there are any references
 
     override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
-        val dotMinecraftFolder = File(launcherInstanceDirectory.parentFile, DOT_MINECRAFT_FOLDER_NAME)
+        val dotMinecraftDirectory = File(launcherInstanceDirectory.parentFile, DOT_MINECRAFT_DIRECTORY_NAME)
 
-        if (!dotMinecraftFolder.exists()) {
+        if (!dotMinecraftDirectory.exists()) {
             return Result.failure(
                 IllegalArgumentException(
-                    "The file (${dotMinecraftFolder.absolutePath}) does not exist. If this " +
+                    "The file (${dotMinecraftDirectory.absolutePath}) does not exist. If this " +
                         "is the root instance folder for Prism Launcher, the path should be to '.minecraft' folder.",
                 ),
             )
         }
-        if (!dotMinecraftFolder.isDirectory) {
-            return Result.failure(IllegalArgumentException("The file (${dotMinecraftFolder.absolutePath}) should be a folder."))
+        if (!dotMinecraftDirectory.isDirectory) {
+            return Result.failure(IllegalArgumentException("The file (${dotMinecraftDirectory.absolutePath}) should be a folder."))
         }
 
         val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
@@ -84,22 +84,22 @@ class PrismLauncherDataSource : LauncherDataSource {
     private fun isCurseForgeApiRequestNeededForMod(modMetadata: PrismLauncherModMetadata): Boolean =
         modMetadata.download.url.isBlank() && modMetadata.update.curseForge != null
 
-    private fun getModsMetaDataFolder(launcherInstanceDirectory: File): File =
+    private fun getModsMetaDataDirectory(launcherInstanceDirectory: File): File =
         File(
-            Paths.get(launcherInstanceDirectory.path, MinecraftInstanceNames.MODS_FOLDER).toFile(),
-            MODS_METADATA_FOLDER_NAME,
+            Paths.get(launcherInstanceDirectory.path, MinecraftInstanceNames.MODS_DIRECTORY).toFile(),
+            MODS_METADATA_DIRECTORY_NAME,
         )
 
     private fun getModMetadataFiles(launcherInstanceDirectory: File): Result<List<File>> {
         return try {
-            val modsMetaDataFolder = getModsMetaDataFolder(launcherInstanceDirectory = launcherInstanceDirectory)
+            val modsMetaDataDirectory = getModsMetaDataDirectory(launcherInstanceDirectory = launcherInstanceDirectory)
             val modMetadataFiles =
-                modsMetaDataFolder.listFiles()?.filter {
+                modsMetaDataDirectory.listFiles()?.filter {
                     it.isFile && it.extension == MOD_METADATA_FILE_EXTENSION
                 }
             if (modMetadataFiles == null) {
                 return Result.failure(
-                    IllegalArgumentException("(${modsMetaDataFolder.absolutePath}) might not be a directory or an I/O error occurred."),
+                    IllegalArgumentException("(${modsMetaDataDirectory.absolutePath}) might not be a directory or an I/O error occurred."),
                 )
             }
             Result.success(modMetadataFiles)
@@ -138,16 +138,16 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> {
         return try {
-            val modsMetaDataFolder =
-                getModsMetaDataFolder(
+            val modsMetaDataDirectory =
+                getModsMetaDataDirectory(
                     launcherInstanceDirectory = launcherInstanceDirectory,
                 )
-            if (!modsMetaDataFolder.exists()) {
+            if (!modsMetaDataDirectory.exists()) {
                 return Result.success(false)
             }
-            if (!modsMetaDataFolder.isDirectory) {
+            if (!modsMetaDataDirectory.isDirectory) {
                 return Result.failure(
-                    IllegalArgumentException("The file (${modsMetaDataFolder.absolutePath} should be a folder/directory."),
+                    IllegalArgumentException("The file (${modsMetaDataDirectory.absolutePath} should be a folder/directory."),
                 )
             }
             val modMetadataFiles =
@@ -352,7 +352,7 @@ class PrismLauncherDataSource : LauncherDataSource {
                         }
                     }?.map {
                         Instance(
-                            launcherInstanceDirectory = it.resolve(DOT_MINECRAFT_FOLDER_NAME).toFile(),
+                            launcherInstanceDirectory = it.resolve(DOT_MINECRAFT_DIRECTORY_NAME).toFile(),
                             instanceName = it.name,
                         )
                     }

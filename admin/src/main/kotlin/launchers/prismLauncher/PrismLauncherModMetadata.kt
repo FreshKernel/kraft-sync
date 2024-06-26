@@ -6,7 +6,7 @@ import syncInfo.models.FileIntegrityInfo
 import syncInfo.models.Mod
 
 /**
- * Prism launcher stores the mod info inside a folder [PrismLauncherDataSource.MODS_METADATA_FOLDER_NAME] which is
+ * Prism launcher stores the mod info inside a folder [PrismLauncherDataSource.MODS_METADATA_DIRECTORY_NAME] which is
  * in the `mods` folder
  *
  * This data class represents the data as TOML
@@ -41,13 +41,12 @@ data class PrismLauncherModMetadata(
          * Note: This mapping assumes the mod is required when present on the respective side
          * due to the lack of explicit optional support information.
          * */
-        fun toClientServerModSupport(): Pair<Mod.ModSupport, Mod.ModSupport> {
-            return when (this) {
+        fun toClientServerModSupport(): Pair<Mod.ModSupport, Mod.ModSupport> =
+            when (this) {
                 Client -> Pair(Mod.ModSupport.Required, Mod.ModSupport.Unsupported)
                 Server -> Pair(Mod.ModSupport.Unsupported, Mod.ModSupport.Required)
                 Both -> Pair(Mod.ModSupport.Required, Mod.ModSupport.Required)
             }
-        }
     }
 
     @Serializable

@@ -11,15 +11,15 @@ import java.io.File
 sealed class SyncScriptInstanceFiles(
     val file: File,
 ) {
-    data object Mods : SyncScriptInstanceFiles(File(MinecraftInstanceNames.MODS_FOLDER))
+    data object Mods : SyncScriptInstanceFiles(File(MinecraftInstanceNames.MODS_DIRECTORY))
 
-    data object ResourcePacks : SyncScriptInstanceFiles(File(MinecraftInstanceNames.RESOURCE_PACKS_FOLDER))
+    data object ResourcePacks : SyncScriptInstanceFiles(File(MinecraftInstanceNames.RESOURCE_PACKS_DIRECTORY))
 
-    data object ShaderPacks : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SHADER_PACKS_FOLDER))
+    data object ShaderPacks : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SHADER_PACKS_DIRECTORY))
 
-    data object Config : SyncScriptInstanceFiles(File(MinecraftInstanceNames.CONFIG_FOLDER))
+    data object Config : SyncScriptInstanceFiles(File(MinecraftInstanceNames.CONFIG_DIRECTORY))
 
-    data object Saves : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SAVES_FOLDER))
+    data object Saves : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SAVES_DIRECTORY))
 
     /**
      * A txt file contains the minecraft options/settings or data like the key bindings, sound settings
@@ -33,9 +33,9 @@ sealed class SyncScriptInstanceFiles(
     data object ServersDat : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SERVERS_FILE))
 
     /**
-     * This folder will be created and managed by the script, it's specific to it
+     * This directory will be created and managed by the script, it's specific to it
      * */
-    data object SyncScriptData : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SYNC_SCRIPT_FOLDER)) {
+    data object SyncScriptData : SyncScriptInstanceFiles(File(MinecraftInstanceNames.SYNC_SCRIPT_DIRECTORY)) {
         /**
          * The script needs a config file that contains required data and other optional to configure it
          * */

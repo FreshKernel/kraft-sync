@@ -23,7 +23,7 @@ import java.io.File
 //  mods issue when allowing the user to install other mods
 
 class ModsSyncService : SyncService {
-    private val modsFolder = SyncScriptInstanceFiles.Mods.file
+    private val modsDirectory = SyncScriptInstanceFiles.Mods.file
 
     companion object {
         private const val MOD_FILE_EXTENSION = "jar"
@@ -41,7 +41,7 @@ class ModsSyncService : SyncService {
             val mods = syncInfo.mods
             println("📥 Total received mods from server: ${mods.size}")
 
-            validateModsFolder()
+            validateModsDirectory()
             deleteUnSyncedLocalModFiles(mods = mods)
 
             val currentEnvironmentModsOrAll = getCurrentEnvironmentModsOrAll(mods = mods)
@@ -71,13 +71,13 @@ class ModsSyncService : SyncService {
             println("\uD83D\uDD52 Finished syncing the mods in ${modsExecutionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
         }
 
-    private fun validateModsFolder() {
-        if (!modsFolder.exists()) {
+    private fun validateModsDirectory() {
+        if (!modsDirectory.exists()) {
             println("\uD83D\uDCC1 The mods folder doesn't exist, creating it..")
-            modsFolder.mkdirs()
+            modsDirectory.mkdirs()
         }
 
-        if (!modsFolder.isDirectory) {
+        if (!modsDirectory.isDirectory) {
             showErrorMessageAndTerminate(
                 title = "❌ Invalid Mods Folder",
                 message =
@@ -91,7 +91,7 @@ class ModsSyncService : SyncService {
     private fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
         val localModFiles =
             (
-                modsFolder.listFiles() ?: kotlin.run {
+                modsDirectory.listFiles() ?: kotlin.run {
                     showErrorMessageAndTerminate(
                         title = "📁 File Listing Error",
                         message = "⚠ Failed to list the files in the mods folder.",
@@ -245,7 +245,7 @@ class ModsSyncService : SyncService {
         val modFileNameWithoutExtension =
             File(getFileNameFromUrlOrError(mod.downloadUrl)).nameWithoutExtension
         return File(
-            modsFolder,
+            modsDirectory,
             "${modFileNameWithoutExtension}${SyncInfo.instance.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
         )
     }
