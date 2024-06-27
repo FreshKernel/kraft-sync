@@ -1,12 +1,13 @@
 import com.sun.net.httpserver.HttpServer
-import java.io.File
 import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.concurrent.thread
+import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.readText
 import kotlin.streams.toList
 
 fun main() {
@@ -19,9 +20,9 @@ fun main() {
         when {
             exchange.requestMethod.equals("GET", ignoreCase = true) -> {
                 val path = exchange.requestURI.path
-                val requestedFile = File(path.substring(1))
+                val requestedFile = Paths.get(path.substring(1))
 
-                if (requestedFile.exists() && requestedFile.isFile) {
+                if (requestedFile.exists() && requestedFile.isRegularFile()) {
                     val responseText = requestedFile.readText()
                     exchange.sendResponseHeaders(200, responseText.toByteArray().size.toLong())
                     val outputStream: OutputStream = exchange.responseBody
