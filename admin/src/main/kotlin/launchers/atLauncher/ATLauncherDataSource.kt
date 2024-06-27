@@ -213,18 +213,17 @@ class ATLauncherDataSource : LauncherDataSource {
 
     override suspend fun getInstances(): Result<List<Instance>?> =
         try {
-            val (directory, _) =
+            val (directoryPath, _) =
                 SystemFileProvider
                     .getUserApplicationDataDirectoryWithFlatpakSupport(
                         applicationDirectoryName = "ATLauncher",
                         flatpakApplicationId = "com.atlauncher.ATLauncher",
                     ).getOrThrow()
-            val instancesDirectory = directory?.resolve("instances")
             val instances =
-                instancesDirectory?.let {
+                directoryPath?.resolve("instances").let {
                     withContext(Dispatchers.IO) {
                         Files
-                            .list(it.toPath())
+                            .list(it)
                             .filter { it.isDirectory() && !it.isHidden() }
                             .toList()
                     }.map {

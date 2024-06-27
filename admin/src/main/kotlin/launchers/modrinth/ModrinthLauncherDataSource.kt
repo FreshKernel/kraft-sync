@@ -166,18 +166,18 @@ class ModrinthLauncherDataSource : LauncherDataSource {
 
     override suspend fun getInstances(): Result<List<Instance>?> =
         try {
-            val directory =
+            val directoryPath =
                 SystemFileProvider
                     .getUserApplicationDataDirectory(
                         applicationDirectoryName = "com.modrinth.theseus",
                     ).getOrThrow()
-            val instancesDirectory = directory?.resolve("profiles")
             val instances =
-                instancesDirectory
+                directoryPath
+                    ?.resolve("profiles")
                     ?.let {
                         withContext(Dispatchers.IO) {
                             Files
-                                .list(it.toPath())
+                                .list(it)
                                 .filter { it.isDirectory() && !it.isHidden() }
                                 .toList()
                         }

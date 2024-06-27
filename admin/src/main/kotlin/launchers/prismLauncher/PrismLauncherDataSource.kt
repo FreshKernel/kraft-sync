@@ -325,21 +325,21 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     override suspend fun getInstances(): Result<List<Instance>?> =
         try {
-            val (directory, isFlatpak) =
+            val (directoryPath, isFlatpak) =
                 SystemFileProvider
                     .getUserApplicationDataDirectoryWithFlatpakSupport(
                         applicationDirectoryName = "PrismLauncher",
                         flatpakApplicationId = "org.prismlauncher.PrismLauncher",
                     ).getOrThrow()
-            val instancesDirectory =
-                (if (isFlatpak) directory?.resolve("PrismLauncher") else directory)
+            val instancesDirectoryPath =
+                (if (isFlatpak) directoryPath?.resolve("PrismLauncher") else directoryPath)
                     ?.resolve("instances")
             val instances =
-                instancesDirectory
+                instancesDirectoryPath
                     ?.let {
                         withContext(Dispatchers.IO) {
                             Files
-                                .list(it.toPath())
+                                .list(it)
                                 .filter {
                                     it.isDirectory() &&
                                         !it.isHidden() &&
