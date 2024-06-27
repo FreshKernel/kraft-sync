@@ -99,37 +99,33 @@ class ModsSyncService : SyncService {
     }
 
     private suspend fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
-        val localModFiles =
-            try {
-                modsDirectoryPath
-                    .listFilteredPaths {
-                        !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
-                    }.getOrThrow()
-            } catch (e: Exception) {
-                showErrorMessageAndTerminate(
-                    title = "📁 File Listing Error",
-                    message = "⚠ Failed to list the files in the mods folder: ${e.message}",
-                )
-                return
-            }
-
         // Get only the mods that are created by the script if the admin allows the player to install other mods
 
         /**
          * The mods to deal with based on [SyncInfo.allowUsingOtherMods]
          * will or will not remove the mods that are created by the script
          * */
-        val localModFilesToProcess =
-            if (syncInfo.allowUsingOtherMods) {
-                localModFiles.filter { isScriptModFile(it) }
-            } else {
-                localModFiles.toList()
-            }
+        val localModFilePathsToProcess =
+            modsDirectoryPath
+                .listFilteredPaths {
+                    val isModFileExtension = !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
+                    if (syncInfo.allowUsingOtherMods) {
+                        return@listFilteredPaths isModFileExtension && isScriptModFile(it)
+                    } else {
+                        return@listFilteredPaths isModFileExtension
+                    }
+                }.getOrElse {
+                    showErrorMessageAndTerminate(
+                        title = "📁 File Listing Error",
+                        message = "⚠ Failed to list the files in the mods folder: ${it.message}",
+                    )
+                    return
+                }
 
         // Delete the old un-synced mods
 
         val remoteModFileNames: List<String> = mods.map { getModFilePath(it).name }
-        for (localModFile in localModFilesToProcess) {
+        for (localModFile in localModFilePathsToProcess) {
             if (localModFile.name !in remoteModFileNames) {
                 println("\uD83D\uDEAB Deleting the mod '${localModFile.name}' as it's no longer on the server.")
                 localModFile.deleteExistingOrTerminate(
