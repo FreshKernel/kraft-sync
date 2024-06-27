@@ -17,8 +17,7 @@ import kotlin.io.path.writeText
  * for reading and getting the properties or set them if it doesn't exist
  * */
 object MinecraftOptionsManager {
-    // TODO: Avoid using toPath() later
-    private var optionsFilePath = SyncScriptDotMinecraftFiles.Options.file.toPath()
+    private var optionsFilePath = SyncScriptDotMinecraftFiles.Options.path
     private val properties: MutableMap<String, String> = mutableMapOf()
 
     private var isLoaded = false

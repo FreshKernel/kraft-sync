@@ -10,6 +10,7 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import kotlin.io.path.exists
 import kotlin.io.path.extension
+import kotlin.io.path.isWritable
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.pathString
 
@@ -63,28 +64,16 @@ class FileDownloader(
                 // We could use File.createTempFile from JVM, to avoid creating
                 // files on the user system we will handle it manually
                 val tempFile =
-                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.resolve(
+                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.resolve(
                         "${targetFilePath.nameWithoutExtension}-${System.currentTimeMillis()}.${targetFilePath.extension}",
                     )
-                if (!tempFile.exists()) {
-                    tempFile.parentFile.mkdirs()
-                }
-                val wasFileCreated = tempFile.createNewFile()
-                if (!wasFileCreated) {
-                    showErrorMessageAndTerminate(
-                        title = "📄 File Already Exists",
-                        message =
-                            "⚠️ The temporary file '${tempFile.name}' already exists. We're unable to create it. " +
-                                "This might be a bug," +
-                                " delete the file: ${targetFilePath.pathString} as a workaround.",
-                    )
-                }
-                if (!tempFile.canWrite()) {
+                tempFile.createFileWithParentDirectoriesOrTerminate()
+                if (!tempFile.isWritable()) {
                     showErrorMessageAndTerminate(
                         title = "🔒 Permission Error",
                         message =
                             "It seems that we don't have the necessary write permission to download" +
-                                " the file: ${tempFile.path}. Double check your permissions and try again.",
+                                " the file: ${tempFile.pathString}. Double check your permissions and try again.",
                     )
                 }
                 tempFile.sink().buffer().use { sink ->
@@ -104,8 +93,7 @@ class FileDownloader(
                 // The use block already calls 'response.closeQuietly()'
 
                 // Move the downloaded file from the temporary place to where it should
-                // TODO: Avoid converting toPath and use Path directly later,
-                tempFile.toPath().moveToOrTerminate(
+                tempFile.moveToOrTerminate(
                     target = targetFilePath,
                     StandardCopyOption.ATOMIC_MOVE,
                     fileEntityType = "JAR",

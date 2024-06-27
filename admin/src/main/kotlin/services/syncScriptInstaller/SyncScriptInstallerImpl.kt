@@ -5,15 +5,13 @@ import constants.ProjectInfoConstants
 import launchers.LauncherDataSource
 import launchers.LauncherDataSourceFactory
 import launchers.MinecraftLauncher
+import utils.deleteRecursivelyWithLegacyJavaIo
 import java.nio.file.Paths
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.copyTo
 import kotlin.io.path.deleteExisting
-import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 
 class SyncScriptInstallerImpl : SyncScriptInstaller {
-    @OptIn(ExperimentalPathApi::class)
     override suspend fun configureInstallation(
         installationConfig: SyncScriptInstallationConfig,
         launcher: MinecraftLauncher,
@@ -88,7 +86,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                     try {
                         launcherInstanceDirectoryPath
                             .resolve(DotMinecraftFileNames.SYNC_SCRIPT_DIRECTORY)
-                            .deleteRecursively()
+                            .deleteRecursivelyWithLegacyJavaIo()
                     } catch (e: Exception) {
                         return SyncScriptInstallationResult.Failure(
                             error =

@@ -7,6 +7,7 @@ import okhttp3.Request
 import utils.FileDownloader
 import utils.HttpService
 import utils.SystemInfoProvider
+import utils.createFileWithParentDirectoriesOrTerminate
 import utils.deleteExistingOrTerminate
 import utils.executeAsync
 import utils.executeBatchScriptInSeparateWindow
@@ -18,15 +19,14 @@ import utils.terminateWithOrWithoutError
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
 object JarAutoUpdater {
     private suspend fun downloadLatestJarFile(): Result<Path> =
         try {
-            // TODO: Avoid converting to Path and use the Path instead
             val newJarFile =
-                SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file
+                SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path
                     .resolve("${ProjectInfoConstants.NORMALIZED_NAME}-new.jar")
-                    .toPath()
             if (newJarFile.exists()) {
                 newJarFile.deleteExistingOrTerminate(
                     fileEntityType = "JAR",
@@ -129,13 +129,11 @@ object JarAutoUpdater {
 
             OperatingSystem.Windows -> {
                 // On Windows, we can't rename, delete or modify the current running JAR file due to file locking
-                // TODO: Migrate to Java NIO later
                 val updateBatScriptFile =
-                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file
+                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path
                         .resolve("update.bat")
                 withContext(Dispatchers.IO) {
-                    updateBatScriptFile.parentFile.mkdirs()
-                    updateBatScriptFile.createNewFile()
+                    updateBatScriptFile.createFileWithParentDirectoriesOrTerminate()
                 }
                 updateBatScriptFile.writeText(
                     """
@@ -147,9 +145,8 @@ object JarAutoUpdater {
                     exit
                     """.trimIndent(),
                 )
-                // TODO: Avoid using toPath()
                 executeBatchScriptInSeparateWindow(
-                    batScriptFilePath = updateBatScriptFile.toPath(),
+                    batScriptFilePath = updateBatScriptFile,
                 )
             }
 

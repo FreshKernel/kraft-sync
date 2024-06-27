@@ -12,6 +12,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.test.AfterTest
@@ -43,8 +45,8 @@ class MinecraftOptionsManagerTest {
     fun setUp() {
         testsOptionsFilePath =
             Files.createTempFile(
-                SyncScriptDotMinecraftFiles.Options.file.nameWithoutExtension,
-                ".${SyncScriptDotMinecraftFiles.Options.file.extension}",
+                SyncScriptDotMinecraftFiles.Options.path.nameWithoutExtension,
+                ".${SyncScriptDotMinecraftFiles.Options.path.extension}",
             )
 
         // To make sure the next test doesn't use the properties from previous test

@@ -34,8 +34,7 @@ import kotlin.streams.toList
 //  mods issue when allowing the user to install other mods
 
 class ModsSyncService : SyncService {
-    // TODO: Avoid converting to Path and use the Path instead
-    private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.file.toPath()
+    private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.path
 
     companion object {
         private const val MOD_FILE_EXTENSION = "jar"
@@ -94,7 +93,7 @@ class ModsSyncService : SyncService {
                 title = "❌ Invalid Mods Folder",
                 message =
                     "\uD83D\uDEE0 Mods must be stored in a directory/folder \uD83D\uDCC2 called " +
-                        "`${SyncScriptDotMinecraftFiles.Mods.file.name}`" +
+                        "`${SyncScriptDotMinecraftFiles.Mods.path.name}`" +
                         ", a file was found instead.",
             )
         }

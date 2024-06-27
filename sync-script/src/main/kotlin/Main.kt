@@ -23,11 +23,15 @@ import syncService.SyncService
 import utils.ExecutionTimer
 import utils.HttpService
 import utils.SystemInfoProvider
+import utils.createFileWithParentDirectoriesOrTerminate
+import utils.deleteRecursivelyWithLegacyJavaIo
 import utils.os.LinuxDesktopEnvironment
 import utils.os.OperatingSystem
 import utils.showErrorMessageAndTerminate
 import utils.terminateWithOrWithoutError
 import java.awt.GraphicsEnvironment
+import kotlin.io.path.exists
+import kotlin.io.path.pathString
 import kotlin.system.exitProcess
 
 val scriptConfigDataSource: ScriptConfigDataSource = LocalJsonScriptConfigDataSource()
@@ -59,13 +63,13 @@ suspend fun main(args: Array<String>) {
         }.also { println(it) }
     }
 
-    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.apply {
+    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
         if (exists()) {
             println(
-                "ℹ\uFE0F The temporary folder: $path exist. " +
+                "ℹ\uFE0F The temporary folder: $pathString exist. " +
                     "The script might not finished last time. Removing the folder.",
             )
-            deleteRecursively()
+            deleteRecursivelyWithLegacyJavaIo()
         }
     }
 
@@ -88,7 +92,7 @@ suspend fun main(args: Array<String>) {
 
     // Loading the script config file from json file
 
-    val scriptConfigFile = SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig.file
+    val scriptConfigFile = SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig.path
     if (!scriptConfigFile.exists()) {
         if (GuiState.isGuiEnabled) {
             println(
@@ -110,7 +114,7 @@ suspend fun main(args: Array<String>) {
                 title = "Configuration Missing! ⚠\uFE0F",
                 message =
                     """
-                    The script configuration file, `${scriptConfigFile.path}`, couldn't be found. 
+                    The script configuration file `${scriptConfigFile.pathString}` couldn't be found. 
 
                     To get started, create this file in the same directory where you're running the script or 
                     in the working directory. 
@@ -128,7 +132,7 @@ suspend fun main(args: Array<String>) {
                 title = "Configuration Error ⚠\uFE0F",
                 message =
                     buildString {
-                        append("An error occurred while parsing your script configuration file (${scriptConfigFile.path})\n\n")
+                        append("An error occurred while parsing your script configuration file (${scriptConfigFile.pathString})\n\n")
                         append("Ensure it's valid JSON format.\n\n")
                         append("Error details: ${it.message?.trim()}")
                     },
@@ -157,11 +161,8 @@ suspend fun main(args: Array<String>) {
     }
 
     // TODO: Plan if we should implement this in non GUI mode
-    val isPreferencesConfiguredFile = SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.file
-    if (GuiState.isGuiEnabled &&
-        !isPreferencesConfiguredFile
-            .exists()
-    ) {
+    val isPreferencesConfiguredFilePath = SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.path
+    if (GuiState.isGuiEnabled && !isPreferencesConfiguredFilePath.exists()) {
         val newScriptConfig = QuickPreferencesDialog().showDialog()
 
         scriptConfigDataSource.replaceConfig(newScriptConfig).getOrElse {
@@ -178,17 +179,7 @@ suspend fun main(args: Array<String>) {
         GuiState.updateIsGuiEnabled()
 
         withContext(Dispatchers.IO) {
-            val wasFileCreated =
-                isPreferencesConfiguredFile
-                    .createNewFile()
-            if (!wasFileCreated) {
-                showErrorMessageAndTerminate(
-                    title = "📄 File Already Exists",
-                    message =
-                        "⚠️ The file '${isPreferencesConfiguredFile.name}' already exists. We're unable to create it. " +
-                            "This might be a bug, a workaround is to delete '${isPreferencesConfiguredFile.path}'.",
-                )
-            }
+            isPreferencesConfiguredFilePath.createFileWithParentDirectoriesOrTerminate()
         }
     }
 
@@ -261,10 +252,10 @@ suspend fun main(args: Array<String>) {
 
     // The temporary folder usually contains the downloaded files which will be moved once finished
     // after finish syncing the contents successfully, we don't need it anymore.
-    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.apply {
+    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
         if (exists()) {
-            println("\uD83D\uDEAB Deleting the temporary folder: '$path' (no longer needed).")
-            deleteRecursively()
+            println("\uD83D\uDEAB Deleting the temporary folder: '$pathString' (no longer needed).")
+            deleteRecursivelyWithLegacyJavaIo()
         }
     }
 

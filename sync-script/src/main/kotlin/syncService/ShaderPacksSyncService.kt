@@ -3,7 +3,7 @@ package syncService
 import constants.SyncScriptDotMinecraftFiles
 
 class ShaderPacksSyncService : SyncService {
-    private val shaderPacksDirectory = SyncScriptDotMinecraftFiles.ShaderPacks.file
+    private val shaderPacksDirectoryPath = SyncScriptDotMinecraftFiles.ShaderPacks.path
 
     override suspend fun syncData() {
         TODO("Not yet implemented")
