@@ -6,8 +6,8 @@
 ![Build and test](https://github.com/ellet0/kraft-sync/actions/workflows/build.yml/badge.svg?branch=main)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ellet0/kraft-sync)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ellet0/kraft-sync)
-![JAR Size](https://img.shields.io/badge/JAR_Size-4.57_MB-blue)
-![Minimized JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.54_MB-blue)
+![JAR Size](https://img.shields.io/badge/JAR_Size-4.60_MB-blue)
+![Minimized JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.55_MB-blue)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ellet0/kraft-sync/total)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
 
@@ -22,8 +22,8 @@ The script will sync the following:
 4. 🌐 Server List (in-game) (not implemented yet)
 5. 🧩 Mods configurations (not implemented yet): These may be synced initially, since each player can have their own
    configurations.
-   We have not yet found a solution for this, except by enforcing the same mod settings for all players.
-6. ⌨️ Keybindings (not implemented yet): These may be synced initially, since each player can have their own
+   We have not yet found a solution, except by enforcing the same mod settings for all players.
+6. ⌨️ Keybindings (not implemented yet): These may be synced initially since each player can have their own
    keybindings.
    We have not yet found a solution for this, except by enforcing the same keybindings for all players
 
@@ -55,7 +55,7 @@ subsidiaries.**
 
 Let's say you're running a Minecraft server and every time you add, remove, or update a mod, resource pack, or shader,
 each player has to make the changes manually each time you do it or let's say you're changing the server address, the
-players have to manually update it in the game.
+players have to update it in the game manually.
 
 It's designed for server owners, yet it can also be effective for mod-pack developers and other use cases.
 The script will run before each time when launching the game will make a `GET` request to a file you upload somewhere
@@ -112,7 +112,7 @@ You can use [MultiMC Launcher] or [Prism Launcher] which provide more features t
 1. Exporting the instance, each instance has its assets (e.g., Mods, Resource-packs, Shader-packs)
 2. Configurations and data in a way so no instance will affect another
 3. Other features like allow to launch
-   Pre-launch command which is needed by this script to automate the process, otherwise if you're using the
+   `Pre-launch` command is needed by this script to automate the process, otherwise if you're using the
    official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
    they want to (when new mods are added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script
    that launches this script first then the launcher, This way the players are forced to use your mods and resource
@@ -140,21 +140,22 @@ Use the manual or automated method to get started 🚀:
 1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#-admin-utility)
 2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
    launcher, and hooks/custom commands feature.
-3. **Create a new instance**, choose the version, mod loader and download the mods you want to use.
+3. **Create a new instance**, choose the version, and mod loader, and download the mods you want to use.
 
-   Consider using [Modrinth] **as asset provider** to make the process easier and faster with a smaller possibility of
+   Consider using [Modrinth] **as an asset provider** to make the process easier and faster with a smaller possibility
+   of
    errors for the utility as it will be an offline task
 4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, and upload the new file
    you get from the admin application to somewhere public, like [GitHub](https://github.com/)
 5. To prepare the instance that will be used by the players, **create a new instance**, choose the same version
-   and mod loader as the previous instance while refraining from downloading the mods.
+   and mod loader as in the previous instance while refraining from downloading the mods.
    This instance will be configured to use the script.
 
    The previous one will be used by [Admin Utility] to convert the mods' info to the script format.
 6. Use the [Admin Utility] to install the script into the new instance, navigate
    to [Admin Script Installer](./admin/README.md#-script-installer) for details.
 7. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
-   that from **Step 4**.
+   from **Step 4**.
    Enter it and then wait for the sync process to finish, the game will launch with the new synced
    content.
 8. To make this process easier for all the players, export the instance from **Step 5** that's configured
@@ -196,7 +197,8 @@ Use the manual or automated method to get started 🚀:
    launcher, [MultiMC Launcher] and the launchers that are based on it use those variables,
    and other launchers like [ATLauncher] use the same for compatibility
 9. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
-   that from **Step 4**. Enter it and then wait for the sync process to finish, the game will launch with the new synced
+   from **Step 4**.
+   Enter it and then wait for the sync process to finish, the game will launch with the new synced
    content
 10. To make this process easier for all the players, export the instance from **Step 5** that's configured
     to use the script, make sure to include the used JAR file and the `kraft-sync-data` folder
@@ -238,7 +240,7 @@ answer.
 <details>
 <summary id="q1">Why not use sync mods?</summary>
 There are some mods that are required to be installed on both the client and server-side
-and it will simply sync the mods when you join a server by downloading the mods a Minecraft server.
+and it will simply sync the mods when you join a server by downloading the mods to a Minecraft server.
 
 While those mods work great, depending on your use case,
 you might use one of those mods or use this script.
@@ -404,7 +406,7 @@ to use Minecraft mods with players
    be used to detect the mod provider, if it's unknown or unverified, then it will warn the user before continuing for
    the first time, the script doesn't store any data remotely by itself, which gives you more control over where to
    store it
-5. License Compliance by avoiding re-uploading the mods somewhere other than the original source, the script will
+5. License Compliance by avoiding re-uploading the mods somewhere other than the source, the script will
    download the mods as if you're downloading them from the website
 6. It can only support mods; The term "Mod packs" typically refers to collections of mods, which can include resource
    packs as well.
@@ -455,7 +457,7 @@ discussion.
 ## 🔰 Admin Utility
 
 We provide a utility program 🛠️ for the Admin which helps when dealing with the data or converting them from other
-launchers, for more details, navigate to [Admin Utility] page.
+launchers, for more details, navigate to the [Admin Utility] page.
 
 ## 🛠 Build from Source
 
