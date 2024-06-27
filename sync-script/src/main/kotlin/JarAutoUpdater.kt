@@ -7,26 +7,35 @@ import okhttp3.Request
 import utils.FileDownloader
 import utils.HttpService
 import utils.SystemInfoProvider
+import utils.deleteExistingOrTerminate
 import utils.executeAsync
 import utils.executeBatchScriptInSeparateWindow
 import utils.getBodyOrThrow
-import utils.getRunningJarFileAsUrl
+import utils.getRunningJarFilePath
+import utils.moveToOrTerminate
 import utils.os.OperatingSystem
 import utils.terminateWithOrWithoutError
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 
 object JarAutoUpdater {
-    private suspend fun downloadLatestJarFile(): Result<File> =
+    private suspend fun downloadLatestJarFile(): Result<Path> =
         try {
+            // TODO: Avoid converting to Path and use the Path instead
             val newJarFile =
                 SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file
                     .resolve("${ProjectInfoConstants.NORMALIZED_NAME}-new.jar")
+                    .toPath()
             if (newJarFile.exists()) {
-                newJarFile.delete()
+                newJarFile.deleteExistingOrTerminate(
+                    fileEntityType = "JAR",
+                    reasonOfDelete = "the script is downloading the new update",
+                )
             }
             FileDownloader(
                 downloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL,
-                targetFile = newJarFile,
+                targetFilePath = newJarFile,
                 progressListener = { _, _, _ -> },
             ).downloadFile()
             Result.success(newJarFile)
@@ -63,14 +72,12 @@ object JarAutoUpdater {
         }
 
     suspend fun updateIfAvailable() {
-        val currentRunningJarFile =
-            File(
-                getRunningJarFileAsUrl()
-                    .getOrElse {
-                        println("⚠\uFE0F Auto update feature is only supported when running using JAR.")
-                        return
-                    }.file,
-            )
+        val currentRunningJarFilePath =
+            getRunningJarFilePath()
+                .getOrElse {
+                    println("⚠\uFE0F Auto update feature is only supported when running using JAR.")
+                    return
+                }
         val latestProjectVersion =
             getLatestProjectVersion().getOrElse {
                 println("❌ We couldn't get the latest project version: ${it.message}")
@@ -94,27 +101,35 @@ object JarAutoUpdater {
             }
         println("ℹ\uFE0F The new update has been downloaded, will close the application.")
         updateApplication(
-            currentRunningJarFile = currentRunningJarFile,
-            newJarFile = newJarFile,
+            currentRunningJarFilePath = currentRunningJarFilePath,
+            newJarFilePath = newJarFile,
         )
     }
 
     private suspend fun updateApplication(
-        currentRunningJarFile: File,
-        newJarFile: File,
+        currentRunningJarFilePath: Path,
+        newJarFilePath: Path,
     ) {
         when (OperatingSystem.current) {
             OperatingSystem.Linux, OperatingSystem.MacOS -> {
                 Runtime.getRuntime().addShutdownHook(
                     Thread {
-                        currentRunningJarFile.delete()
-                        newJarFile.renameTo(currentRunningJarFile)
+                        currentRunningJarFilePath.deleteExistingOrTerminate(
+                            fileEntityType = "JAR",
+                            reasonOfDelete = "the script is deleting is deleting the current JAR file to use the updated one",
+                        )
+                        newJarFilePath.moveToOrTerminate(
+                            target = currentRunningJarFilePath,
+                            overwrite = true,
+                            fileEntityType = "JAR",
+                        )
                     },
                 )
             }
 
             OperatingSystem.Windows -> {
                 // On Windows, we can't rename, delete or modify the current running JAR file due to file locking
+                // TODO: Migrate to Java NIO later
                 val updateBatScriptFile =
                     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file
                         .resolve("update.bat")
@@ -127,8 +142,8 @@ object JarAutoUpdater {
                     @echo off
                     echo Waiting for 2 seconds to ensure application closure...
                     timeout /t 2 > nul
-                    del "${currentRunningJarFile.absolutePath}"
-                    move "${newJarFile.absolutePath}" "${currentRunningJarFile.absolutePath}"
+                    del "${currentRunningJarFilePath.absolutePathString()}"
+                    move "${newJarFilePath.absolutePathString()}" "${currentRunningJarFilePath.absolutePathString()}"
                     exit
                     """.trimIndent(),
                 )

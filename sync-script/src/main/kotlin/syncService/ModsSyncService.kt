@@ -34,7 +34,7 @@ import kotlin.streams.toList
 //  mods issue when allowing the user to install other mods
 
 class ModsSyncService : SyncService {
-    // TODO: Avoid converting to File and use the Path instead
+    // TODO: Avoid converting to Path and use the Path instead
     private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.file.toPath()
 
     companion object {
@@ -231,8 +231,7 @@ class ModsSyncService : SyncService {
 
             FileDownloader(
                 downloadUrl = mod.downloadUrl,
-                // TODO: Avoid converting to File and use the Path instead
-                targetFile = modFilePath.toFile(),
+                targetFilePath = modFilePath,
                 progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
                     loadingIndicatorDialog?.updateComponentProperties(
                         title =

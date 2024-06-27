@@ -6,12 +6,15 @@ import kotlinx.coroutines.withContext
 import okhttp3.Request
 import okio.buffer
 import okio.sink
-import java.io.File
-import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.pathString
 
 /**
- * A utility class for downloading files from [downloadUrl] to [targetFile] with [progressListener].
+ * A utility class for downloading files from [downloadUrl] to [targetFilePath] with [progressListener].
  * TODO: Add the option to cancel a download, might need to refactor this class too
  *
  * Currently will handle errors internally by showing a error message and close.
@@ -20,7 +23,7 @@ import java.nio.file.StandardCopyOption
  * */
 class FileDownloader(
     private val downloadUrl: String,
-    private val targetFile: File,
+    private val targetFilePath: Path,
     val progressListener: (
         downloadedBytes: Long,
         // in percentage, from 0 to 100
@@ -29,12 +32,12 @@ class FileDownloader(
     ) -> Unit,
 ) {
     suspend fun downloadFile() {
-        if (targetFile.exists()) {
+        if (targetFilePath.exists()) {
             showErrorMessageAndTerminate(
                 title = "📁 File Conflict",
                 message =
                     "Unable to download the file. The destination file already exists. " +
-                        "This might be a bug, delete the file: (${targetFile.path}) as a workaround.",
+                        "This might be a bug, delete the file: (${targetFilePath.pathString}) as a workaround.",
             )
         }
         val request =
@@ -61,7 +64,7 @@ class FileDownloader(
                 // files on the user system we will handle it manually
                 val tempFile =
                     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.file.resolve(
-                        "${targetFile.nameWithoutExtension}-${System.currentTimeMillis()}.${targetFile.extension}",
+                        "${targetFilePath.nameWithoutExtension}-${System.currentTimeMillis()}.${targetFilePath.extension}",
                     )
                 if (!tempFile.exists()) {
                     tempFile.parentFile.mkdirs()
@@ -73,7 +76,7 @@ class FileDownloader(
                         message =
                             "⚠️ The temporary file '${tempFile.name}' already exists. We're unable to create it. " +
                                 "This might be a bug," +
-                                " delete the file: ${targetFile.path} as a workaround.",
+                                " delete the file: ${targetFilePath.pathString} as a workaround.",
                     )
                 }
                 if (!tempFile.canWrite()) {
@@ -101,7 +104,12 @@ class FileDownloader(
                 // The use block already calls 'response.closeQuietly()'
 
                 // Move the downloaded file from the temporary place to where it should
-                Files.move(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.ATOMIC_MOVE)
+                // TODO: Avoid converting toPath and use Path directly later,
+                tempFile.toPath().moveToOrTerminate(
+                    target = targetFilePath,
+                    StandardCopyOption.ATOMIC_MOVE,
+                    fileEntityType = "JAR",
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
                 showErrorMessageAndTerminate(
