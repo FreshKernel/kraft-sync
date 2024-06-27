@@ -147,8 +147,9 @@ object JarAutoUpdater {
                     exit
                     """.trimIndent(),
                 )
+                // TODO: Avoid using toPath()
                 executeBatchScriptInSeparateWindow(
-                    batScriptFile = updateBatScriptFile,
+                    batScriptFilePath = updateBatScriptFile.toPath(),
                 )
             }
 

@@ -1,8 +1,9 @@
 package utils
 
 import utils.os.OperatingSystem
-import java.io.File
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.absolutePathString
 
 /**
  * Run a command in the command line of the system
@@ -81,9 +82,9 @@ fun powerShellCommandLine(
  * the code execution of the bat script will continue to work even if the application has been closed
  * @throws IllegalStateException If the current operating system is not [OperatingSystem.Windows]
  * */
-fun executeBatchScriptInSeparateWindow(batScriptFile: File) {
+fun executeBatchScriptInSeparateWindow(batScriptFilePath: Path) {
     if (!OperatingSystem.current.isWindows()) {
         throw IllegalStateException("Bat script can be only executed on Windows.")
     }
-    ProcessBuilder("cmd", "/c", "start", batScriptFile.absolutePath).start()
+    ProcessBuilder("cmd", "/c", "start", batScriptFilePath.absolutePathString()).start()
 }
