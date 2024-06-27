@@ -24,6 +24,7 @@ import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JTextField
 import javax.swing.plaf.basic.BasicComboBoxEditor
+import kotlin.io.path.absolutePathString
 
 fun instanceDirectoryInputField(
     inputComboBox: JComboBox<ComboItem<Instance>>,
@@ -116,7 +117,7 @@ fun instanceDirectoryInputField(
                             fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
                         }
                     val result = fileChooser.showOpenDialog(parentComponent)
-                    val selectedFile =
+                    val selectedFilePath =
                         fileChooser.handleResult(
                             result = result,
                             onErrorWhileChoosingFile = {
@@ -127,7 +128,7 @@ fun instanceDirectoryInputField(
                                 )
                             },
                         ) ?: return@onClick
-                    inputComboBox.selectedItem = selectedFile.absolutePath
+                    inputComboBox.selectedItem = selectedFilePath.absolutePathString()
                 },
             ),
         preferredLabelWidth = preferredLabelWidth,

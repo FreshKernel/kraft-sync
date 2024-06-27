@@ -29,6 +29,7 @@ import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JLabel
 import javax.swing.filechooser.FileNameExtensionFilter
+import kotlin.io.path.absolutePathString
 
 class SyncScriptInstallerTab : Tab() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -86,12 +87,12 @@ class SyncScriptInstallerTab : Tab() {
                                                 fileFilter = FileNameExtensionFilter("JAR Files", "jar")
                                             }
                                         val result = fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
-                                        val selectedFile =
+                                        val selectedFilePath =
                                             fileChooser.handleResult(
                                                 result = result,
                                                 onErrorWhileChoosingFile = {},
                                             ) ?: return@Install null
-                                        selectedFile.path
+                                        selectedFilePath.absolutePathString()
                                     },
                                 ),
                             confirmReplaceExistingPreLaunchCommand = false,

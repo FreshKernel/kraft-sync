@@ -1,6 +1,6 @@
 package gui.utils
 
-import java.io.File
+import java.nio.file.Path
 import javax.swing.JFileChooser
 
 /**
@@ -9,7 +9,7 @@ import javax.swing.JFileChooser
 fun JFileChooser.handleResult(
     result: Int,
     onErrorWhileChoosingFile: () -> Unit,
-): File? {
+): Path? {
     when (result) {
         JFileChooser.CANCEL_OPTION -> {
             return null
@@ -21,7 +21,7 @@ fun JFileChooser.handleResult(
         }
 
         JFileChooser.APPROVE_OPTION -> {
-            return selectedFile
+            return selectedFile.toPath()
         }
     }
     return null

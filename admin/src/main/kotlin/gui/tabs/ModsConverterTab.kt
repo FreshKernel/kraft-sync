@@ -31,6 +31,7 @@ import javax.swing.JComboBox
 import javax.swing.JFileChooser
 import javax.swing.JPanel
 import javax.swing.filechooser.FileNameExtensionFilter
+import kotlin.io.path.writeText
 
 class ModsConverterTab : Tab() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -299,13 +300,13 @@ class ModsConverterTab : Tab() {
 
                         val filePickResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
 
-                        val outputFile =
+                        val outputFilePath =
                             outputFileChooser.handleResult(
                                 result = filePickResult,
                                 onErrorWhileChoosingFile = {},
                             ) ?: return
                         try {
-                            outputFile.writeText(result.modsOutputText)
+                            outputFilePath.writeText(result.modsOutputText)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             GuiUtils.showErrorMessage(
