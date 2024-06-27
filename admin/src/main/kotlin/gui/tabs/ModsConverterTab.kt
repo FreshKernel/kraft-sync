@@ -210,7 +210,7 @@ class ModsConverterTab : Tab() {
                                         "Some launchers might save the changes after closing the launcher/app.",
                                     )
                                     newLine()
-                                    text("If you created the instance/profile recently, try closing the launcher and try again.")
+                                    text("If you created the instance/profile recently, close the launcher and try again.")
                                 }.buildBodyAsText(),
                             parentComponent = this@ModsConverterTab,
                         )
