@@ -7,7 +7,13 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -18,25 +24,28 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class MinecraftOptionsManagerTest {
-    private var testsOptionsFile: File = File("")
+    companion object {
+        const val FILE_PATH_THAT_DOES_NOT_EXIST = "non_existent_file.txt"
+    }
+
+    private var testsOptionsFilePath: Path = Paths.get(FILE_PATH_THAT_DOES_NOT_EXIST)
         set(value) {
-            manager.setOptionsFileForTests(value)
+            manager.setOptionsFilePathForTests(value)
             field = value
         }
 
     /**
-     * Using [manager] to update the properties will also update [testsOptionsFile] as we're using [MinecraftOptionsManager.setOptionsFileForTests]
+     * Using [manager] to update the properties will also update [testsOptionsFilePath] as we're using [MinecraftOptionsManager.setOptionsFilePathForTests]
      * */
     private val manager = MinecraftOptionsManager
 
     @BeforeTest
     fun setUp() {
-        testsOptionsFile =
-            File.createTempFile(
+        testsOptionsFilePath =
+            Files.createTempFile(
                 SyncScriptDotMinecraftFiles.Options.file.nameWithoutExtension,
                 ".${SyncScriptDotMinecraftFiles.Options.file.extension}",
             )
-        testsOptionsFile.deleteOnExit()
 
         // To make sure the next test doesn't use the properties from previous test
         manager.loadPropertiesFromFile().getOrThrow()
@@ -44,12 +53,11 @@ class MinecraftOptionsManagerTest {
 
     @AfterTest
     fun cleanUp() {
-        // Optionally delete the file, it will be already deleted once existing the tests
-        testsOptionsFile.delete()
+        testsOptionsFilePath.deleteIfExists()
     }
 
     private fun setOptionsFileText(value: String) {
-        testsOptionsFile.writeText(value)
+        testsOptionsFilePath.writeText(value)
         manager.loadPropertiesFromFile().getOrThrow()
     }
 
@@ -111,12 +119,12 @@ class MinecraftOptionsManagerTest {
 
     @Test
     fun `should throw exception for file doesn't exist`() {
-        assertTrue(testsOptionsFile.exists(), "The options file should exist")
+        assertTrue(testsOptionsFilePath.exists(), "The options file should exist")
 
         // Override the file with a file doesn't exist
-        testsOptionsFile = File("")
+        testsOptionsFilePath = Paths.get(FILE_PATH_THAT_DOES_NOT_EXIST)
 
-        assertFalse(testsOptionsFile.exists(), "The options file exist which it shouldn't")
+        assertFalse(testsOptionsFilePath.exists(), "The options file exist which it shouldn't")
         assertThrows<IllegalArgumentException> {
             manager.loadPropertiesFromFile().getOrThrow()
         }
@@ -165,9 +173,9 @@ class MinecraftOptionsManagerTest {
                 MinecraftOptionsManager.ResourcePack.BuiltIn("fabric"),
                 MinecraftOptionsManager.ResourcePack.BuiltIn("quilt"),
             )
-        val currentOptionsFileText = testsOptionsFile.readText()
+        val currentOptionsFileText = testsOptionsFilePath.readText()
         manager.setResourcePacks(inputResourcePacks).getOrThrow()
-        val newOptionsFileText = testsOptionsFile.readText()
+        val newOptionsFileText = testsOptionsFilePath.readText()
 
         val outputResourcePacks = manager.readResourcePacks()
 
@@ -209,7 +217,7 @@ class MinecraftOptionsManagerTest {
         // Adding a new property
         manager.setResourcePacks(resourcePack)
         assertEquals(
-            testsOptionsFile.readText(),
+            testsOptionsFilePath.readText(),
             buildString {
                 appendLine(inCompatibleResourcePacksLine)
                 appendLine(
@@ -256,9 +264,9 @@ class MinecraftOptionsManagerTest {
     @Test
     fun `clearing the properties should clear the file too`() {
         manager.setResourcePacks(listOf())
-        assertTrue(testsOptionsFile.readText().isNotEmpty())
+        assertTrue(testsOptionsFilePath.readText().isNotEmpty())
         manager.clear()
-        assertTrue(testsOptionsFile.readText().isEmpty())
+        assertTrue(testsOptionsFilePath.readText().isEmpty())
     }
 
     @Test
