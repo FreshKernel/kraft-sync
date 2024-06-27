@@ -1,8 +1,7 @@
 # 🔰 Admin
 
-A utility for the [Kraft Sync](../README.md) for the administration who manage the sync info
-
-At the moment, the only functionality the program has is [Mods Info Converter](#mods-info-converter)
+A utility for the [Kraft Sync](../README.md) for the administration who manage the sync info, can
+extract mod info from launchers or install the script to a Minecraft launcher instance/profile.
 
 This page isn't complete yet, and this tool is experimental and can have many breaking changes
 
