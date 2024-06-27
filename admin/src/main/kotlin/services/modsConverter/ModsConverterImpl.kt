@@ -40,7 +40,7 @@ class ModsConverterImpl : ModsConverter {
                     return ModsConvertResult.Failure(
                         error =
                             ModsConvertError.InvalidLauncherInstanceDirectory(
-                                message = it.message.toString(),
+                                message = it.toString(),
                                 exception = it,
                             ),
                     )
@@ -51,7 +51,7 @@ class ModsConverterImpl : ModsConverter {
                     return ModsConvertResult.Failure(
                         error =
                             ModsConvertError.ModsAvailabilityCheckError(
-                                message = it.message.toString(),
+                                message = it.toString(),
                                 exception = it,
                             ),
                     )
@@ -73,7 +73,7 @@ class ModsConverterImpl : ModsConverter {
                         return ModsConvertResult.Failure(
                             error =
                                 ModsConvertError.CurseForgeApiCheckError(
-                                    message = it.message.toString(),
+                                    message = it.toString(),
                                     exception = it,
                                 ),
                         )
@@ -90,7 +90,7 @@ class ModsConverterImpl : ModsConverter {
                         return ModsConvertResult.Failure(
                             error =
                                 ModsConvertError.CouldNotConvertMods(
-                                    message = it.message.toString(),
+                                    message = it.toString(),
                                     exception = it,
                                 ),
                         )
@@ -117,7 +117,9 @@ class ModsConverterImpl : ModsConverter {
                 modsOutputText = modsOutputText,
             )
         } catch (e: Exception) {
-            ModsConvertResult.Failure(error = ModsConvertError.UnknownError(e.message.toString(), e))
+            ModsConvertResult.Failure(
+                error = ModsConvertError.UnknownError(e.toString(), e),
+            )
         }
     }
 }

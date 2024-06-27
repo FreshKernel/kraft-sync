@@ -188,7 +188,7 @@ class SyncScriptInstallerTab : Tab() {
                         GuiUtils.showErrorMessage(
                             title = "❌ Unexpected error",
                             message =
-                                "An error occurred while updating the Pre Launch command/hook: \uD83D\uDEE0: ${result.error.message}",
+                                "An error occurred while updating the Pre-Launch command/hook: \uD83D\uDEE0: ${result.error.message}",
                             parentComponent = this@SyncScriptInstallerTab,
                         )
                     }

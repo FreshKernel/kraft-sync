@@ -8,7 +8,7 @@ import launchers.MinecraftLauncher
 import utils.deleteRecursivelyWithLegacyJavaIo
 import java.nio.file.Paths
 import kotlin.io.path.copyTo
-import kotlin.io.path.deleteExisting
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 
 class SyncScriptInstallerImpl : SyncScriptInstaller {
@@ -39,14 +39,14 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                     return SyncScriptInstallationResult.Failure(
                         error =
                             SyncScriptInstallationError.InvalidLauncherInstanceDirectory(
-                                message = it.message.toString(),
+                                message = it.toString(),
                                 exception = it,
                             ),
                     )
                 }
 
             val newSyncScriptJarFileName = "${ProjectInfoConstants.NORMALIZED_NAME}.jar"
-            val syncScriptJarFilePath = launcherInstanceDirectoryPath.resolve(newSyncScriptJarFileName)
+            val newSyncScriptJarFilePath = launcherInstanceDirectoryPath.resolve(newSyncScriptJarFileName)
 
             when (installationConfig) {
                 is SyncScriptInstallationConfig.Install -> {
@@ -65,19 +65,19 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                         )
                     }
                     providedSyncScriptJarFilePath.copyTo(
-                        syncScriptJarFilePath,
+                        newSyncScriptJarFilePath,
                         overwrite = true,
                     )
                 }
 
                 SyncScriptInstallationConfig.UnInstall -> {
                     try {
-                        syncScriptJarFilePath.deleteExisting()
+                        newSyncScriptJarFilePath.deleteIfExists()
                     } catch (e: Exception) {
                         return SyncScriptInstallationResult.Failure(
                             error =
                                 SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall(
-                                    message = e.message.toString(),
+                                    message = e.toString(),
                                     exception = e,
                                 ),
                         )
@@ -91,7 +91,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                         return SyncScriptInstallationResult.Failure(
                             error =
                                 SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall(
-                                    message = e.message.toString(),
+                                    message = e.toString(),
                                     exception = e,
                                 ),
                         )
@@ -131,7 +131,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                     return SyncScriptInstallationResult.Failure(
                         error =
                             SyncScriptInstallationError.CouldNotSetPreLaunchCommand(
-                                message = it.message.toString(),
+                                message = it.toString(),
                                 exception = it,
                             ),
                     )
@@ -141,7 +141,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
             SyncScriptInstallationResult.Failure(
                 error =
                     SyncScriptInstallationError.UnknownError(
-                        message = e.message.toString(),
+                        message = e.toString(),
                         exception = e,
                     ),
             )
