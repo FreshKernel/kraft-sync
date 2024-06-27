@@ -1,8 +1,6 @@
 package launchers.atLauncher
 
 import curseForgeDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -14,13 +12,16 @@ import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.JsonPrettyPrint
 import utils.SystemFileProvider
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
+import utils.listFilteredPaths
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isHidden
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
-import kotlin.streams.toList
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class ATLauncherDataSource : LauncherDataSource {
     companion object {
@@ -30,13 +31,14 @@ class ATLauncherDataSource : LauncherDataSource {
         const val INSTANCE_FILE_NAME = "instance.json"
     }
 
-    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File =
-        Paths.get(launcherInstanceDirectory.path, INSTANCE_FILE_NAME).toFile()
+    private fun getInstanceConfigFilePath(launcherInstanceDirectoryPath: Path): Path =
+        launcherInstanceDirectoryPath.resolve(INSTANCE_FILE_NAME)
 
-    private fun getInstance(launcherInstanceDirectory: File): Result<ATLauncherInstance> {
+    private fun getInstance(launcherInstanceDirectoryPath: Path): Result<ATLauncherInstance> {
         return try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            val instance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceConfigFile.readText())
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+            val instance = JsonIgnoreUnknownKeys.decodeFromString<ATLauncherInstance>(instanceConfigFilePath.readText())
             return Result.success(instance)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -54,14 +56,17 @@ class ATLauncherDataSource : LauncherDataSource {
         instance.launcher.mods
             .filter { it.type == ATLauncherInstance.Launcher.Mod.Type.Mods }
 
-    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectoryPath: Path): Result<Unit> {
         return try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            if (!instanceConfigFile.exists()) {
-                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+            if (!instanceConfigFilePath.exists()) {
+                return Result.failure(IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) does not exist."))
             }
-            if (!instanceConfigFile.isFile) {
-                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+            if (!instanceConfigFilePath.isRegularFile()) {
+                return Result.failure(
+                    IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) should be a file."),
+                )
             }
             Result.success(Unit)
         } catch (e: Exception) {
@@ -75,9 +80,9 @@ class ATLauncherDataSource : LauncherDataSource {
         return modrinthFile == null && (mod.curseForgeProjectId != null && mod.curseForgeFileId != null)
     }
 
-    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
+    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectoryPath: Path): Result<Boolean> =
         try {
-            val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            val instance = getInstance(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             val isCurseForgeApiRequestNeeded =
                 getMods(instance).any { atLauncherMod ->
                     isCurseForgeApiRequestNeededForMod(mod = atLauncherMod)
@@ -88,11 +93,11 @@ class ATLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> =
+    override suspend fun hasMods(launcherInstanceDirectoryPath: Path): Result<Boolean> =
         try {
             val mods =
                 getMods(
-                    instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow(),
+                    instance = getInstance(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow(),
                 )
             Result.success(mods.isNotEmpty())
         } catch (e: Exception) {
@@ -100,11 +105,11 @@ class ATLauncherDataSource : LauncherDataSource {
         }
 
     override suspend fun getLauncherInstanceMods(
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
         overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>> =
         try {
-            val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            val instance = getInstance(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
 
             val mods =
                 getMods(instance = instance)
@@ -151,9 +156,9 @@ class ATLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun getPreLaunchCommand(launcherInstanceDirectory: File): Result<String?> =
+    override suspend fun getPreLaunchCommand(launcherInstanceDirectoryPath: Path): Result<String?> =
         try {
-            val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            val instance = getInstance(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             Result.success(instance.launcher.preLaunchCommand)
         } catch (e: Exception) {
             Result.failure(e)
@@ -161,12 +166,13 @@ class ATLauncherDataSource : LauncherDataSource {
 
     override suspend fun setPreLaunchCommand(
         command: String?,
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
     ): Result<Unit> =
         try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
 
-            val instanceJsonObject: JsonObject = Json.parseToJsonElement(instanceConfigFile.readText()).jsonObject
+            val instanceJsonObject: JsonObject = Json.parseToJsonElement(instanceConfigFilePath.readText()).jsonObject
 
             val launcherJsonKey = ATLauncherInstance::launcher.name
             val preLaunchCommandJsonKey = ATLauncherInstance.Launcher::preLaunchCommand.name
@@ -199,7 +205,7 @@ class ATLauncherDataSource : LauncherDataSource {
                         this[launcherJsonKey] = updatedLauncher
                     }.let { JsonObject(it) }
 
-            instanceConfigFile.writeText(
+            instanceConfigFilePath.writeText(
                 text =
                     JsonPrettyPrint.encodeToString(
                         JsonObject.serializer(),
@@ -213,27 +219,24 @@ class ATLauncherDataSource : LauncherDataSource {
 
     override suspend fun getInstances(): Result<List<Instance>?> =
         try {
-            val (directory, _) =
+            val (directoryPath, _) =
                 SystemFileProvider
                     .getUserApplicationDataDirectoryWithFlatpakSupport(
                         applicationDirectoryName = "ATLauncher",
                         flatpakApplicationId = "com.atlauncher.ATLauncher",
                     ).getOrThrow()
-            val instancesDirectory = directory?.resolve("instances")
             val instances =
-                instancesDirectory?.let {
-                    withContext(Dispatchers.IO) {
-                        Files
-                            .list(it.toPath())
-                            .filter { it.isDirectory() && !it.isHidden() }
-                            .toList()
-                    }.map {
+                directoryPath
+                    ?.resolve("instances")
+                    ?.listFilteredPaths { path ->
+                        path.isDirectory() && !path.isHidden()
+                    }?.getOrThrow()
+                    ?.map {
                         Instance(
-                            launcherInstanceDirectory = it.toFile(),
+                            launcherInstanceDirectoryPath = it,
                             instanceName = it.name,
                         )
                     }
-                }
             Result.success(instances)
         } catch (e: Exception) {
             Result.failure(e)

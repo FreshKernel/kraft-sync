@@ -6,6 +6,9 @@ import utils.os.LinuxDesktopEnvironment
 import utils.os.OperatingSystem
 import utils.powerShellCommandLine
 import java.nio.file.Paths
+import kotlin.io.path.bufferedReader
+import kotlin.io.path.name
+import kotlin.io.path.pathString
 
 object ThemeDetector {
     private fun LinuxDesktopEnvironment.Companion.isSystemInDarkMode(): Boolean {
@@ -45,10 +48,10 @@ object ThemeDetector {
                         Paths.get(
                             SystemInfoProvider.getUserHomeDirectoryPath(),
                             ".config/kdeglobals",
-                        ).toFile()
+                        )
                     println(
                         "\uD83D\uDCC4 Reading the following file to check if the KDE Plasma desktop environment " +
-                            "is in dark mode: ${kdeGlobalsFile.path}",
+                            "is in dark mode: ${kdeGlobalsFile.pathString}",
                     )
                     return try {
                         val lookAndFeelPackageName =
@@ -143,8 +146,7 @@ object ThemeDetector {
                         "-g",
                         "AppleInterfaceStyle",
                         reasonOfRunningTheCommand = "to check if the macOS system is in dark mode",
-                    )
-                        .getOrDefault("")
+                    ).getOrDefault("")
                 if (appleInterfaceStyleOutput.contains("dark", ignoreCase = true)) {
                     return true
                 }

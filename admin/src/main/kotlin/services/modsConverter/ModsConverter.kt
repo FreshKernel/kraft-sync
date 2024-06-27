@@ -10,7 +10,7 @@ interface ModsConverter {
      * */
     suspend fun convertMods(
         launcher: MinecraftLauncher,
-        launcherInstanceDirectoryPath: String,
+        launcherInstanceDirectoryPathString: String,
         convertMode: ModsConvertMode,
         prettyFormat: Boolean,
         overrideCurseForgeApiKey: String?,

@@ -4,21 +4,27 @@ import constants.SyncScriptDotMinecraftFiles
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.annotations.VisibleForTesting
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.bufferedWriter
+import kotlin.io.path.exists
+import kotlin.io.path.forEachLine
+import kotlin.io.path.name
+import kotlin.io.path.pathString
+import kotlin.io.path.writeText
 
 /**
  * Helper class for reading [SyncScriptDotMinecraftFiles.Options] file which contains Minecraft settings
  * for reading and getting the properties or set them if it doesn't exist
  * */
 object MinecraftOptionsManager {
-    private var optionsFile = SyncScriptDotMinecraftFiles.Options.file
+    private var optionsFilePath = SyncScriptDotMinecraftFiles.Options.path
     private val properties: MutableMap<String, String> = mutableMapOf()
 
     private var isLoaded = false
 
     @VisibleForTesting
-    fun setOptionsFileForTests(file: File) {
-        optionsFile = file
+    fun setOptionsFilePathForTests(filePath: Path) {
+        optionsFilePath = filePath
     }
 
     @VisibleForTesting
@@ -38,18 +44,20 @@ object MinecraftOptionsManager {
     }
 
     /**
-     * Load the [properties] from [optionsFile]
+     * Load the [properties] from [optionsFilePath]
      *
-     * @throws IllegalArgumentException If [optionsFile] doesn't exist
-     * @throws IndexOutOfBoundsException If the text of [optionsFile] is invalid
+     * @throws IllegalArgumentException If [optionsFilePath] doesn't exist
+     * @throws IndexOutOfBoundsException If the text of [optionsFilePath] is invalid
      * */
     fun loadPropertiesFromFile(): Result<Unit> =
         try {
-            require(optionsFile.exists()) { "The file ${optionsFile.name} doesn't exist in ${optionsFile.path}" }
+            require(
+                optionsFilePath.exists(),
+            ) { "The file ${optionsFilePath.name} doesn't exist in ${optionsFilePath.pathString}" }
             if (properties.isNotEmpty()) {
                 properties.clear()
             }
-            optionsFile.forEachLine { line ->
+            optionsFilePath.forEachLine { line ->
                 val (key, value) = line.split(":", limit = 2)
                 val trimmedKey = key.trim()
                 val trimmedValue = value.trim()
@@ -72,7 +80,7 @@ object MinecraftOptionsManager {
 
     /**
      * Should call [loadPropertiesFromFile] before calling this
-     * @IllegalArgumentException If the property doesn't exist in [optionsFile]
+     * @IllegalArgumentException If the property doesn't exist in [optionsFilePath]
      * */
     fun readProperty(property: Property): Result<String> =
         try {
@@ -82,7 +90,7 @@ object MinecraftOptionsManager {
             val propertyValue = properties[propertyKey]
             requireNotNull(
                 propertyValue,
-            ) { "The key property $propertyKey doesn't exist in the ${optionsFile.name} in ${optionsFile.path}" }
+            ) { "The key property $propertyKey doesn't exist in the ${optionsFilePath.name} in ${optionsFilePath.pathString}" }
             println(properties)
             Result.success(propertyValue)
         } catch (e: Exception) {
@@ -96,7 +104,7 @@ object MinecraftOptionsManager {
 
     fun clear() {
         properties.clear()
-        optionsFile.writeText(text = "")
+        optionsFilePath.writeText(text = "")
     }
 
     fun setProperty(
@@ -108,7 +116,7 @@ object MinecraftOptionsManager {
 
             properties[property.key] = propertyValue
 
-            optionsFile.bufferedWriter().use { bufferedWriter ->
+            optionsFilePath.bufferedWriter().use { bufferedWriter ->
                 properties.forEach { (key, value) ->
                     bufferedWriter.appendLine("$key:$value")
                 }

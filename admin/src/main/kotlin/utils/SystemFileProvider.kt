@@ -1,14 +1,15 @@
 package utils
 
 import utils.os.OperatingSystem
-import java.io.File
+import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.exists
 
 object SystemFileProvider {
     /**
      * @return Get the directory where the applications store their data for the current [OperatingSystem]
      * */
-    private fun getUserApplicationDataRootDirectory(): Result<File?> {
+    private fun getUserApplicationDataRootDirectory(): Result<Path?> {
         return try {
             val directory =
                 when (OperatingSystem.current) {
@@ -18,7 +19,7 @@ object SystemFileProvider {
                                 SystemInfoProvider.getUserHomeDirectoryPath(),
                                 ".local",
                                 "share",
-                            ).toFile()
+                            )
 
                     OperatingSystem.MacOS ->
                         Paths
@@ -26,14 +27,14 @@ object SystemFileProvider {
                                 SystemInfoProvider.getUserHomeDirectoryPath(),
                                 "Library",
                                 "Application Support",
-                            ).toFile()
+                            )
 
                     OperatingSystem.Windows ->
                         SystemInfoProvider.getWindowsAppDataDirectory()?.let {
                             Paths
                                 .get(
                                     it,
-                                ).toFile()
+                                )
                         } ?: throw IllegalStateException("Windows APPDATA environment variable is not set")
 
                     OperatingSystem.Unknown -> {
@@ -59,7 +60,7 @@ object SystemFileProvider {
      * @param applicationDirectoryName The name of the application directory, it depends on the application
      * and might not be the application name, or it could with a slightly different name
      * */
-    fun getUserApplicationDataDirectory(applicationDirectoryName: String): Result<File?> {
+    fun getUserApplicationDataDirectory(applicationDirectoryName: String): Result<Path?> {
         return try {
             val directory = getUserApplicationDataRootDirectory().getOrThrow()?.resolve(applicationDirectoryName)
             if (directory?.exists() == false) {
@@ -71,7 +72,7 @@ object SystemFileProvider {
         }
     }
 
-    private fun getFlatpakApplicationDataDirectory(flatpakApplicationId: String): Result<File> {
+    private fun getFlatpakApplicationDataDirectory(flatpakApplicationId: String): Result<Path> {
         if (!OperatingSystem.current.isLinux()) {
             return Result.failure(
                 UnsupportedOperationException(
@@ -82,8 +83,7 @@ object SystemFileProvider {
         }
         return Result.success(
             Paths
-                .get(SystemInfoProvider.getUserHomeDirectoryPath(), ".var", "app", flatpakApplicationId, "data")
-                .toFile(),
+                .get(SystemInfoProvider.getUserHomeDirectoryPath(), ".var", "app", flatpakApplicationId, "data"),
         )
     }
 
@@ -94,7 +94,7 @@ object SystemFileProvider {
     fun getUserApplicationDataDirectoryWithFlatpakSupport(
         applicationDirectoryName: String,
         flatpakApplicationId: String,
-    ): Result<Pair<File?, Boolean>> {
+    ): Result<Pair<Path?, Boolean>> {
         return try {
             val directory =
                 getUserApplicationDataDirectory(applicationDirectoryName = applicationDirectoryName).getOrThrow()

@@ -1,6 +1,7 @@
-import java.io.FileNotFoundException
+import java.nio.file.NoSuchFileException
 import java.nio.file.Paths
 import java.util.jar.JarFile
+import kotlin.io.path.exists
 import kotlin.math.abs as kotlinMathAbs
 
 plugins {
@@ -125,10 +126,9 @@ val minimizedJar =
 
             // Starting from Java 9, runtime classes are packaged in modular JMOD files.
             fun includeModuleFromJdk(jModFileNameWithoutExtension: String) {
-                val jModFilePath = Paths.get(javaHome, "jmods", "$jModFileNameWithoutExtension.jmod").toString()
-                val jModFile = File(jModFilePath)
-                if (!jModFile.exists()) {
-                    throw FileNotFoundException("The '$jModFileNameWithoutExtension' at '$jModFilePath' doesn't exist.")
+                val jModFilePath = Paths.get(javaHome, "jmods", "$jModFileNameWithoutExtension.jmod")
+                if (!jModFilePath.exists()) {
+                    throw NoSuchFileException("The '$jModFileNameWithoutExtension' at '$jModFilePath' doesn't exist.")
                 }
                 libraryjars(
                     mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),

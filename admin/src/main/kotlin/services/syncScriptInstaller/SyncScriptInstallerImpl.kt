@@ -5,23 +5,27 @@ import constants.ProjectInfoConstants
 import launchers.LauncherDataSource
 import launchers.LauncherDataSourceFactory
 import launchers.MinecraftLauncher
-import java.io.File
+import utils.deleteRecursivelyWithLegacyJavaIo
+import java.nio.file.Paths
+import kotlin.io.path.copyTo
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
 
 class SyncScriptInstallerImpl : SyncScriptInstaller {
     override suspend fun configureInstallation(
         installationConfig: SyncScriptInstallationConfig,
         launcher: MinecraftLauncher,
-        launcherInstanceDirectoryPath: String,
+        launcherInstanceDirectoryPathString: String,
         confirmReplaceExistingPreLaunchCommand: Boolean,
     ): SyncScriptInstallationResult {
         return try {
-            if (launcherInstanceDirectoryPath.isBlank()) {
+            if (launcherInstanceDirectoryPathString.isBlank()) {
                 return SyncScriptInstallationResult.Failure(
                     error = SyncScriptInstallationError.EmptyLauncherInstanceDirectoryPath,
                 )
             }
-            val launcherInstanceDirectory = File(launcherInstanceDirectoryPath)
-            if (!launcherInstanceDirectory.exists()) {
+            val launcherInstanceDirectoryPath = Paths.get(launcherInstanceDirectoryPathString)
+            if (!launcherInstanceDirectoryPath.exists()) {
                 return SyncScriptInstallationResult.Failure(
                     error = SyncScriptInstallationError.LauncherInstanceDirectoryNotFound,
                 )
@@ -30,53 +34,66 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
 
             launcherDataSource
                 .validateInstanceDirectory(
-                    launcherInstanceDirectory = launcherInstanceDirectory,
+                    launcherInstanceDirectoryPath = launcherInstanceDirectoryPath,
                 ).getOrElse {
                     return SyncScriptInstallationResult.Failure(
                         error =
                             SyncScriptInstallationError.InvalidLauncherInstanceDirectory(
-                                message = it.message.toString(),
+                                message = it.toString(),
                                 exception = it,
                             ),
                     )
                 }
 
             val newSyncScriptJarFileName = "${ProjectInfoConstants.NORMALIZED_NAME}.jar"
-            val syncScriptJarFile = launcherInstanceDirectory.resolve(newSyncScriptJarFileName)
+            val newSyncScriptJarFilePath = launcherInstanceDirectoryPath.resolve(newSyncScriptJarFileName)
 
             when (installationConfig) {
                 is SyncScriptInstallationConfig.Install -> {
-                    val providedSyncScriptJarFilePath =
-                        installationConfig.getSyncScriptJarFilePath() ?: return SyncScriptInstallationResult.Cancelled
-                    if (providedSyncScriptJarFilePath.isBlank()) {
+                    val syncScriptJarFilePathString =
+                        installationConfig.getSyncScriptJarFilePathString()
+                            ?: return SyncScriptInstallationResult.Cancelled
+                    if (syncScriptJarFilePathString.isBlank()) {
                         return SyncScriptInstallationResult.Failure(
                             error = SyncScriptInstallationError.EmptySyncScriptJarFilePath,
                         )
                     }
-                    val providedSyncScriptJarFile = File(providedSyncScriptJarFilePath)
-                    if (!providedSyncScriptJarFile.exists()) {
+                    val providedSyncScriptJarFilePath = Paths.get(syncScriptJarFilePathString)
+                    if (!providedSyncScriptJarFilePath.exists()) {
                         return SyncScriptInstallationResult.Failure(
                             error = SyncScriptInstallationError.SyncScriptJarFileNotFound,
                         )
                     }
-                    providedSyncScriptJarFile.copyTo(
-                        syncScriptJarFile,
+                    providedSyncScriptJarFilePath.copyTo(
+                        newSyncScriptJarFilePath,
                         overwrite = true,
                     )
                 }
 
                 SyncScriptInstallationConfig.UnInstall -> {
-                    val isSyncScriptJarFileDeleted = syncScriptJarFile.delete()
-                    if (!isSyncScriptJarFileDeleted && syncScriptJarFile.exists()) {
+                    try {
+                        newSyncScriptJarFilePath.deleteIfExists()
+                    } catch (e: Exception) {
                         return SyncScriptInstallationResult.Failure(
-                            error = SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall,
+                            error =
+                                SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall(
+                                    message = e.toString(),
+                                    exception = e,
+                                ),
                         )
                     }
-                    val isSyncScriptDataExist =
-                        File(launcherInstanceDirectory, DotMinecraftFileNames.SYNC_SCRIPT_DIRECTORY).deleteRecursively()
-                    if (!isSyncScriptDataExist) {
+
+                    try {
+                        launcherInstanceDirectoryPath
+                            .resolve(DotMinecraftFileNames.SYNC_SCRIPT_DIRECTORY)
+                            .deleteRecursivelyWithLegacyJavaIo()
+                    } catch (e: Exception) {
                         return SyncScriptInstallationResult.Failure(
-                            error = SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall,
+                            error =
+                                SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall(
+                                    message = e.toString(),
+                                    exception = e,
+                                ),
                         )
                     }
                 }
@@ -96,7 +113,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
 
             val currentCommand =
                 launcherDataSource
-                    .getPreLaunchCommand(launcherInstanceDirectory = launcherInstanceDirectory)
+                    .getPreLaunchCommand(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
                     .getOrThrow()
 
             if ((currentCommand != null && currentCommand != newCommand) && !confirmReplaceExistingPreLaunchCommand) {
@@ -109,12 +126,12 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
             launcherDataSource
                 .setPreLaunchCommand(
                     command = newCommandToSet,
-                    launcherInstanceDirectory = launcherInstanceDirectory,
+                    launcherInstanceDirectoryPath = launcherInstanceDirectoryPath,
                 ).getOrElse {
                     return SyncScriptInstallationResult.Failure(
                         error =
                             SyncScriptInstallationError.CouldNotSetPreLaunchCommand(
-                                message = it.message.toString(),
+                                message = it.toString(),
                                 exception = it,
                             ),
                     )
@@ -124,7 +141,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
             SyncScriptInstallationResult.Failure(
                 error =
                     SyncScriptInstallationError.UnknownError(
-                        message = e.message.toString(),
+                        message = e.toString(),
                         exception = e,
                     ),
             )

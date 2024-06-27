@@ -1,31 +1,32 @@
 package syncInfo.models
 
 import services.hashGenerator.HashGeneratorInstance
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.fileSize
 
 /**
  * Support for using one, some or all of the ways for validating a file
  * @return if none of them are specified, return `null` as unknown
  * otherwise `true` or `false`
  * */
-private suspend fun FileIntegrityInfo.validateAll(file: File): Result<Boolean?> {
+private suspend fun FileIntegrityInfo.validateAll(filePath: Path): Result<Boolean?> {
     return try {
         val validations = mutableListOf<Boolean>()
 
         if (sizeInBytes != null) {
-            validations.add(sizeInBytes == file.length())
+            validations.add(sizeInBytes == filePath.fileSize())
         }
         if (md5 != null) {
-            validations.add(md5 == HashGeneratorInstance.generateMD5(file).getOrThrow())
+            validations.add(md5 == HashGeneratorInstance.generateMD5(filePath).getOrThrow())
         }
         if (sha1 != null) {
-            validations.add(sha1 == HashGeneratorInstance.generateSHA1(file).getOrThrow())
+            validations.add(sha1 == HashGeneratorInstance.generateSHA1(filePath).getOrThrow())
         }
         if (sha256 != null) {
-            validations.add(sha256 == HashGeneratorInstance.generateSHA256(file).getOrThrow())
+            validations.add(sha256 == HashGeneratorInstance.generateSHA256(filePath).getOrThrow())
         }
         if (sha512 != null) {
-            validations.add(sha512 == HashGeneratorInstance.generateSHA512(file).getOrThrow())
+            validations.add(sha512 == HashGeneratorInstance.generateSHA512(filePath).getOrThrow())
         }
         if (validations.isEmpty()) {
             // If none of the values specified, return null as unknown
@@ -42,74 +43,74 @@ private suspend fun FileIntegrityInfo.validateAll(file: File): Result<Boolean?> 
  * Only validate the file using the preferred file integrity method/option
  * */
 private suspend fun FileIntegrityInfo.validateOnlyPreferredOption(
-    file: File,
+    filePath: Path,
     preferredFileVerificationOption: PreferredFileVerificationOption,
 ): Result<Boolean?> {
     return try {
         val isValidFileIntegrity =
             when (preferredFileVerificationOption) {
                 PreferredFileVerificationOption.Strong ->
-                    sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
 
                 PreferredFileVerificationOption.Medium ->
-                    sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
 
                 PreferredFileVerificationOption.Unsecure ->
-                    md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
 
                 PreferredFileVerificationOption.LeastUnsecure ->
-                    sizeInBytes?.let { it == file.length() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
+                    sizeInBytes?.let { it == filePath.fileSize() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
 
                 PreferredFileVerificationOption.FileSize ->
-                    sizeInBytes?.let { it == file.length() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
+                    sizeInBytes?.let { it == filePath.fileSize() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
 
                 PreferredFileVerificationOption.Md5 ->
-                    md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
 
                 PreferredFileVerificationOption.Sha1 ->
-                    sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
 
                 PreferredFileVerificationOption.Sha256 ->
-                    sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
 
                 PreferredFileVerificationOption.Sha512 ->
-                    sha512?.let { it == HashGeneratorInstance.generateSHA512(file).getOrThrow() }
-                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(file).getOrThrow() }
-                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(file).getOrThrow() }
-                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(file).getOrThrow() }
-                        ?: sizeInBytes?.let { it == file.length() }
+                    sha512?.let { it == HashGeneratorInstance.generateSHA512(filePath).getOrThrow() }
+                        ?: sha256?.let { it == HashGeneratorInstance.generateSHA256(filePath).getOrThrow() }
+                        ?: sha1?.let { it == HashGeneratorInstance.generateSHA1(filePath).getOrThrow() }
+                        ?: md5?.let { it == HashGeneratorInstance.generateMD5(filePath).getOrThrow() }
+                        ?: sizeInBytes?.let { it == filePath.fileSize() }
             }
         return Result.success(isValidFileIntegrity)
     } catch (e: Exception) {
@@ -123,13 +124,13 @@ private suspend fun FileIntegrityInfo.validateOnlyPreferredOption(
  * will either validate the file using all the data in [FileIntegrityInfo] or only one of them.
  * @return true or false if the file integrity is known, null otherwise
  * */
-suspend fun FileIntegrityInfo.hasValidIntegrity(file: File): Result<Boolean?> {
+suspend fun FileIntegrityInfo.hasValidIntegrity(filePath: Path): Result<Boolean?> {
     return try {
         val isValidFileIntegrityResult =
             SyncInfo.instance.preferredAssetFileVerification?.let {
-                this.validateOnlyPreferredOption(file = file, preferredFileVerificationOption = it)
+                this.validateOnlyPreferredOption(filePath = filePath, preferredFileVerificationOption = it)
             } ?: this.validateAll(
-                file = file,
+                filePath = filePath,
             )
         return isValidFileIntegrityResult
     } catch (e: Exception) {

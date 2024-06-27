@@ -1,10 +1,10 @@
 package utils
 
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.io.InputStream
 import java.net.URL
 import java.net.URLDecoder
+import java.nio.file.Path
+import kotlin.io.path.toPath
 
 /**
  * Extracts the file name from a public download URL.
@@ -35,25 +35,14 @@ fun getFileNameFromUrl(url: String): Result<String?> {
     }
 }
 
-fun getClassLoader(): ClassLoader {
-    return object {}.javaClass.classLoader
-}
+fun getClassLoader(): ClassLoader = object {}.javaClass.classLoader
 
-fun getResourceAsURLOrThrow(resourceName: String): URL {
-    return getClassLoader().getResource(resourceName) ?: throw IllegalStateException(
+fun getResourceAsURLOrThrow(resourceName: String): URL =
+    getClassLoader().getResource(resourceName) ?: throw IllegalStateException(
         "Could not get the resource with name $resourceName from the resources, double check if it exist.",
     )
-}
 
-fun getResourceAsFileOrThrow(resourceName: String): File {
-    return File(getResourceAsURLOrThrow(resourceName).toURI())
-}
-
-fun getResourceAsStreamOrThrow(resourceName: String): InputStream {
-    return getClassLoader().getResourceAsStream(resourceName) ?: throw IllegalStateException(
-        "Could not get the resource with name $resourceName from the resources, double check if it exist.",
-    )
-}
+fun getResourceAsPathOrThrow(resourceName: String): Path = getResourceAsURLOrThrow(resourceName).toURI().toPath()
 
 fun String.isValidUrl(): Boolean {
     val urlPattern = Regex("""^(https?://)?([\w\-.]+)+(:\d+)?(/[-._~/\w:@?=%&$+,()!*]*)?""")

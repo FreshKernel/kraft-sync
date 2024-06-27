@@ -31,6 +31,7 @@ import javax.swing.JComboBox
 import javax.swing.JFileChooser
 import javax.swing.JPanel
 import javax.swing.filechooser.FileNameExtensionFilter
+import kotlin.io.path.writeText
 
 class ModsConverterTab : Tab() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -126,7 +127,7 @@ class ModsConverterTab : Tab() {
         val result =
             ModsConverterInstance.convertMods(
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
-                launcherInstanceDirectoryPath =
+                launcherInstanceDirectoryPathString =
                     (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
                         "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
                     ),
@@ -209,7 +210,7 @@ class ModsConverterTab : Tab() {
                                         "Some launchers might save the changes after closing the launcher/app.",
                                     )
                                     newLine()
-                                    text("If you created the instance/profile recently, try closing the launcher and try again.")
+                                    text("If you created the instance/profile recently, close the launcher and try again.")
                                 }.buildBodyAsText(),
                             parentComponent = this@ModsConverterTab,
                         )
@@ -299,13 +300,13 @@ class ModsConverterTab : Tab() {
 
                         val filePickResult = outputFileChooser.showSaveDialog(this@ModsConverterTab)
 
-                        val outputFile =
+                        val outputFilePath =
                             outputFileChooser.handleResult(
                                 result = filePickResult,
                                 onErrorWhileChoosingFile = {},
                             ) ?: return
                         try {
-                            outputFile.writeText(result.modsOutputText)
+                            outputFilePath.writeText(result.modsOutputText)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             GuiUtils.showErrorMessage(

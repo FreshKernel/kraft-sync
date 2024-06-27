@@ -1,7 +1,5 @@
 package launchers.modrinth
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -14,14 +12,17 @@ import launchers.modrinth.ModrinthLauncherInstance.ModrinthLauncherProject
 import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.SystemFileProvider
+import utils.listFilteredPaths
 import utils.simpleMergeJsonObjects
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isHidden
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
-import kotlin.streams.toList
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class ModrinthLauncherDataSource : LauncherDataSource {
     companion object {
@@ -31,27 +32,33 @@ class ModrinthLauncherDataSource : LauncherDataSource {
         const val INSTANCE_FILE_NAME = "profile.json"
     }
 
-    private fun getInstanceConfigFile(launcherInstanceDirectory: File) =
-        Paths.get(launcherInstanceDirectory.path, INSTANCE_FILE_NAME).toFile()
+    private fun getInstanceConfigFilePath(launcherInstanceDirectoryPath: Path): Path =
+        launcherInstanceDirectoryPath.resolve(INSTANCE_FILE_NAME)
 
-    private fun getInstance(launcherInstanceDirectory: File): Result<ModrinthLauncherInstance> =
+    private fun getInstance(launcherInstanceDirectoryPath: Path): Result<ModrinthLauncherInstance> =
         try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
             val modrinthLauncherInstance =
-                JsonIgnoreUnknownKeys.decodeFromString<ModrinthLauncherInstance>(instanceConfigFile.readText())
+                JsonIgnoreUnknownKeys.decodeFromString<ModrinthLauncherInstance>(instanceConfigFilePath.readText())
             Result.success(modrinthLauncherInstance)
         } catch (e: Exception) {
             Result.failure(e)
         }
 
-    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectoryPath: Path): Result<Unit> {
         return try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            if (!instanceConfigFile.exists()) {
-                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+            if (!instanceConfigFilePath.exists()) {
+                return Result.failure(
+                    IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) does not exist."),
+                )
             }
-            if (!instanceConfigFile.isFile) {
-                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+            if (!instanceConfigFilePath.isRegularFile()) {
+                return Result.failure(
+                    IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) should be a file."),
+                )
             }
             Result.success(Unit)
         } catch (e: Exception) {
@@ -59,25 +66,30 @@ class ModrinthLauncherDataSource : LauncherDataSource {
         }
     }
 
-    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
+    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectoryPath: Path): Result<Boolean> =
         Result.success(false)
 
     private fun getModrinthLauncherProjects(instance: ModrinthLauncherInstance): Map<String, ModrinthLauncherProject> = instance.projects
 
-    override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> {
+    override suspend fun hasMods(launcherInstanceDirectoryPath: Path): Result<Boolean> {
         return try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            if (!instanceConfigFile.exists()) {
-                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+            if (!instanceConfigFilePath.exists()) {
+                return Result.failure(
+                    IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) does not exist."),
+                )
             }
-            if (!instanceConfigFile.isFile) {
-                return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+            if (!instanceConfigFilePath.isRegularFile()) {
+                return Result.failure(
+                    IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) should be a file."),
+                )
             }
             val mods =
                 getModrinthLauncherProjects(
                     instance =
                         getInstance(
-                            launcherInstanceDirectory = launcherInstanceDirectory,
+                            launcherInstanceDirectoryPath = launcherInstanceDirectoryPath,
                         ).getOrThrow(),
                 )
             Result.success(mods.isNotEmpty())
@@ -87,11 +99,11 @@ class ModrinthLauncherDataSource : LauncherDataSource {
     }
 
     override suspend fun getLauncherInstanceMods(
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
         overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>> =
         try {
-            val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            val instance = getInstance(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             val mods =
                 getModrinthLauncherProjects(instance = instance).map { (_, project) ->
                     val metadata = project.metadata
@@ -111,9 +123,9 @@ class ModrinthLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun getPreLaunchCommand(launcherInstanceDirectory: File): Result<String?> =
+    override suspend fun getPreLaunchCommand(launcherInstanceDirectoryPath: Path): Result<String?> =
         try {
-            val instance = getInstance(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            val instance = getInstance(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             val command = instance.hooks?.preLaunch
             Result.success(command)
         } catch (e: Exception) {
@@ -122,14 +134,15 @@ class ModrinthLauncherDataSource : LauncherDataSource {
 
     override suspend fun setPreLaunchCommand(
         command: String?,
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
     ): Result<Unit> =
         try {
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
 
             // Since the data class does not have the full properties, and to avoid removing any other properties,
             // we will load it using a json element and modify it using the data class then merge it
-            val instanceJsonElement: JsonElement = Json.parseToJsonElement(instanceConfigFile.readText())
+            val instanceJsonElement: JsonElement = Json.parseToJsonElement(instanceConfigFilePath.readText())
             val instance: ModrinthLauncherInstance = JsonIgnoreUnknownKeys.decodeFromJsonElement(instanceJsonElement)
 
             // TODO The current implementation does not disable
@@ -152,7 +165,7 @@ class ModrinthLauncherDataSource : LauncherDataSource {
                     updates = Json.encodeToJsonElement(newInstance).jsonObject,
                 )
 
-            instanceConfigFile.writeText(
+            instanceConfigFilePath.writeText(
                 text =
                     Json.encodeToString(
                         JsonObject.serializer(),
@@ -166,24 +179,20 @@ class ModrinthLauncherDataSource : LauncherDataSource {
 
     override suspend fun getInstances(): Result<List<Instance>?> =
         try {
-            val directory =
+            val directoryPath =
                 SystemFileProvider
                     .getUserApplicationDataDirectory(
                         applicationDirectoryName = "com.modrinth.theseus",
                     ).getOrThrow()
-            val instancesDirectory = directory?.resolve("profiles")
             val instances =
-                instancesDirectory
-                    ?.let {
-                        withContext(Dispatchers.IO) {
-                            Files
-                                .list(it.toPath())
-                                .filter { it.isDirectory() && !it.isHidden() }
-                                .toList()
-                        }
-                    }?.map {
+                directoryPath
+                    ?.resolve("profiles")
+                    ?.listFilteredPaths { path ->
+                        path.isDirectory() && !path.isHidden()
+                    }?.getOrThrow()
+                    ?.map {
                         Instance(
-                            launcherInstanceDirectory = it.toFile(),
+                            launcherInstanceDirectoryPath = it,
                             instanceName = it.name,
                         )
                     }

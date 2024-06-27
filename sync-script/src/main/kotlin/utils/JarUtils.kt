@@ -1,6 +1,8 @@
 package utils
 
 import java.net.URL
+import java.nio.file.Path
+import kotlin.io.path.toPath
 
 /**
  * @return The current running JAR file, or the JAR URI used to run the application from using `java -jar app.jar`
@@ -22,3 +24,10 @@ fun getRunningJarFileAsUrl(): Result<URL> {
         IllegalStateException("The running JAR file or the code source location is null"),
     )
 }
+
+fun getRunningJarFilePath(): Result<Path> =
+    try {
+        Result.success(getRunningJarFileAsUrl().getOrThrow().toURI().toPath())
+    } catch (e: Exception) {
+        Result.failure(e)
+    }

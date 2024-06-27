@@ -3,6 +3,7 @@ package utils
 import constants.SharedAssetConstants
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.io.path.exists
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -73,12 +74,12 @@ class SharedUtilsTest {
     }
 
     @Test
-    fun `test getResourceAsFile`() {
+    fun `test getResourceAsFilePathOrThrow`() {
         assertTrue(
-            getResourceAsFileOrThrow(SharedAssetConstants.PROJECT_ICON_FILE_NAME).exists(),
+            getResourceAsPathOrThrow(SharedAssetConstants.PROJECT_ICON_FILE_NAME).exists(),
         )
         assertThrows<IllegalStateException> {
-            getResourceAsFileOrThrow("file-does-not-exist").exists()
+            getResourceAsPathOrThrow("file-does-not-exist").exists()
         }
     }
 }

@@ -9,7 +9,7 @@ interface SyncScriptInstaller {
     suspend fun configureInstallation(
         installationConfig: SyncScriptInstallationConfig,
         launcher: MinecraftLauncher,
-        launcherInstanceDirectoryPath: String,
+        launcherInstanceDirectoryPathString: String,
         confirmReplaceExistingPreLaunchCommand: Boolean,
     ): SyncScriptInstallationResult
 }

@@ -14,9 +14,15 @@ sealed class SyncScriptInstallationError {
 
     data object SyncScriptJarFileNotFound : SyncScriptInstallationError()
 
-    data object CouldNotDeleteSyncScriptJarFileWhileUninstall : SyncScriptInstallationError()
+    data class CouldNotDeleteSyncScriptJarFileWhileUninstall(
+        val message: String,
+        val exception: Exception,
+    ) : SyncScriptInstallationError()
 
-    data object CouldNotDeleteSyncScriptDataWhileUninstall : SyncScriptInstallationError()
+    data class CouldNotDeleteSyncScriptDataWhileUninstall(
+        val message: String,
+        val exception: Exception,
+    ) : SyncScriptInstallationError()
 
     data class CouldNotSetPreLaunchCommand(
         val message: String,

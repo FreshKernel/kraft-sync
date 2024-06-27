@@ -29,6 +29,7 @@ import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JLabel
 import javax.swing.filechooser.FileNameExtensionFilter
+import kotlin.io.path.absolutePathString
 
 class SyncScriptInstallerTab : Tab() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -78,7 +79,7 @@ class SyncScriptInstallerTab : Tab() {
                         configureInstallation(
                             installationConfig =
                                 SyncScriptInstallationConfig.Install(
-                                    getSyncScriptJarFilePath = {
+                                    getSyncScriptJarFilePathString = {
                                         val fileChooser =
                                             JFileChooser().apply {
                                                 dialogTitle = "Choose the JAR File for the sync script."
@@ -86,12 +87,12 @@ class SyncScriptInstallerTab : Tab() {
                                                 fileFilter = FileNameExtensionFilter("JAR Files", "jar")
                                             }
                                         val result = fileChooser.showOpenDialog(this@SyncScriptInstallerTab)
-                                        val selectedFile =
+                                        val selectedFilePath =
                                             fileChooser.handleResult(
                                                 result = result,
                                                 onErrorWhileChoosingFile = {},
                                             ) ?: return@Install null
-                                        selectedFile.path
+                                        selectedFilePath.absolutePathString()
                                     },
                                 ),
                             confirmReplaceExistingPreLaunchCommand = false,
@@ -116,7 +117,7 @@ class SyncScriptInstallerTab : Tab() {
         val result =
             SyncScriptInstallerInstance.configureInstallation(
                 installationConfig = installationConfig,
-                launcherInstanceDirectoryPath =
+                launcherInstanceDirectoryPathString =
                     (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
                         "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
                     ),
@@ -167,18 +168,18 @@ class SyncScriptInstallerTab : Tab() {
                         )
                     }
 
-                    SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall -> {
+                    is SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall -> {
                         GuiUtils.showErrorMessage(
                             title = "❌ Unexpected error",
-                            message = "An error occurred while deleting the sync script JAR file.",
+                            message = "An error occurred while deleting the sync script JAR file: ${result.error.message}",
                             parentComponent = this@SyncScriptInstallerTab,
                         )
                     }
 
-                    SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall -> {
+                    is SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall -> {
                         GuiUtils.showErrorMessage(
                             title = "❌ Unexpected error",
-                            message = "An error occurred while deleting the sync script data \uD83D\uDCC1.",
+                            message = "An error occurred while deleting the sync script data \uD83D\uDCC1: ${result.error.message}",
                             parentComponent = this@SyncScriptInstallerTab,
                         )
                     }
@@ -187,7 +188,7 @@ class SyncScriptInstallerTab : Tab() {
                         GuiUtils.showErrorMessage(
                             title = "❌ Unexpected error",
                             message =
-                                "An error occurred while updating the Pre Launch command/hook: \uD83D\uDEE0: ${result.error.message}",
+                                "An error occurred while updating the Pre-Launch command/hook: \uD83D\uDEE0: ${result.error.message}",
                             parentComponent = this@SyncScriptInstallerTab,
                         )
                     }

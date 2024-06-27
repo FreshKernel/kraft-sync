@@ -2,7 +2,10 @@ package launchers
 
 import minecraftAssetProviders.MinecraftAssetProvider
 import syncInfo.models.Mod
-import java.io.File
+import java.nio.file.Path
+
+// TODO: Rename launcherInstanceDirectoryPath to dotMinecraftDirectoryPath,
+//  review other usages such as launcherInstanceDirectory
 
 /**
  * An interface that abstract dealing with the launcher data, like converting mods from the launcher data format
@@ -21,7 +24,7 @@ interface LauncherDataSource {
      * with an exception.
      * @return [Result.success] if valid, otherwise [Result.failure]
      * */
-    suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit>
+    suspend fun validateInstanceDirectory(launcherInstanceDirectoryPath: Path): Result<Unit>
 
     /**
      * If an HTTP get request is needed to convert all the mods, this will be true if
@@ -31,19 +34,19 @@ interface LauncherDataSource {
      * 3. Other reasons that are specific to the launcher implementation, if the download url or related info wasn't available
      * for some reason and a request to Curse Forge API is needed to get the info, this should return true
      * */
-    suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean>
+    suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectoryPath: Path): Result<Boolean>
 
     /**
      * Check if the instance has mods installed (not empty).
      * */
-    suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean>
+    suspend fun hasMods(launcherInstanceDirectoryPath: Path): Result<Boolean>
 
     /**
      * @return A list of [Mod] which contains the information about the mod, converting it from the specified launcher
      * into the script data format
      * */
     suspend fun getLauncherInstanceMods(
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
         overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>>
 
@@ -53,7 +56,7 @@ interface LauncherDataSource {
      *
      * @return Null if it's not set
      * */
-    suspend fun getPreLaunchCommand(launcherInstanceDirectory: File): Result<String?>
+    suspend fun getPreLaunchCommand(launcherInstanceDirectoryPath: Path): Result<String?>
 
     /**
      * Update the Pre Launch command.
@@ -65,7 +68,7 @@ interface LauncherDataSource {
      * */
     suspend fun setPreLaunchCommand(
         command: String?,
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
     ): Result<Unit>
 
     /**
