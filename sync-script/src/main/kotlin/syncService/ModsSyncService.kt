@@ -125,10 +125,10 @@ class ModsSyncService : SyncService {
         // Delete the old un-synced mods
 
         val remoteModFileNames: List<String> = mods.map { getModFilePath(it).name }
-        for (localModFile in localModFilePathsToProcess) {
-            if (localModFile.name !in remoteModFileNames) {
-                println("\uD83D\uDEAB Deleting the mod '${localModFile.name}' as it's no longer on the server.")
-                localModFile.deleteExistingOrTerminate(
+        for (localModFilePath in localModFilePathsToProcess) {
+            if (localModFilePath.name !in remoteModFileNames) {
+                println("\uD83D\uDEAB Deleting the mod '${localModFilePath.name}' as it's no longer on the server.")
+                localModFilePath.deleteExistingOrTerminate(
                     fileEntityType = "mod",
                     reasonOfDelete = "it's no longer on the server",
                 )
