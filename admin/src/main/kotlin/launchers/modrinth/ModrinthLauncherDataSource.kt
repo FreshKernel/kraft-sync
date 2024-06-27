@@ -1,7 +1,5 @@
 package launchers.modrinth
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -14,8 +12,8 @@ import launchers.modrinth.ModrinthLauncherInstance.ModrinthLauncherProject
 import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.SystemFileProvider
+import utils.listFilteredPaths
 import utils.simpleMergeJsonObjects
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -25,7 +23,6 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.streams.toList
 
 class ModrinthLauncherDataSource : LauncherDataSource {
     companion object {
@@ -190,14 +187,10 @@ class ModrinthLauncherDataSource : LauncherDataSource {
             val instances =
                 directoryPath
                     ?.resolve("profiles")
-                    ?.let {
-                        withContext(Dispatchers.IO) {
-                            Files
-                                .list(it)
-                                .filter { it.isDirectory() && !it.isHidden() }
-                                .toList()
-                        }
-                    }?.map {
+                    ?.listFilteredPaths { path ->
+                        path.isDirectory() && !path.isHidden()
+                    }?.getOrThrow()
+                    ?.map {
                         Instance(
                             launcherInstanceDirectoryPath = it,
                             instanceName = it.name,

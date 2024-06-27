@@ -1,8 +1,6 @@
 package launchers.atLauncher
 
 import curseForgeDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -14,7 +12,7 @@ import syncInfo.models.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.JsonPrettyPrint
 import utils.SystemFileProvider
-import java.nio.file.Files
+import utils.listFilteredPaths
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -24,7 +22,6 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.streams.toList
 
 class ATLauncherDataSource : LauncherDataSource {
     companion object {
@@ -229,19 +226,17 @@ class ATLauncherDataSource : LauncherDataSource {
                         flatpakApplicationId = "com.atlauncher.ATLauncher",
                     ).getOrThrow()
             val instances =
-                directoryPath?.resolve("instances").let {
-                    withContext(Dispatchers.IO) {
-                        Files
-                            .list(it)
-                            .filter { it.isDirectory() && !it.isHidden() }
-                            .toList()
-                    }.map {
+                directoryPath
+                    ?.resolve("instances")
+                    ?.listFilteredPaths { path ->
+                        path.isDirectory() && !path.isHidden()
+                    }?.getOrThrow()
+                    ?.map {
                         Instance(
                             launcherInstanceDirectoryPath = it,
                             instanceName = it.name,
                         )
                     }
-                }
             Result.success(instances)
         } catch (e: Exception) {
             Result.failure(e)

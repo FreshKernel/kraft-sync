@@ -17,8 +17,8 @@ import utils.calculateProgressByIndex
 import utils.convertBytesToReadableMegabytesAsString
 import utils.deleteExistingOrTerminate
 import utils.getFileNameFromUrlOrError
+import utils.listFilteredPaths
 import utils.showErrorMessageAndTerminate
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.createDirectories
@@ -28,7 +28,6 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.isHidden
 import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
-import kotlin.streams.toList
 
 // TODO: Use JarFile(modFile).manifest.mainAttributes to read the mod name, id and some info to solve the duplicating
 //  mods issue when allowing the user to install other mods
@@ -99,16 +98,13 @@ class ModsSyncService : SyncService {
         }
     }
 
-    private fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
+    private suspend fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
         val localModFiles =
             try {
-                Files
-                    .list(modsDirectoryPath)
-                    .use { stream ->
-                        stream
-                            .filter { !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION }
-                            .toList()
-                    }
+                modsDirectoryPath
+                    .listFilteredPaths {
+                        !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
+                    }.getOrThrow()
             } catch (e: Exception) {
                 showErrorMessageAndTerminate(
                     title = "📁 File Listing Error",

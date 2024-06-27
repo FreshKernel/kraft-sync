@@ -3,14 +3,12 @@ package launchers.prismLauncher
 import com.akuleshov7.ktoml.Toml
 import constants.DotMinecraftFileNames
 import curseForgeDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import launchers.Instance
 import launchers.LauncherDataSource
 import okio.IOException
 import syncInfo.models.Mod
 import utils.SystemFileProvider
-import java.nio.file.Files
+import utils.listFilteredPaths
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -19,10 +17,10 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.isHidden
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
+import kotlin.io.path.pathString
 import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.streams.toList
 
 class PrismLauncherDataSource : LauncherDataSource {
     companion object {
@@ -79,7 +77,8 @@ class PrismLauncherDataSource : LauncherDataSource {
             )
         }
 
-        val instanceConfigFilePath = getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+        val instanceConfigFilePath =
+            getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
 
         if (!instanceConfigFilePath.exists()) {
             return Result.failure(IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) does not exist."))
@@ -100,21 +99,21 @@ class PrismLauncherDataSource : LauncherDataSource {
             .resolve(DotMinecraftFileNames.MODS_DIRECTORY)
             .resolve(MODS_METADATA_DIRECTORY_NAME)
 
-    private fun getModMetadataFilePaths(launcherInstanceDirectoryPath: Path): Result<List<Path>> {
+    private suspend fun getModMetadataFilePaths(launcherInstanceDirectoryPath: Path): Result<List<Path>> {
         return try {
             val modsMetaDataDirectoryPath =
                 getModsMetaDataDirectoryPath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
 
             val modMetadataFilePaths =
                 try {
-                    Files
-                        .list(modsMetaDataDirectoryPath)
-                        .use { stream ->
-                            stream.filter { it.isRegularFile() && !it.isHidden() && it.extension == MOD_METADATA_FILE_EXTENSION }
-                        }.toList()
+                    modsMetaDataDirectoryPath
+                        .listFilteredPaths {
+                            it.isRegularFile() && !it.isHidden() && it.extension == MOD_METADATA_FILE_EXTENSION
+                        }.getOrThrow()
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     return Result.failure(
-                        IOException("Failed to list the files in (${modsMetaDataDirectoryPath.absolutePathString()}): ${e.message}"),
+                        IOException("Failed to list the files in (${modsMetaDataDirectoryPath.pathString}): ${e.message}"),
                     )
                 }
             Result.success(modMetadataFilePaths)
@@ -123,7 +122,7 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    private fun getModsMetadata(launcherInstanceDirectoryPath: Path): Result<List<PrismLauncherModMetadata>> =
+    private suspend fun getModsMetadata(launcherInstanceDirectoryPath: Path): Result<List<PrismLauncherModMetadata>> =
         try {
             val modMetadataFilePaths =
                 getModMetadataFilePaths(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
@@ -353,21 +352,16 @@ class PrismLauncherDataSource : LauncherDataSource {
                     ?.resolve("instances")
             val instances =
                 instancesDirectoryPath
-                    ?.let {
-                        withContext(Dispatchers.IO) {
-                            Files
-                                .list(it)
-                                .filter {
-                                    it.isDirectory() &&
-                                        !it.isHidden() &&
-                                        it.name !in
-                                        listOf(
-                                            ".LAUNCHER_TEMP",
-                                            ".tmp",
-                                        )
-                                }.toList()
-                        }
-                    }?.map {
+                    ?.listFilteredPaths { path ->
+                        path.isDirectory() &&
+                            !path.isHidden() &&
+                            path.name !in
+                            listOf(
+                                ".LAUNCHER_TEMP",
+                                ".tmp",
+                            )
+                    }?.getOrThrow()
+                    ?.map {
                         Instance(
                             launcherInstanceDirectoryPath = it.resolve(DOT_MINECRAFT_DIRECTORY_NAME),
                             instanceName = it.name,
