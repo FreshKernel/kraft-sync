@@ -8,7 +8,7 @@ sealed class SyncScriptInstallationConfig {
         /**
          * Null if the user canceled the operation
          * */
-        val getSyncScriptJarFilePath: () -> String?,
+        val getSyncScriptJarFilePathString: () -> String?,
     ) : SyncScriptInstallationConfig()
 
     /**

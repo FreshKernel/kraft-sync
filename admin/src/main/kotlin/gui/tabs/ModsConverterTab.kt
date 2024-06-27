@@ -127,7 +127,7 @@ class ModsConverterTab : Tab() {
         val result =
             ModsConverterInstance.convertMods(
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
-                launcherInstanceDirectoryPath =
+                launcherInstanceDirectoryPathString =
                     (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
                         "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
                     ),

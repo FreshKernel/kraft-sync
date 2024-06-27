@@ -7,14 +7,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import launchers.Instance
 import launchers.LauncherDataSource
+import okio.IOException
 import syncInfo.models.Mod
 import utils.SystemFileProvider
-import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
+import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isHidden
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
+import kotlin.io.path.readLines
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlin.streams.toList
 
 class PrismLauncherDataSource : LauncherDataSource {
@@ -43,7 +50,8 @@ class PrismLauncherDataSource : LauncherDataSource {
         }
     }
 
-    private fun getInstanceConfigFile(launcherInstanceDirectory: File): File = launcherInstanceDirectory.parentFile.resolve("instance.cfg")
+    private fun getInstanceConfigFilePath(launcherInstanceDirectoryPath: Path): Path =
+        launcherInstanceDirectoryPath.parent.resolve("instance.cfg")
 
     // TODO: We have a issue in the naming of launcherInstanceDirectory and similar names everywhere in the admin module
     //  by this, we mean the root instance folder as some launchers might store minecraft specific folders
@@ -54,28 +62,30 @@ class PrismLauncherDataSource : LauncherDataSource {
     //  by the root instance folder (launcherInstanceDirectory), currently for this implementation, we're asking
     //  for the `.minecraft` folder, also update the GUI instructions (InstanceDirectoryInputField.kt), and the docs if there are any references
 
-    override suspend fun validateInstanceDirectory(launcherInstanceDirectory: File): Result<Unit> {
-        val dotMinecraftDirectory = File(launcherInstanceDirectory.parentFile, DOT_MINECRAFT_DIRECTORY_NAME)
+    override suspend fun validateInstanceDirectory(launcherInstanceDirectoryPath: Path): Result<Unit> {
+        val dotMinecraftDirectoryPath = launcherInstanceDirectoryPath.parent.resolve(DOT_MINECRAFT_DIRECTORY_NAME)
 
-        if (!dotMinecraftDirectory.exists()) {
+        if (!dotMinecraftDirectoryPath.exists()) {
             return Result.failure(
                 IllegalArgumentException(
-                    "The file (${dotMinecraftDirectory.absolutePath}) does not exist. If this " +
+                    "The file (${dotMinecraftDirectoryPath.absolutePathString()}) does not exist. If this " +
                         "is the root instance folder for Prism Launcher, the path should be to '.minecraft' folder.",
                 ),
             )
         }
-        if (!dotMinecraftDirectory.isDirectory) {
-            return Result.failure(IllegalArgumentException("The file (${dotMinecraftDirectory.absolutePath}) should be a folder."))
+        if (!dotMinecraftDirectoryPath.isDirectory()) {
+            return Result.failure(
+                IllegalArgumentException("The file (${dotMinecraftDirectoryPath.absolutePathString()}) should be a folder."),
+            )
         }
 
-        val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
+        val instanceConfigFilePath = getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
 
-        if (!instanceConfigFile.exists()) {
-            return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) does not exist."))
+        if (!instanceConfigFilePath.exists()) {
+            return Result.failure(IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) does not exist."))
         }
-        if (!instanceConfigFile.isFile) {
-            return Result.failure(IllegalArgumentException("The file (${instanceConfigFile.absolutePath}) should be a file."))
+        if (!instanceConfigFilePath.isRegularFile()) {
+            return Result.failure(IllegalArgumentException("The file (${instanceConfigFilePath.absolutePathString()}) should be a file."))
         }
 
         return Result.success(Unit)
@@ -84,36 +94,41 @@ class PrismLauncherDataSource : LauncherDataSource {
     private fun isCurseForgeApiRequestNeededForMod(modMetadata: PrismLauncherModMetadata): Boolean =
         modMetadata.download.url.isBlank() && modMetadata.update.curseForge != null
 
-    private fun getModsMetaDataDirectory(launcherInstanceDirectory: File): File =
-        File(
-            Paths.get(launcherInstanceDirectory.path, DotMinecraftFileNames.MODS_DIRECTORY).toFile(),
-            MODS_METADATA_DIRECTORY_NAME,
-        )
+    private fun getModsMetaDataDirectoryPath(launcherInstanceDirectoryPath: Path): Path =
+        launcherInstanceDirectoryPath
+            .resolve(launcherInstanceDirectoryPath)
+            .resolve(DotMinecraftFileNames.MODS_DIRECTORY)
+            .resolve(MODS_METADATA_DIRECTORY_NAME)
 
-    private fun getModMetadataFiles(launcherInstanceDirectory: File): Result<List<File>> {
+    private fun getModMetadataFilePaths(launcherInstanceDirectoryPath: Path): Result<List<Path>> {
         return try {
-            val modsMetaDataDirectory = getModsMetaDataDirectory(launcherInstanceDirectory = launcherInstanceDirectory)
-            val modMetadataFiles =
-                modsMetaDataDirectory.listFiles()?.filter {
-                    it.isFile && it.extension == MOD_METADATA_FILE_EXTENSION
+            val modsMetaDataDirectoryPath =
+                getModsMetaDataDirectoryPath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+
+            val modMetadataFilePaths =
+                try {
+                    Files
+                        .list(modsMetaDataDirectoryPath)
+                        .use { stream ->
+                            stream.filter { it.isRegularFile() && !it.isHidden() && it.extension == MOD_METADATA_FILE_EXTENSION }
+                        }.toList()
+                } catch (e: Exception) {
+                    return Result.failure(
+                        IOException("Failed to list the files in (${modsMetaDataDirectoryPath.absolutePathString()}): ${e.message}"),
+                    )
                 }
-            if (modMetadataFiles == null) {
-                return Result.failure(
-                    IllegalArgumentException("(${modsMetaDataDirectory.absolutePath}) might not be a directory or an I/O error occurred."),
-                )
-            }
-            Result.success(modMetadataFiles)
+            Result.success(modMetadataFilePaths)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    private fun getModsMetadata(launcherInstanceDirectory: File): Result<List<PrismLauncherModMetadata>> =
+    private fun getModsMetadata(launcherInstanceDirectoryPath: Path): Result<List<PrismLauncherModMetadata>> =
         try {
-            val modMetadataFiles =
-                getModMetadataFiles(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+            val modMetadataFilePaths =
+                getModMetadataFilePaths(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             val modsMetadata =
-                modMetadataFiles.map {
+                modMetadataFilePaths.map {
                     val fileText = it.readText()
                     Toml.decodeFromString(PrismLauncherModMetadata.serializer(), fileText)
                 }
@@ -123,10 +138,10 @@ class PrismLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory: File): Result<Boolean> =
+    override suspend fun isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectoryPath: Path): Result<Boolean> =
         try {
             val modsMetadata =
-                getModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+                getModsMetadata(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             val isCurseForgeApiRequestNeeded =
                 modsMetadata.any { modMetadata ->
                     isCurseForgeApiRequestNeededForMod(modMetadata = modMetadata)
@@ -136,35 +151,35 @@ class PrismLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun hasMods(launcherInstanceDirectory: File): Result<Boolean> {
+    override suspend fun hasMods(launcherInstanceDirectoryPath: Path): Result<Boolean> {
         return try {
-            val modsMetaDataDirectory =
-                getModsMetaDataDirectory(
-                    launcherInstanceDirectory = launcherInstanceDirectory,
+            val modsMetaDataDirectoryPath =
+                getModsMetaDataDirectoryPath(
+                    launcherInstanceDirectoryPath = launcherInstanceDirectoryPath,
                 )
-            if (!modsMetaDataDirectory.exists()) {
+            if (!modsMetaDataDirectoryPath.exists()) {
                 return Result.success(false)
             }
-            if (!modsMetaDataDirectory.isDirectory) {
+            if (!modsMetaDataDirectoryPath.isDirectory()) {
                 return Result.failure(
-                    IllegalArgumentException("The file (${modsMetaDataDirectory.absolutePath} should be a folder/directory."),
+                    IllegalArgumentException("The file (${modsMetaDataDirectoryPath.absolutePathString()} should be a folder/directory."),
                 )
             }
-            val modMetadataFiles =
-                getModMetadataFiles(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
-            Result.success(modMetadataFiles.isNotEmpty())
+            val modMetadataFilePaths =
+                getModMetadataFilePaths(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
+            Result.success(modMetadataFilePaths.isNotEmpty())
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
     override suspend fun getLauncherInstanceMods(
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
         overrideCurseForgeApiKey: String?,
     ): Result<List<Mod>> =
         try {
             val modsMetadata =
-                getModsMetadata(launcherInstanceDirectory = launcherInstanceDirectory).getOrThrow()
+                getModsMetadata(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrThrow()
             val mods =
                 modsMetadata.map { modMetadata ->
                     var modDownloadUrl = modMetadata.download.url
@@ -210,12 +225,13 @@ class PrismLauncherDataSource : LauncherDataSource {
             Result.failure(e)
         }
 
-    override suspend fun getPreLaunchCommand(launcherInstanceDirectory: File): Result<String?> {
+    override suspend fun getPreLaunchCommand(launcherInstanceDirectoryPath: Path): Result<String?> {
         return try {
             val preLaunchCommand =
                 readInstanceProperty(
                     propertyKey = PropertyKey.PRE_LAUNCH_COMMAND,
-                    instanceFileLines = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory).readLines(),
+                    instanceFileLines =
+                        getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).readLines(),
                 )
             return Result.success(preLaunchCommand)
         } catch (e: Exception) {
@@ -274,12 +290,13 @@ class PrismLauncherDataSource : LauncherDataSource {
 
     override suspend fun setPreLaunchCommand(
         command: String?,
-        launcherInstanceDirectory: File,
+        launcherInstanceDirectoryPath: Path,
     ): Result<Unit> =
         try {
             // Manually update the file instead of Properties
-            val instanceConfigFile = getInstanceConfigFile(launcherInstanceDirectory = launcherInstanceDirectory)
-            val instanceConfigFileLines = instanceConfigFile.readLines().toMutableList()
+            val instanceConfigFilePath =
+                getInstanceConfigFilePath(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
+            val instanceConfigFileLines = instanceConfigFilePath.readLines().toMutableList()
 
             setInstancePropertyInGeneralSection(
                 propertyKey = PropertyKey.PRE_LAUNCH_COMMAND,
@@ -316,7 +333,7 @@ class PrismLauncherDataSource : LauncherDataSource {
                 }
             }
 
-            instanceConfigFile.writeText(text = instanceConfigFileLines.joinToString("\n"))
+            instanceConfigFilePath.writeText(text = instanceConfigFileLines.joinToString("\n"))
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -352,7 +369,7 @@ class PrismLauncherDataSource : LauncherDataSource {
                         }
                     }?.map {
                         Instance(
-                            launcherInstanceDirectory = it.resolve(DOT_MINECRAFT_DIRECTORY_NAME).toFile(),
+                            launcherInstanceDirectoryPath = it.resolve(DOT_MINECRAFT_DIRECTORY_NAME),
                             instanceName = it.name,
                         )
                     }

@@ -107,7 +107,7 @@ fun instanceDirectoryInputField(
                         // The second which is changed in this lambda, which is why we need to check to avoid
                         // unexpected error on the second change. The (item) will be null if the selected item
                         // is null or is different from the JComboBox<E> type of the elements
-                        selectedItem = item.value.launcherInstanceDirectory.absolutePath
+                        selectedItem = item.value.launcherInstanceDirectoryPath.absolutePathString()
                     }
                 },
                 JButton("Browse").onClick {

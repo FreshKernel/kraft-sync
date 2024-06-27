@@ -1,6 +1,6 @@
 package launchers
 
-import java.io.File
+import java.nio.file.Path
 
 /**
  * An abstraction of Instance/Profile for all Minecraft launchers that
@@ -12,6 +12,6 @@ import java.io.File
  * them as dropdown options for the text input field that request the instance directory path.
  * */
 data class Instance(
-    val launcherInstanceDirectory: File,
+    val launcherInstanceDirectoryPath: Path,
     val instanceName: String,
 )

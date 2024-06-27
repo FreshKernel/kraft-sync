@@ -8,25 +8,26 @@ import launchers.MinecraftLauncher
 import services.modsConverter.models.ModsConvertMode
 import syncInfo.models.SyncInfo
 import utils.JsonPrettyPrint
-import java.io.File
+import java.nio.file.Paths
+import kotlin.io.path.exists
 
 class ModsConverterImpl : ModsConverter {
     override suspend fun convertMods(
         launcher: MinecraftLauncher,
-        launcherInstanceDirectoryPath: String,
+        launcherInstanceDirectoryPathString: String,
         convertMode: ModsConvertMode,
         prettyFormat: Boolean,
         overrideCurseForgeApiKey: String?,
         isCurseForgeForStudiosTermsOfServiceAccepted: Boolean,
     ): ModsConvertResult {
         return try {
-            if (launcherInstanceDirectoryPath.isBlank()) {
+            if (launcherInstanceDirectoryPathString.isBlank()) {
                 return ModsConvertResult.Failure(
                     error = ModsConvertError.EmptyLauncherInstanceDirectoryPath,
                 )
             }
-            val launcherInstanceDirectory = File(launcherInstanceDirectoryPath)
-            if (!launcherInstanceDirectory.exists()) {
+            val launcherInstanceDirectoryPath = Paths.get(launcherInstanceDirectoryPathString)
+            if (!launcherInstanceDirectoryPath.exists()) {
                 return ModsConvertResult.Failure(
                     error = ModsConvertError.LauncherInstanceDirectoryNotFound,
                 )
@@ -34,7 +35,7 @@ class ModsConverterImpl : ModsConverter {
             val launcherDataSource: LauncherDataSource = LauncherDataSourceFactory.getHandler(launcher)
 
             launcherDataSource
-                .validateInstanceDirectory(launcherInstanceDirectory = launcherInstanceDirectory)
+                .validateInstanceDirectory(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
                 .getOrElse {
                     return ModsConvertResult.Failure(
                         error =
@@ -46,7 +47,7 @@ class ModsConverterImpl : ModsConverter {
                 }
 
             val hasMods =
-                launcherDataSource.hasMods(launcherInstanceDirectory = launcherInstanceDirectory).getOrElse {
+                launcherDataSource.hasMods(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath).getOrElse {
                     return ModsConvertResult.Failure(
                         error =
                             ModsConvertError.ModsAvailabilityCheckError(
@@ -67,7 +68,7 @@ class ModsConverterImpl : ModsConverter {
 
             val isCurseForgeApiRequestNeeded =
                 launcherDataSource
-                    .isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectory)
+                    .isCurseForgeApiRequestNeededForConvertingMods(launcherInstanceDirectoryPath)
                     .getOrElse {
                         return ModsConvertResult.Failure(
                             error =
@@ -83,7 +84,7 @@ class ModsConverterImpl : ModsConverter {
             val mods =
                 launcherDataSource
                     .getLauncherInstanceMods(
-                        launcherInstanceDirectory = launcherInstanceDirectory,
+                        launcherInstanceDirectoryPath = launcherInstanceDirectoryPath,
                         overrideCurseForgeApiKey = overrideCurseForgeApiKey?.ifBlank { null },
                     ).getOrElse {
                         return ModsConvertResult.Failure(

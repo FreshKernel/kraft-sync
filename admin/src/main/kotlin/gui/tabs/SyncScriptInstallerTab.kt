@@ -79,7 +79,7 @@ class SyncScriptInstallerTab : Tab() {
                         configureInstallation(
                             installationConfig =
                                 SyncScriptInstallationConfig.Install(
-                                    getSyncScriptJarFilePath = {
+                                    getSyncScriptJarFilePathString = {
                                         val fileChooser =
                                             JFileChooser().apply {
                                                 dialogTitle = "Choose the JAR File for the sync script."
@@ -117,7 +117,7 @@ class SyncScriptInstallerTab : Tab() {
         val result =
             SyncScriptInstallerInstance.configureInstallation(
                 installationConfig = installationConfig,
-                launcherInstanceDirectoryPath =
+                launcherInstanceDirectoryPathString =
                     (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
                         "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
                     ),
@@ -168,18 +168,18 @@ class SyncScriptInstallerTab : Tab() {
                         )
                     }
 
-                    SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall -> {
+                    is SyncScriptInstallationError.CouldNotDeleteSyncScriptJarFileWhileUninstall -> {
                         GuiUtils.showErrorMessage(
                             title = "❌ Unexpected error",
-                            message = "An error occurred while deleting the sync script JAR file.",
+                            message = "An error occurred while deleting the sync script JAR file: ${result.error.message}",
                             parentComponent = this@SyncScriptInstallerTab,
                         )
                     }
 
-                    SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall -> {
+                    is SyncScriptInstallationError.CouldNotDeleteSyncScriptDataWhileUninstall -> {
                         GuiUtils.showErrorMessage(
                             title = "❌ Unexpected error",
-                            message = "An error occurred while deleting the sync script data \uD83D\uDCC1.",
+                            message = "An error occurred while deleting the sync script data \uD83D\uDCC1: ${result.error.message}",
                             parentComponent = this@SyncScriptInstallerTab,
                         )
                     }
