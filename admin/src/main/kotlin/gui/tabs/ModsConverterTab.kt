@@ -82,8 +82,11 @@ class ModsConverterTab : Tab() {
             labeledInputField(
                 labelText = "Convert mode",
                 tooltipText =
-                    "Either copy the mods info as mods list or inside a new sync info. Notice that the " +
-                        "second option is easier as it will reset the configurations if you have any.",
+                    buildHtml {
+                        text("Either convert the mods info as mods list or inside a new sync info.")
+                        newLine()
+                        boldText("If you're uncertain and you don't use custom configurations, stick with the default option.")
+                    }.buildBodyAsText(),
                 inputComponent =
                     modsConvertModeComboBox
                         .apply {
@@ -105,8 +108,11 @@ class ModsConverterTab : Tab() {
             labeledInputField(
                 labelText = "Pretty Format",
                 tooltipText =
-                    "Check if you want the file format to be human-readable if you're planning on editing it manually. " +
-                        "minifying the file can save up to 10-20% for larger data.",
+                    buildHtml {
+                        text("Check if you want the file format to be human-readable if you're planning on editing it manually.")
+                        newLine()
+                        boldText("Minifying the file can save up to 10-20% for larger data.")
+                    }.buildBodyAsText(),
                 inputComponent = prettyFormatCheckBox,
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ),

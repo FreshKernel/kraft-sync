@@ -117,8 +117,7 @@ data class SyncInfo(
      * in case you have different servers for different regions or some other use-case, for example
      * */
     val servers: List<Server> = listOf(),
-    // TODO: Add support for quick play: https://github.com/ATLauncher/ATLauncher/pull/893
-    // for the launches that support it
+    // TODO: We might not support Quick Play support to avoid having launcher specific logic
     val quickPlay: QuickPlay = QuickPlay(),
 ) {
     companion object

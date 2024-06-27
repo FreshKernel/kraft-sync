@@ -125,7 +125,7 @@ val minimizedJar =
         } else {
 
             // Starting from Java 9, runtime classes are packaged in modular JMOD files.
-            fun includeModuleFromJdk(jModFileNameWithoutExtension: String) {
+            fun includeJavaModuleFromJdk(jModFileNameWithoutExtension: String) {
                 val jModFilePath = Paths.get(javaHome, "jmods", "$jModFileNameWithoutExtension.jmod")
                 if (!jModFilePath.exists()) {
                     throw NoSuchFileException("The '$jModFileNameWithoutExtension' at '$jModFilePath' doesn't exist.")
@@ -146,7 +146,7 @@ val minimizedJar =
                     // Needed to support Java logging utils (needed by Okio)
                     "java.logging",
                 )
-            javaModules.forEach { includeModuleFromJdk(jModFileNameWithoutExtension = it) }
+            javaModules.forEach { includeJavaModuleFromJdk(jModFileNameWithoutExtension = it) }
         }
 
         // Includes the main source set's compile classpath for Proguard.
