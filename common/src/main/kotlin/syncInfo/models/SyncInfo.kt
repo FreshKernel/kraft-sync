@@ -34,7 +34,7 @@ data class SyncInfo(
     /**
      * The list of mods to sync, take a look at [Mod] for more details
      * */
-    val mods: List<Mod> = listOf(),
+    val mods: List<Mod> = emptyList(),
     /**
      * Will override [shouldVerifyAssetFilesIntegrity] for the mods
      *
@@ -116,9 +116,7 @@ data class SyncInfo(
      * the players are no longer required to update it, it will be all automated, you can add multiple servers
      * in case you have different servers for different regions or some other use-case, for example
      * */
-    val servers: List<Server> = listOf(),
-    // TODO: We might not support Quick Play support to avoid having launcher specific logic
-    val quickPlay: QuickPlay = QuickPlay(),
+    val servers: List<Server> = emptyList(),
 ) {
     companion object
 }

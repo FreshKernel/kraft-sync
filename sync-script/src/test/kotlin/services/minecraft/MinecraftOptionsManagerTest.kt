@@ -265,7 +265,7 @@ class MinecraftOptionsManagerTest {
 
     @Test
     fun `clearing the properties should clear the file too`() {
-        manager.setResourcePacks(listOf())
+        manager.setResourcePacks(emptyList())
         assertTrue(testsOptionsFilePath.readText().isNotEmpty())
         manager.clear()
         assertTrue(testsOptionsFilePath.readText().isEmpty())
