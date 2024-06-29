@@ -52,5 +52,5 @@ suspend fun Mod.hasValidFileIntegrityOrError(modFilePath: Path): Boolean? =
             message = "An error occurred while validating the integrity of the mod file (${modFilePath.name}) \uD83D\uDCC1.",
         )
         // This will never reach due to the previous statement stopping the application
-        exitProcess(0)
+        exitProcess(1)
     }
