@@ -20,8 +20,8 @@ data class Mod(
      * */
     val fileIntegrityInfo: FileIntegrityInfo = FileIntegrityInfo(),
     /**
-     * The mod name (optional) for now will be only used in the gui, if you don't specify it, then will get
-     * the file name from [mod]
+     * The mod name (optional) that might be displayed in GUI, if not present
+     * will fall back to the file name from [downloadUrl]
      * */
     val name: String? = null,
     /**
