@@ -81,10 +81,10 @@ data class ModSyncInfo(
      *
      * If you want to change it to something like (`my-mod.sync.jar`) pass `.sync` instead
      *
-     * if there is already existing players that has the installed mods with a specific [modSyncMarker] and you change
+     * if there is already existing players that has the installed mods with a specific [fileSyncMarker] and you change
      * it from (`.synced` to `.sync` for example), then the script would identify the mods with (`.sync`) as mods
      * installed by the player resulting in duplication, However, this occurs only if [allowUsingOtherMods] is true, otherwise
      * will be deleted and downloaded again in case of this changed
      * */
-    val modSyncMarker: String? = ".synced",
+    val fileSyncMarker: String? = ".synced",
 )

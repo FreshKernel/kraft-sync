@@ -254,8 +254,8 @@ class ModsSyncService : SyncService {
     }
 
     /**
-     * @return The file that will be used, we use [ModSyncInfo.modSyncMarker] to support [isScriptModFile]
-     * will be the same file name from the [Mod.downloadUrl] if [ModSyncInfo.modSyncMarker] is null
+     * @return The file that will be used, we use [ModSyncInfo.fileSyncMarker] to support [isScriptModFile]
+     * will be the same file name from the [Mod.downloadUrl] if [ModSyncInfo.fileSyncMarker] is null
      *
      * @see isScriptModFile
      * */
@@ -265,7 +265,7 @@ class ModsSyncService : SyncService {
         val modFileName =
             buildString {
                 append(modFileNameWithoutExtension)
-                modSyncInfo.modSyncMarker?.let { append(it) }
+                modSyncInfo.fileSyncMarker?.let { append(it) }
                 append(".${MOD_FILE_EXTENSION}")
             }
         return modsDirectoryPath.resolve(modFileName)
@@ -273,14 +273,14 @@ class ModsSyncService : SyncService {
 
     /**
      * @return if this mod is created/synced by the script
-     * it will be identified by [ModSyncInfo.modSyncMarker] and will always return true
-     * if [ModSyncInfo.modSyncMarker] is null
+     * it will be identified by [ModSyncInfo.fileSyncMarker] and will always return true
+     * if [ModSyncInfo.fileSyncMarker] is null
      *
      * @see getModFilePath
      * */
     private fun isScriptModFile(modFilePath: Path): Boolean =
         modFilePath.name.endsWith(
-            "${modSyncInfo.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
+            "${modSyncInfo.fileSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
         )
 
     /**
