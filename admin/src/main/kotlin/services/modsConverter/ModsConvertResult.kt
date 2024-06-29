@@ -1,7 +1,7 @@
 package services.modsConverter
 
 import constants.AdminConstants
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 
 sealed class ModsConvertResult {
     data class Success(

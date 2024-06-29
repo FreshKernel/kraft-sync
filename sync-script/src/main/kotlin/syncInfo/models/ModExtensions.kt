@@ -1,6 +1,7 @@
 package syncInfo.models
 
 import config.models.ScriptConfig
+import syncInfo.models.mod.Mod
 import utils.getFileNameFromUrlOrError
 import utils.showErrorMessageAndTerminate
 import java.nio.file.Path
@@ -42,7 +43,7 @@ fun Mod.shouldSyncOnCurrentEnvironment(): Boolean {
  * Allow overriding the value for a specific mod, or all the mods, or use a global value for all the assets.
  * */
 fun Mod.shouldVerifyFileIntegrity(): Boolean =
-    overrideShouldVerifyFileIntegrity ?: SyncInfo.instance.shouldVerifyModFilesIntegrity
+    overrideShouldVerifyFileIntegrity ?: SyncInfo.instance.modSyncInfo.shouldVerifyModFilesIntegrity
         ?: SyncInfo.instance.shouldVerifyAssetFilesIntegrity
 
 suspend fun Mod.hasValidFileIntegrityOrError(modFilePath: Path): Boolean? =
@@ -52,5 +53,5 @@ suspend fun Mod.hasValidFileIntegrityOrError(modFilePath: Path): Boolean? =
             message = "An error occurred while validating the integrity of the mod file (${modFilePath.name}) \uD83D\uDCC1.",
         )
         // This will never reach due to the previous statement stopping the application
-        exitProcess(0)
+        exitProcess(1)
     }

@@ -1,7 +1,10 @@
-package syncInfo.models
+package syncInfo.models.mod
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import syncInfo.models.Environment
+import syncInfo.models.FileIntegrityInfo
+import syncInfo.models.SyncInfo
 
 // When adding a new property, consider converting/import the new
 // data from other launchers data format if possible
@@ -20,8 +23,8 @@ data class Mod(
      * */
     val fileIntegrityInfo: FileIntegrityInfo = FileIntegrityInfo(),
     /**
-     * The mod name (optional) for now will be only used in the gui, if you don't specify it, then will get
-     * the file name from [mod]
+     * The mod name (optional) that might be displayed in GUI, if not present
+     * will fall back to the file name from [downloadUrl]
      * */
     val name: String? = null,
     /**
@@ -53,10 +56,10 @@ data class Mod(
      * */
     val description: String? = null,
     /**
-     * Will override [SyncInfo.shouldVerifyModFilesIntegrity] and [SyncInfo.shouldVerifyAssetFilesIntegrity]
+     * Will override [ModSyncInfo.shouldVerifyModFilesIntegrity] and [SyncInfo.shouldVerifyAssetFilesIntegrity]
      * for a specific mod
      *
-     * @see SyncInfo.shouldVerifyModFilesIntegrity for more details.
+     * @see ModSyncInfo.shouldVerifyModFilesIntegrity for more details.
      * */
     val overrideShouldVerifyFileIntegrity: Boolean? = null,
 ) {

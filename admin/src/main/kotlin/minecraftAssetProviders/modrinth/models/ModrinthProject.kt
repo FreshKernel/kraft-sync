@@ -2,7 +2,7 @@ package minecraftAssetProviders.modrinth.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import syncInfo.models.Mod.ModSupport
+import syncInfo.models.mod.Mod.ModSupport
 
 /**
  * From https://docs.modrinth.com/#tag/projects/operation/getProject
@@ -87,13 +87,12 @@ data class ModrinthProject(
         /**
          * @return Convert [ProjectSide] to [ModSupport] which is data-specific to the project
          * */
-        fun toModSupport(): ModSupport {
-            return when (this) {
+        fun toModSupport(): ModSupport =
+            when (this) {
                 Required -> ModSupport.Required
                 Optional -> ModSupport.Optional
                 Unsupported -> ModSupport.Unsupported
             }
-        }
     }
 
     @Serializable

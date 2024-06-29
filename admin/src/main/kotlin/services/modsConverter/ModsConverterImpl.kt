@@ -7,6 +7,7 @@ import launchers.LauncherDataSourceFactory
 import launchers.MinecraftLauncher
 import services.modsConverter.models.ModsConvertMode
 import syncInfo.models.SyncInfo
+import syncInfo.models.mod.ModSyncInfo
 import utils.JsonPrettyPrint
 import java.nio.file.Paths
 import kotlin.io.path.exists
@@ -108,7 +109,7 @@ class ModsConverterImpl : ModsConverter {
             val json = if (prettyFormat) JsonPrettyPrint else Json
             val modsOutputText: String =
                 when (convertMode) {
-                    ModsConvertMode.InsideSyncInfo -> json.encodeToString(SyncInfo(mods = mods))
+                    ModsConvertMode.InsideSyncInfo -> json.encodeToString(SyncInfo(modSyncInfo = ModSyncInfo(mods = mods)))
                     ModsConvertMode.AsModsList -> json.encodeToString(mods)
                 }
 

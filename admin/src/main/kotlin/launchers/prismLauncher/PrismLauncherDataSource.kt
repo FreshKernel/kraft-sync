@@ -6,7 +6,7 @@ import curseForgeDataSource
 import launchers.Instance
 import launchers.LauncherDataSource
 import okio.IOException
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 import utils.SystemFileProvider
 import utils.listFilteredPaths
 import java.nio.file.Path

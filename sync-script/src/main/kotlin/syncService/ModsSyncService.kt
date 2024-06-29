@@ -4,11 +4,12 @@ import constants.SyncScriptDotMinecraftFiles
 import gui.dialogs.LoadingIndicatorDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import syncInfo.models.Mod
 import syncInfo.models.SyncInfo
 import syncInfo.models.getDisplayName
 import syncInfo.models.hasValidFileIntegrityOrError
 import syncInfo.models.instance
+import syncInfo.models.mod.Mod
+import syncInfo.models.mod.ModSyncInfo
 import syncInfo.models.shouldSyncOnCurrentEnvironment
 import syncInfo.models.shouldVerifyFileIntegrity
 import utils.ExecutionTimer
@@ -34,12 +35,11 @@ import kotlin.io.path.nameWithoutExtension
 
 class ModsSyncService : SyncService {
     private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.path
+    private val modSyncInfo = SyncInfo.instance.modSyncInfo
 
     companion object {
         private const val MOD_FILE_EXTENSION = "jar"
     }
-
-    private val syncInfo = SyncInfo.instance
 
     override suspend fun syncData() =
         withContext(Dispatchers.IO) {
@@ -48,7 +48,7 @@ class ModsSyncService : SyncService {
             println("\n\uD83D\uDD04 Syncing mods...")
 
             // All mods from the remote
-            val mods = syncInfo.mods
+            val mods = modSyncInfo.mods
             println("📥 Total received mods from server: ${mods.size}")
 
             validateModsDirectory()
@@ -102,14 +102,14 @@ class ModsSyncService : SyncService {
         // Get only the mods that are created by the script if the admin allows the player to install other mods
 
         /**
-         * The mods to deal with based on [SyncInfo.allowUsingOtherMods]
+         * The mods to deal with based on [ModSyncInfo.allowUsingOtherMods]
          * will or will not remove the mods that are created by the script
          * */
         val localModFilePathsToProcess =
             modsDirectoryPath
                 .listFilteredPaths {
                     val isModFileExtension = !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
-                    if (syncInfo.allowUsingOtherMods) {
+                    if (modSyncInfo.allowUsingOtherMods) {
                         return@listFilteredPaths isModFileExtension && isScriptModFile(it)
                     } else {
                         return@listFilteredPaths isModFileExtension
@@ -137,7 +137,7 @@ class ModsSyncService : SyncService {
     }
 
     private fun getCurrentEnvironmentModsOrAll(mods: List<Mod>): List<Mod> {
-        if (syncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
+        if (modSyncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
             val currentEnvironmentMods =
                 mods.filter { mod ->
                     if (!mod.shouldSyncOnCurrentEnvironment()) {
@@ -254,8 +254,8 @@ class ModsSyncService : SyncService {
     }
 
     /**
-     * @return The file that will be used, we use [SyncInfo.modSyncMarker] to support [isScriptModFile]
-     * will be the same file name from the [Mod.downloadUrl] if [SyncInfo.modSyncMarker] is null
+     * @return The file that will be used, we use [ModSyncInfo.modSyncMarker] to support [isScriptModFile]
+     * will be the same file name from the [Mod.downloadUrl] if [ModSyncInfo.modSyncMarker] is null
      *
      * @see isScriptModFile
      * */
@@ -265,7 +265,7 @@ class ModsSyncService : SyncService {
         val modFileName =
             buildString {
                 append(modFileNameWithoutExtension)
-                SyncInfo.instance.modSyncMarker?.let { append(it) }
+                modSyncInfo.modSyncMarker?.let { append(it) }
                 append(".${MOD_FILE_EXTENSION}")
             }
         return modsDirectoryPath.resolve(modFileName)
@@ -273,14 +273,14 @@ class ModsSyncService : SyncService {
 
     /**
      * @return if this mod is created/synced by the script
-     * it will be identified by [SyncInfo.modSyncMarker] and will always return true
-     * if [SyncInfo.modSyncMarker] is null
+     * it will be identified by [ModSyncInfo.modSyncMarker] and will always return true
+     * if [ModSyncInfo.modSyncMarker] is null
      *
      * @see getModFilePath
      * */
     private fun isScriptModFile(modFilePath: Path): Boolean =
         modFilePath.name.endsWith(
-            "${SyncInfo.instance.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
+            "${modSyncInfo.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
         )
 
     /**

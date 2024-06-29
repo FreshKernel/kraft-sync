@@ -1,7 +1,7 @@
 package launchers
 
 import minecraftAssetProviders.MinecraftAssetProvider
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 import java.nio.file.Path
 
 // TODO: Rename launcherInstanceDirectoryPath to dotMinecraftDirectoryPath,
