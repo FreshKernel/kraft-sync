@@ -3,7 +3,7 @@ package launchers.prismLauncher
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import syncInfo.models.FileIntegrityInfo
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 
 /**
  * Prism launcher stores the mod info inside a folder [PrismLauncherDataSource.MODS_METADATA_DIRECTORY_NAME] which is

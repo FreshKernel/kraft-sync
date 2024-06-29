@@ -2,7 +2,7 @@ package services.modsConverter
 
 import launchers.MinecraftLauncher
 import services.modsConverter.models.ModsConvertMode
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 
 interface ModsConverter {
     /**

@@ -8,7 +8,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import launchers.Instance
 import launchers.LauncherDataSource
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.JsonPrettyPrint
 import utils.SystemFileProvider

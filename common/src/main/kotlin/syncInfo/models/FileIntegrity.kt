@@ -4,8 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * A class that hold the data that is used for verifying a fle
- * will be used in [Mod] and another type of resources to verify them
+ * A class that holds the data that is used for verifying a file
  *
  * Used to verify the file's integrity
  * and trigger a re-download if the file is invalid or has been tampered with

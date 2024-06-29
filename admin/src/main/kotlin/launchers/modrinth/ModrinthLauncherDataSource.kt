@@ -9,7 +9,7 @@ import kotlinx.serialization.json.jsonObject
 import launchers.Instance
 import launchers.LauncherDataSource
 import launchers.modrinth.ModrinthLauncherInstance.ModrinthLauncherProject
-import syncInfo.models.Mod
+import syncInfo.models.mod.Mod
 import utils.JsonIgnoreUnknownKeys
 import utils.SystemFileProvider
 import utils.listFilteredPaths
