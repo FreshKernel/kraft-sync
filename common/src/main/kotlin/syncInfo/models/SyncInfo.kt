@@ -2,6 +2,7 @@ package syncInfo.models
 
 import kotlinx.serialization.Serializable
 import syncInfo.models.mod.ModSyncInfo
+import syncInfo.models.server.ServerSyncInfo
 
 // When adding new data fields to this data class, ensure they are added in the correct order
 // to maintain consistency with the JSON structure.
@@ -30,14 +31,11 @@ data class SyncInfo(
      * @see PreferredFileVerificationOption
      * */
     val preferredAssetFileVerification: PreferredFileVerificationOption? = PreferredFileVerificationOption.Medium,
-    val modSyncInfo: ModSyncInfo,
     /**
-     * The list of servers to sync, so when you change the server address or move to another host,
-     * the players are no longer required to update it, it will be all automated, you can add multiple servers
-     * in case you have different servers for different regions or some other use-case, for example
-     * // TODO: Later
+     * Have all required and option properties for mods syncing
      * */
-    val servers: List<Server> = emptyList(),
+    val modSyncInfo: ModSyncInfo = ModSyncInfo(),
+    val serverSyncInfo: ServerSyncInfo = ServerSyncInfo(),
 ) {
     companion object
 }

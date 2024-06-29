@@ -1,4 +1,4 @@
-package syncInfo.models
+package syncInfo.models.server
 
 import kotlinx.serialization.Serializable
 
