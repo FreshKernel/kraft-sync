@@ -1,3 +1,5 @@
+package services.updater
+
 import constants.ProjectInfoConstants
 import constants.SyncScriptDotMinecraftFiles
 import generated.BuildConfig

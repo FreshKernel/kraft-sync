@@ -14,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import preferences.ScriptPreferencesDataSource
 import preferences.SystemScriptPreferencesDataSource
+import services.updater.JarAutoUpdater
 import syncInfo.data.RemoteSyncInfoDataSource
 import syncInfo.data.SyncInfoDataSource
 import syncInfo.models.SyncInfo
