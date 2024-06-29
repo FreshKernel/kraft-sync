@@ -41,8 +41,6 @@ class ModsSyncService : SyncService {
         private const val MOD_FILE_EXTENSION = "jar"
     }
 
-    private val syncInfo = SyncInfo.instance
-
     override suspend fun syncData() =
         withContext(Dispatchers.IO) {
             val modsExecutionTimer = ExecutionTimer()
