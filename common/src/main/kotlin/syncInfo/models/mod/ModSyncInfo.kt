@@ -14,29 +14,9 @@ data class ModSyncInfo(
     /**
      * Will override [SyncInfo.shouldVerifyAssetFilesIntegrity] for the mods
      *
-     * By default, the script only validates the file name and usually the file name contains
-     * the mod and minecraft version, so when you update some mods, the old versions will be deleted and be
-     * downloaded once again, if you also want the script to verify each file and if it matches the file from the source
-     * if not, then it will be deleted and re-downloaded again
+     * See [Mod.overrideShouldVerifyFileIntegrity] to override this value for a specific mod
      *
-     * Also, if some mods got corrupted because of killing the process, then this would be helpful to make sure
-     * you have healthy mod files
-     *
-     * **Notice**: This option will only take effect for the mods that have at least one non-null value in the [FileIntegrityInfo]
-     * for example if [FileIntegrityInfo.sha256] or [FileIntegrityInfo.sizeInBytes] is not null, you can use one, some or all
-     * of them, it's up to you, in short if you want to verify a mod to be matched on the one the server, you have
-     * to assign a value to at least one, use [FileIntegrityInfo.sha256] or [FileIntegrityInfo.sha512]
-     * as it's validating the content to make sure it's valid and secure,
-     * validating using [FileIntegrityInfo.sizeInBytes] is a little bit faster (the difference is very negligible)
-     *
-     * If you want to verify all the mods, then all the mods need to have at least one value for one
-     * of those discussed above
-     *
-     * If you want to completely disable the verifying process,
-     * pass false to [shouldVerifyModFilesIntegrity] and will ignore
-     * even if the data in the [FileIntegrityInfo] are specified
-     *
-     * @see Mod.overrideShouldVerifyFileIntegrity to override this value for a specific mod
+     * @see FileIntegrityInfo
      *
      * */
     val shouldVerifyModFilesIntegrity: Boolean? = null,

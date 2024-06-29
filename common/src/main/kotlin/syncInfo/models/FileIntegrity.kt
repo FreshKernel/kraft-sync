@@ -10,7 +10,25 @@ import kotlinx.serialization.Serializable
  * and trigger a re-download if the file is invalid or has been tampered with
  *
  * If all of them are null, the file integrity will be unknown as
- * there is no way to validate it
+ * there is no way to validate it.
+ *
+ * By default, the script only validates the file name and usually the file name contains
+ * the mod and minecraft version, so when you update some mods, the old versions will be deleted and be
+ * downloaded once again, if you also want the script to verify each file and if it matches the file from the source
+ * if not, then it will be deleted and re-downloaded again
+ *
+ * Also, if some files got corrupted because of killing the process, then this would be helpful to make sure
+ * you have healthy files
+ *
+ * **Notice**: This option will only take effect for the files that have at least one non-null value in the [FileIntegrityInfo]
+ * for example if [FileIntegrityInfo.sha256] or [FileIntegrityInfo.sizeInBytes] is not null, you can use one, some or all
+ * of them, it's up to you, in short if you want to verify a file to be matched on the one the server, you have
+ * to assign a value to at least one, use [FileIntegrityInfo.sha256] or [FileIntegrityInfo.sha512]
+ * as it's validating the content to make sure it's valid and secure.
+ *
+ * If you want to verify all the files, then all the files need to have at least one value for one
+ * of those discussed above
+ *
  * */
 @Serializable
 data class FileIntegrityInfo(
