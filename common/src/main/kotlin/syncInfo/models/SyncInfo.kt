@@ -32,9 +32,12 @@ data class SyncInfo(
      * */
     val preferredAssetFileVerification: PreferredFileVerificationOption? = PreferredFileVerificationOption.Medium,
     /**
-     * Have all required and option properties for mods syncing
+     * All required and optional properties for the mod syncing process
      * */
     val modSyncInfo: ModSyncInfo = ModSyncInfo(),
+    /**
+     * All required and optional properties for the server syncing process
+     * */
     val serverSyncInfo: ServerSyncInfo = ServerSyncInfo(),
 ) {
     companion object
