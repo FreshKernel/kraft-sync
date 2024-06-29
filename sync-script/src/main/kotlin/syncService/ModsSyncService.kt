@@ -43,8 +43,8 @@ class ModsSyncService : SyncService {
 
     override suspend fun syncData() =
         withContext(Dispatchers.IO) {
-            val modsExecutionTimer = ExecutionTimer()
-            modsExecutionTimer.setStartTime()
+            val executionTimer = ExecutionTimer()
+            executionTimer.setStartTime()
             println("\n\uD83D\uDD04 Syncing mods...")
 
             // All mods from the remote
@@ -78,7 +78,7 @@ class ModsSyncService : SyncService {
 
             loadingIndicatorDialog?.isVisible = false
 
-            println("\uD83D\uDD52 Finished syncing the mods in ${modsExecutionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
+            println("\uD83D\uDD52 Finished syncing the mods in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
         }
 
     private fun validateModsDirectory() {
