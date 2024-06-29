@@ -64,7 +64,7 @@ data class ModSyncInfo(
      * Should the script allow the player to install mods other than the synced mods by the script?
      * if true then the script won't touch any mods that is not installed by the script, otherwise will delete it and
      * won't allow using any other mods, still can be bypassed, it's better to install a server side mod
-     * that check the installed mods (still can be bypassed)
+     * that check the installed mods (can be bypassed)
      *
      * TODO: Currently (BUG) if you let's say have sodium installed (sodium.jar), the synced mod by the script would be (sodium.synced.jar)
      *  however the user can still install (sodium.jar) resulting in mod duplication which will cause the game to not run
