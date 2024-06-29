@@ -2,7 +2,9 @@ package syncInfo.models.mod
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import syncInfo.models.Environment
 import syncInfo.models.FileIntegrityInfo
+import syncInfo.models.SyncInfo
 
 // When adding a new property, consider converting/import the new
 // data from other launchers data format if possible
