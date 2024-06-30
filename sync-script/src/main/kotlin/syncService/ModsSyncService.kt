@@ -33,6 +33,9 @@ import kotlin.io.path.nameWithoutExtension
 // TODO: Use JarFile(modFile).manifest.mainAttributes to read the mod name, id and some info to solve the duplicating
 //  mods issue when allowing the user to install other mods
 
+// TODO: Review the classes ModSyncInfo, Mod and ModsSyncService to be consistent with classes related
+//  to Resource Pack feature (e.g, ResourcePack, ResourcePackSyncInfo, ResourcePacksSyncService)
+
 class ModsSyncService : SyncService {
     private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.path
     private val modSyncInfo = SyncInfo.instance.modSyncInfo

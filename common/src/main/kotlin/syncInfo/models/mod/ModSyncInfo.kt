@@ -19,7 +19,7 @@ data class ModSyncInfo(
      * @see FileIntegrityInfo
      *
      * */
-    val shouldVerifyModFilesIntegrity: Boolean? = null,
+    val shouldVerifyFilesIntegrity: Boolean? = null,
     /**
      * if [Environment] value is [Environment.Client] then will download/sync only the mods that'd need to be
      * on te client side like client side mods and the mods that's needed to be in both Client and Server
