@@ -58,8 +58,6 @@ data class Mod(
     /**
      * Will override [ModSyncInfo.shouldVerifyFilesIntegrity] and [SyncInfo.shouldVerifyAssetFilesIntegrity]
      * for a specific mod
-     *
-     * @see ModSyncInfo.shouldVerifyFilesIntegrity for more details.
      * */
     val overrideShouldVerifyFileIntegrity: Boolean? = null,
 ) {
