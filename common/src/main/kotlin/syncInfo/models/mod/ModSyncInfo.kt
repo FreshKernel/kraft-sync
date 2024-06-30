@@ -41,10 +41,14 @@ data class ModSyncInfo(
      * */
     val shouldSyncOnlyModsForCurrentEnvironment: Boolean = true,
     /**
-     * Should the script allow the player to install mods other than the synced mods by the script?
-     * if true then the script won't touch any mods that is not installed by the script, otherwise will delete it and
-     * won't allow using any other mods, still can be bypassed, it's better to install a server side mod
-     * that check the installed mods (can be bypassed)
+     * Determines whether the script allows the player to use mods other than those synchronized by the script.
+     *
+     * If `true`, the script will not modify or delete any mods not installed by the script.
+     * If `false`, the script will delete any mods not installed by the script and prevent the use of such mods
+     *
+     * This restriction can be bypassed.
+     * It is recommended to install a server-side mod
+     * that checks the installed mods for better enforcement (though this too can be bypassed).
      *
      * TODO: Currently (BUG) if you let's say have sodium installed (sodium.jar), the synced mod by the script would be (sodium.synced.jar)
      *  however the user can still install (sodium.jar) resulting in mod duplication which will cause the game to not run
@@ -52,14 +56,18 @@ data class ModSyncInfo(
      * */
     val allowUsingOtherMods: Boolean = false,
     /**
-     * A way for the script to download mods and save them like (`my-mod.synced.jar`) instead of (`my-mod.jar`)
-     * the script need this so it can know if the mod installed by it or not to support [allowUsingOtherMods]
-     * when true, so it will ignore the mods installed by the player
+     * Specifies a suffix to append to the file names of mods downloaded by the script,
+     * allowing the script to distinguish
+     * between mods it has installed and those installed by the player.
+     * For example, a mod file might be saved as `my-mod.synced.jar`
+     * instead of `my-mod.jar`.
      *
-     * Pass null if you want to disable this and install the mod file name just like how it's on the source.
-     * In that case make sure to not pass true to [allowUsingOtherMods] because it won't work
+     * This will allow [allowUsingOtherMods] to check if a mod is installed by the script or the player.
      *
-     * If you want to change it to something like (`my-mod.sync.jar`) pass `.sync` instead
+     * Pass `null` if you want to disable this and install the mod with the file name just like how it's on the source.
+     * In that case make sure to not pass `true` to [allowUsingOtherMods] because it won't work.
+     *
+     * If you want to change it to something like `my-mod.sync.jar` pass `.sync` instead
      *
      * if there is already existing players that has the installed mods with a specific [fileSyncMarker] and you change
      * it from (`.synced` to `.sync` for example), then the script would identify the mods with (`.sync`) as mods
