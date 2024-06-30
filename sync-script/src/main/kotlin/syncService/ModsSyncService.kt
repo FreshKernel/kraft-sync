@@ -50,7 +50,7 @@ class ModsSyncService : SyncService {
             executionTimer.setStartTime()
             println("\n\uD83D\uDD04 Syncing mods...")
 
-            // All mods from the remote
+            // Mods from the remote
             val mods = modSyncInfo.mods
             println("📥 Total received mods from server: ${mods.size}")
 
