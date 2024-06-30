@@ -111,11 +111,11 @@ class ModsSyncService : SyncService {
         val localModFilePathsToProcess =
             modsDirectoryPath
                 .listFilteredPaths {
-                    val isModFileExtension = !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
+                    val isModFile = !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
                     if (modSyncInfo.allowUsingOtherMods) {
-                        return@listFilteredPaths isModFileExtension && isScriptModFile(it)
+                        return@listFilteredPaths isModFile && isScriptModFile(it)
                     } else {
-                        return@listFilteredPaths isModFileExtension
+                        return@listFilteredPaths isModFile
                     }
                 }.getOrElse {
                     showErrorMessageAndTerminate(
