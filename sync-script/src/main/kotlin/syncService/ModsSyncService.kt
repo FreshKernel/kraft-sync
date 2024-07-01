@@ -36,6 +36,9 @@ import kotlin.io.path.nameWithoutExtension
 // TODO: Review the classes ModSyncInfo, Mod and ModsSyncService to be consistent with classes related
 //  to Resource Pack feature (e.g, ResourcePack, ResourcePackSyncInfo, ResourcePacksSyncService)
 
+// TODO: Some code might need to be refactored, such as extracting getModFilePath() into extension function in Mod
+//  do the same for ResourcePackSyncInfo since there are common code between them
+
 class ModsSyncService : SyncService {
     private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.path
     private val modSyncInfo = SyncInfo.instance.modSyncInfo
@@ -107,6 +110,7 @@ class ModsSyncService : SyncService {
         /**
          * The mods to deal with based on [ModSyncInfo.allowUsingOtherMods]
          * will or will not remove the mods that are created by the script
+         * TODO: Extract into function
          * */
         val localModFilePathsToProcess =
             modsDirectoryPath
