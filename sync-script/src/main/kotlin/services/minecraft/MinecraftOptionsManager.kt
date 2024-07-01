@@ -95,7 +95,6 @@ object MinecraftOptionsManager {
             requireNotNull(
                 propertyValue,
             ) { "The key property $propertyKey doesn't exist in the ${optionsFilePath.name} in ${optionsFilePath.pathString}" }
-            println(properties)
             Result.success(propertyValue)
         } catch (e: Exception) {
             Result.failure(e)
@@ -145,8 +144,6 @@ object MinecraftOptionsManager {
         data class BuiltIn(
             val builtInResourcePackName: String,
         ) : ResourcePack(value = builtInResourcePackName)
-
-        fun isFile() = this is File
 
         /**
          * Return Minecraft specific value of key [Property.ResourcePacks]
