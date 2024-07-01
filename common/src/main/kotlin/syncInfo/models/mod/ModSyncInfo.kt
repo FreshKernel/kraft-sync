@@ -36,7 +36,11 @@ data class ModSyncInfo(
      * An example mod is [FallingTree](https://modrinth.com/mod/fallingtree)
      * is marked as **server side only** and unsupported on the **client side** while it's **optional** for single player,
      * it could work in single player in the **integrated server**;
-     * it's not needed on the **client side** to join a **multiplayer server**
+     * it's not needed on the **client side** to join a **multiplayer server**.
+     *
+     * Another example is that if you use a mod required on both sides, and it uses a library
+     * mod marked as **server side only** although it's required to run the mod.
+     * You will get an error from the mod loader.
      *
      * */
     val shouldSyncOnlyModsForCurrentEnvironment: Boolean = true,
