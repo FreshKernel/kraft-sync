@@ -231,8 +231,8 @@ class ModsSyncService : SyncService {
                         title =
                             buildTitleMessage(
                                 currentModIndex = index,
-                                pendingMods = modsToDownload.size,
-                                totalMods = totalMods.size,
+                                pendingModsCount = modsToDownload.size,
+                                totalModsCount = totalMods.size,
                             ),
                         infoText = "Downloading ${mod.getDisplayName()}",
                         progress = downloadedProgress.toInt(),
@@ -292,13 +292,13 @@ class ModsSyncService : SyncService {
      * */
     private fun buildTitleMessage(
         currentModIndex: Int,
-        pendingMods: Int,
-        totalMods: Int,
+        pendingModsCount: Int,
+        totalModsCount: Int,
     ): String =
         buildString {
-            append("${currentModIndex + 1} of $pendingMods")
-            if (pendingMods != totalMods) {
-                append(" ($totalMods total)")
+            append("${currentModIndex + 1} of $pendingModsCount")
+            if (pendingModsCount != totalModsCount) {
+                append(" ($totalModsCount total)")
             }
         }
 }
