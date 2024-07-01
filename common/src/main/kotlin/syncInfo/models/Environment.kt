@@ -22,12 +22,11 @@ enum class Environment {
 
     fun isServer() = this == Server
 
-    fun isClient() = this == Server
+    fun isClient() = this == Client
 
-    override fun toString(): String {
-        return when (this) {
+    override fun toString(): String =
+        when (this) {
             Client -> "Client"
             Server -> "Server"
         }
-    }
 }
