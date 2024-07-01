@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Path
 import kotlin.io.path.bufferedWriter
+import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.forEachLine
 import kotlin.io.path.name
@@ -49,8 +50,11 @@ object MinecraftOptionsManager {
      * @throws IllegalArgumentException If [optionsFilePath] doesn't exist
      * @throws IndexOutOfBoundsException If the text of [optionsFilePath] is invalid
      * */
-    fun loadPropertiesFromFile(): Result<Unit> =
+    fun loadPropertiesFromFile(createIfMissing: Boolean = false): Result<Unit> =
         try {
+            if (createIfMissing && !optionsFilePath.exists()) {
+                optionsFilePath.createFile()
+            }
             require(
                 optionsFilePath.exists(),
             ) { "The file ${optionsFilePath.name} doesn't exist in ${optionsFilePath.pathString}" }
@@ -141,6 +145,8 @@ object MinecraftOptionsManager {
         data class BuiltIn(
             val builtInResourcePackName: String,
         ) : ResourcePack(value = builtInResourcePackName)
+
+        fun isFile() = this is File
 
         /**
          * Return Minecraft specific value of key [Property.ResourcePacks]

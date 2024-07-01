@@ -120,7 +120,7 @@ class MinecraftOptionsManagerTest {
     }
 
     @Test
-    fun `should throw exception for file doesn't exist`() {
+    fun `should throw exception when the options file doesn't exist`() {
         assertTrue(testsOptionsFilePath.exists(), "The options file should exist")
 
         // Override the file with a file doesn't exist
@@ -133,9 +133,22 @@ class MinecraftOptionsManagerTest {
     }
 
     @Test
-    fun `should not throw an exception for file exist`() {
+    fun `should not throw an exception when the file exist`() {
         assertDoesNotThrow {
             manager.loadPropertiesFromFile().getOrThrow()
+        }
+    }
+
+    @Test
+    fun `should throw exception when the options file does not exist and configured to create it if does not exist`() {
+        assertTrue(testsOptionsFilePath.exists(), "The options file should exist")
+
+        // Override the file with a file doesn't exist
+        testsOptionsFilePath = Paths.get(FILE_PATH_THAT_DOES_NOT_EXIST)
+
+        assertFalse(testsOptionsFilePath.exists(), "The options file exist which it shouldn't")
+        assertDoesNotThrow {
+            manager.loadPropertiesFromFile(createIfMissing = true).getOrThrow()
         }
     }
 
