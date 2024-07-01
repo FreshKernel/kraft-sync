@@ -185,12 +185,12 @@ class ModsSyncService : SyncService {
                     detailsText =
                         "Verifying the mod files integrity...",
                 )
-                val hasValidModIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
-                if (hasValidModIntegrity == null) {
+                val hasValidModFileIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
+                if (hasValidModFileIntegrity == null) {
                     println("❓ The mod: '$modFileName' has an unknown integrity. Skipping to the next mod.")
                     return@filter false
                 }
-                if (hasValidModIntegrity) {
+                if (hasValidModFileIntegrity) {
                     println("✅ The mod: '$modFileName' has valid file integrity. Skipping to the next mod.")
                     return@filter false
                 }
