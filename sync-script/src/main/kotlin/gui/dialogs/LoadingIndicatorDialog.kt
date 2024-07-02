@@ -40,7 +40,7 @@ class LoadingIndicatorDialog(
 
     init {
         this.title = title
-        minimumSize = Dimension(225, 155)
+        minimumSize = Dimension(250, 155)
         maximumSize = Dimension(800, 400)
         defaultCloseOperation = EXIT_ON_CLOSE
 
