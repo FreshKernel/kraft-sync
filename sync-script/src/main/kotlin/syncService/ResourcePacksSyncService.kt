@@ -8,31 +8,25 @@ import syncInfo.models.getDisplayName
 import syncInfo.models.hasValidFileIntegrityOrError
 import syncInfo.models.instance
 import syncInfo.models.resourcePack.ResourcePack
-import syncInfo.models.resourcePack.ResourcePackSyncInfo
 import syncInfo.models.shouldVerifyFileIntegrity
+import syncService.common.AssetSyncService
 import utils.ExecutionTimer
 import utils.FileDownloader
 import utils.calculateProgressByIndex
 import utils.convertBytesToReadableMegabytesAsString
 import utils.deleteExistingOrTerminate
 import utils.getFileNameFromUrlOrError
-import utils.listFilteredPaths
 import utils.showErrorMessageAndTerminate
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
-import kotlin.io.path.extension
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isHidden
 import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
-import kotlin.system.exitProcess
 
-// TODO: Extract the common code between ResourcePacksSyncService and ModsSyncService
-
-class ResourcePacksSyncService : SyncService {
-    private val resourcePacksDirectoryPath = SyncScriptDotMinecraftFiles.ResourcePacks.path
+class ResourcePacksSyncService :
+    AssetSyncService(
+        assetDirectory = SyncScriptDotMinecraftFiles.ResourcePacks.path,
+        assetFileExtension = RESOURCE_PACK_FILE_EXTENSION,
+    ) {
     private val resourcePackSyncInfo = SyncInfo.instance.resourcePackSyncInfo
 
     companion object {
@@ -49,7 +43,7 @@ class ResourcePacksSyncService : SyncService {
         val resourcePacks = resourcePackSyncInfo.resourcePacks
         println("📥 Total received resource-packs from server: ${resourcePacks.size}")
 
-        validateResourcePacksDirectory()
+        validateAssetDirectory()
         deleteUnSyncedLocalResourcePackFiles(resourcePacks = resourcePacks)
 
         val loadingIndicatorDialog: LoadingIndicatorDialog? =
@@ -76,23 +70,6 @@ class ResourcePacksSyncService : SyncService {
         loadingIndicatorDialog?.isVisible = false
 
         println("\uD83D\uDD52 Finished syncing the resource-packs in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
-    }
-
-    private fun validateResourcePacksDirectory() {
-        if (!resourcePacksDirectoryPath.exists()) {
-            println("\uD83D\uDCC1 The resource-packs folder doesn't exist, creating it..")
-            resourcePacksDirectoryPath.createDirectories()
-        }
-
-        if (!resourcePacksDirectoryPath.isDirectory()) {
-            showErrorMessageAndTerminate(
-                title = "❌ Invalid Resource-Packs Folder",
-                message =
-                    "\uD83D\uDEE0 Resource Packs must be stored in a directory/folder \uD83D\uDCC2 called " +
-                        "`${SyncScriptDotMinecraftFiles.ResourcePacks.path.name}`" +
-                        ", a file was found instead.",
-            )
-        }
     }
 
     private suspend fun deleteUnSyncedLocalResourcePackFiles(resourcePacks: List<ResourcePack>) {
@@ -180,10 +157,10 @@ class ResourcePacksSyncService : SyncService {
                 progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
                     loadingIndicatorDialog?.updateComponentProperties(
                         title =
-                            buildTitleMessage(
-                                currentResourcePackIndex = index,
-                                pendingResourcePacksCount = resourcePacksToDownload.size,
-                                totalResourcePacksCount = totalResourcePacks.size,
+                            buildProgressMessage(
+                                currentIndex = index,
+                                pendingCount = resourcePacksToDownload.size,
+                                totalCount = totalResourcePacks.size,
                             ),
                         infoText = "Downloading ${resourcePack.getDisplayName()}",
                         progress = downloadedProgress.toInt(),
@@ -239,73 +216,21 @@ class ResourcePacksSyncService : SyncService {
         )
     }
 
-    /**
-     * @return The file that will be used, we use [ResourcePackSyncInfo.fileSyncMarker] to support [isScriptResourcePackFile]
-     * will be the same file name from the [ResourcePack.downloadUrl] if [ResourcePackSyncInfo.fileSyncMarker] is null
-     *
-     * @see getResourcePackFilePath
-     * */
-    private fun getResourcePackFilePath(resourcePack: ResourcePack): Path {
-        val resourcePackFileNameWithoutExtension =
-            Paths.get(getFileNameFromUrlOrError(resourcePack.downloadUrl)).nameWithoutExtension
-        val resourcePackFileName =
-            buildString {
-                append(resourcePackFileNameWithoutExtension)
-                resourcePackSyncInfo.fileSyncMarker?.let { append(it) }
-                append(".$RESOURCE_PACK_FILE_EXTENSION")
-            }
-        return resourcePacksDirectoryPath.resolve(resourcePackFileName)
-    }
-
-    /**
-     * @return if this resource-pack is created/synced by the script
-     * it will be identified by [ResourcePackSyncInfo.fileSyncMarker] and will always return true
-     * if [ResourcePackSyncInfo.fileSyncMarker] is null
-     *
-     * @see getResourcePackFilePath
-     * */
-    private fun isScriptResourcePackFile(resourcePackFilePath: Path): Boolean =
-        resourcePackFilePath.name.endsWith(
-            "${resourcePackSyncInfo.fileSyncMarker.orEmpty()}.$RESOURCE_PACK_FILE_EXTENSION",
+    private fun getResourcePackFilePath(resourcePack: ResourcePack): Path =
+        getAssetFilePath(
+            downloadUrl = resourcePack.downloadUrl,
+            fileSyncMarker = resourcePackSyncInfo.fileSyncMarker,
         )
 
-    /**
-     * @return The message that will be used for the dialog that will show the progress
-     * of syncing, downloading and verifying resource-packs
-     * */
-    private fun buildTitleMessage(
-        currentResourcePackIndex: Int,
-        pendingResourcePacksCount: Int,
-        totalResourcePacksCount: Int,
-    ): String =
-        buildString {
-            append("${currentResourcePackIndex + 1} of $pendingResourcePacksCount")
-            if (pendingResourcePacksCount != totalResourcePacksCount) {
-                append(" ($totalResourcePacksCount total)")
-            }
-        }
+    private fun isScriptResourcePackFile(resourcePackFilePath: Path): Boolean =
+        isScriptAssetFile(
+            assetFileFilePath = resourcePackFilePath,
+            fileSyncMarker = resourcePackSyncInfo.fileSyncMarker,
+        )
 
-    /**
-     * The resource-packs to deal with based on [ResourcePackSyncInfo.allowUsingOtherResourcePacks]
-     * @return Either all the resource pack files or only the ones created by the script
-     * */
-    private suspend fun getScriptLocalResourcePackFilePathsOrAll(): List<Path> {
-        return resourcePacksDirectoryPath
-            .listFilteredPaths {
-                val isResourcePackFile =
-                    !it.isDirectory() && !it.isHidden() && it.extension == RESOURCE_PACK_FILE_EXTENSION
-                if (resourcePackSyncInfo.allowUsingOtherResourcePacks) {
-                    return@listFilteredPaths isResourcePackFile && isScriptResourcePackFile(it)
-                } else {
-                    return@listFilteredPaths isResourcePackFile
-                }
-            }.getOrElse {
-                showErrorMessageAndTerminate(
-                    title = "📁 File Listing Error",
-                    message = "⚠ Failed to list the files in the resource-packs folder: ${it.message}",
-                )
-                // This will never reach due to the previous statement stopping the application
-                exitProcess(1)
-            }
-    }
+    private suspend fun getScriptLocalResourcePackFilePathsOrAll(): List<Path> =
+        getScriptLocalAssetFilePathsOrAll(
+            allowUsingOtherAssets = resourcePackSyncInfo.allowUsingOtherResourcePacks,
+            isScriptAssetFile = { isScriptResourcePackFile(resourcePackFilePath = it) },
+        )
 }
