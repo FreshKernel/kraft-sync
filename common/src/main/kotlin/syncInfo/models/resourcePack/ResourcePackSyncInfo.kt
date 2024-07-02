@@ -13,12 +13,19 @@ data class ResourcePackSyncInfo(
      * */
     val resourcePacks: List<ResourcePack> = emptyList(),
     /**
-     * Indicates whether the synced resource packs should be activated in the game.
+     * Indicates whether the synced resource-packs should be activated in the game.
      *
-     * When `true`, the script will activate the resource packs in the order specified by [resourcePacks],
-     * ignoring any built-in activated resource packs.
+     * When `true`, the script will activate the resource-packs in the order specified by [resourcePacks],
+     * ignoring any built-in activated resource-packs.
      *
      * If [allowUsingOtherResourcePacks] is `true`, the script will also ignore the resource packs activated by the user.
+     *
+     * Currently the resource-packs will be applied with the following order:
+     * 1. The [resourcePacks] with the same order
+     * 2. The player resource-packs if [allowUsingOtherResourcePacks] is `true` and player have some resource-packs applied
+     * 3. The built-in resource-packs, from mods, mod-loader or in the game if the player applied them
+     *
+     * TODO: Add an option to override the apply order
      */
     val shouldApplyResourcePacks: Boolean = false,
     /**
