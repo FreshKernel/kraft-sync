@@ -2,6 +2,7 @@ package syncInfo.models
 
 import kotlinx.serialization.Serializable
 import syncInfo.models.mod.ModSyncInfo
+import syncInfo.models.resourcePack.ResourcePackSyncInfo
 import syncInfo.models.server.ServerSyncInfo
 
 // When adding new data fields to this data class, ensure they are added in the correct order
@@ -35,6 +36,10 @@ data class SyncInfo(
      * All required and optional properties for the mod syncing process
      * */
     val modSyncInfo: ModSyncInfo = ModSyncInfo(),
+    /**
+     * All required and optional properties for the resource-packs syncing process
+     * */
+    val resourcePackSyncInfo: ResourcePackSyncInfo = ResourcePackSyncInfo(),
     /**
      * All required and optional properties for the server syncing process
      * */

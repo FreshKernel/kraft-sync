@@ -9,32 +9,31 @@ import syncInfo.models.getDisplayName
 import syncInfo.models.hasValidFileIntegrityOrError
 import syncInfo.models.instance
 import syncInfo.models.mod.Mod
-import syncInfo.models.mod.ModSyncInfo
 import syncInfo.models.shouldSyncOnCurrentEnvironment
 import syncInfo.models.shouldVerifyFileIntegrity
+import syncService.common.AssetSyncService
 import utils.ExecutionTimer
 import utils.FileDownloader
 import utils.calculateProgressByIndex
 import utils.convertBytesToReadableMegabytesAsString
 import utils.deleteExistingOrTerminate
 import utils.getFileNameFromUrlOrError
-import utils.listFilteredPaths
 import utils.showErrorMessageAndTerminate
 import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
-import kotlin.io.path.extension
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isHidden
 import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
 
 // TODO: Use JarFile(modFile).manifest.mainAttributes to read the mod name, id and some info to solve the duplicating
 //  mods issue when allowing the user to install other mods
 
-class ModsSyncService : SyncService {
-    private val modsDirectoryPath = SyncScriptDotMinecraftFiles.Mods.path
+// TODO: Review the classes ModSyncInfo, Mod and ModsSyncService to be consistent with classes related
+//  to Resource Pack feature (e.g, ResourcePack, ResourcePackSyncInfo, ResourcePacksSyncService)
+
+class ModsSyncService :
+    AssetSyncService(
+        assetDirectory = SyncScriptDotMinecraftFiles.Mods.path,
+        assetFileExtension = MOD_FILE_EXTENSION,
+    ) {
     private val modSyncInfo = SyncInfo.instance.modSyncInfo
 
     companion object {
@@ -43,15 +42,15 @@ class ModsSyncService : SyncService {
 
     override suspend fun syncData() =
         withContext(Dispatchers.IO) {
-            val modsExecutionTimer = ExecutionTimer()
-            modsExecutionTimer.setStartTime()
+            val executionTimer = ExecutionTimer()
+            executionTimer.setStartTime()
             println("\n\uD83D\uDD04 Syncing mods...")
 
-            // All mods from the remote
+            // Mods from the remote
             val mods = modSyncInfo.mods
             println("📥 Total received mods from server: ${mods.size}")
 
-            validateModsDirectory()
+            validateAssetDirectory()
             deleteUnSyncedLocalModFiles(mods = mods)
 
             val currentEnvironmentModsOrAll = getCurrentEnvironmentModsOrAll(mods = mods)
@@ -78,49 +77,14 @@ class ModsSyncService : SyncService {
 
             loadingIndicatorDialog?.isVisible = false
 
-            println("\uD83D\uDD52 Finished syncing the mods in ${modsExecutionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
+            println("\uD83D\uDD52 Finished syncing the mods in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
         }
-
-    private fun validateModsDirectory() {
-        if (!modsDirectoryPath.exists()) {
-            println("\uD83D\uDCC1 The mods folder doesn't exist, creating it..")
-            modsDirectoryPath.createDirectories()
-        }
-
-        if (!modsDirectoryPath.isDirectory()) {
-            showErrorMessageAndTerminate(
-                title = "❌ Invalid Mods Folder",
-                message =
-                    "\uD83D\uDEE0 Mods must be stored in a directory/folder \uD83D\uDCC2 called " +
-                        "`${SyncScriptDotMinecraftFiles.Mods.path.name}`" +
-                        ", a file was found instead.",
-            )
-        }
-    }
 
     private suspend fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
         // Get only the mods that are created by the script if the admin allows the player to install other mods
 
-        /**
-         * The mods to deal with based on [ModSyncInfo.allowUsingOtherMods]
-         * will or will not remove the mods that are created by the script
-         * */
-        val localModFilePathsToProcess =
-            modsDirectoryPath
-                .listFilteredPaths {
-                    val isModFileExtension = !it.isDirectory() && !it.isHidden() && it.extension == MOD_FILE_EXTENSION
-                    if (modSyncInfo.allowUsingOtherMods) {
-                        return@listFilteredPaths isModFileExtension && isScriptModFile(it)
-                    } else {
-                        return@listFilteredPaths isModFileExtension
-                    }
-                }.getOrElse {
-                    showErrorMessageAndTerminate(
-                        title = "📁 File Listing Error",
-                        message = "⚠ Failed to list the files in the mods folder: ${it.message}",
-                    )
-                    return
-                }
+        // will or will not remove the mods that are created by the script
+        val localModFilePathsToProcess = getScriptLocalModFilePathsOrAll()
 
         // Delete the old un-synced mods
 
@@ -137,27 +101,28 @@ class ModsSyncService : SyncService {
     }
 
     private fun getCurrentEnvironmentModsOrAll(mods: List<Mod>): List<Mod> {
-        if (modSyncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
-            val currentEnvironmentMods =
-                mods.filter { mod ->
-                    if (!mod.shouldSyncOnCurrentEnvironment()) {
-                        val modFilePath = getModFilePath(mod)
-                        if (modFilePath.exists()) {
-                            println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
-                            modFilePath.deleteExistingOrTerminate(
-                                fileEntityType = "mod",
-                                reasonOfDelete = "it's not required on the current environment",
-                            )
-                        }
-                        // Exclude the mod as it's not needed in the current environment
-                        return@filter false
-                    }
-                    // Include the mod
-                    true
-                }
-            return currentEnvironmentMods
+        if (!modSyncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
+            return mods
         }
-        return mods
+        val currentEnvironmentMods =
+            mods.filter { mod ->
+                if (mod.shouldSyncOnCurrentEnvironment()) {
+                    // Include the mod if it should be synced on the current environment.
+                    return@filter true
+                }
+
+                val modFilePath = getModFilePath(mod)
+                if (modFilePath.exists()) {
+                    println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
+                    modFilePath.deleteExistingOrTerminate(
+                        fileEntityType = "mod",
+                        reasonOfDelete = "it's not required on the current environment",
+                    )
+                }
+                // Exclude the mod as it's not needed in the current environment
+                return@filter false
+            }
+        return currentEnvironmentMods
     }
 
     private suspend fun getModsForDownloadAndValidateIfRequired(
@@ -182,12 +147,12 @@ class ModsSyncService : SyncService {
                     detailsText =
                         "Verifying the mod files integrity...",
                 )
-                val hasValidModIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
-                if (hasValidModIntegrity == null) {
+                val hasValidModFileIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
+                if (hasValidModFileIntegrity == null) {
                     println("❓ The mod: '$modFileName' has an unknown integrity. Skipping to the next mod.")
                     return@filter false
                 }
-                if (hasValidModIntegrity) {
+                if (hasValidModFileIntegrity) {
                     println("✅ The mod: '$modFileName' has valid file integrity. Skipping to the next mod.")
                     return@filter false
                 }
@@ -226,10 +191,10 @@ class ModsSyncService : SyncService {
                 progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
                     loadingIndicatorDialog?.updateComponentProperties(
                         title =
-                            buildTitleMessage(
-                                currentModIndex = index,
-                                pendingMods = modsToDownload.size,
-                                totalMods = totalMods.size,
+                            buildProgressMessage(
+                                currentIndex = index,
+                                pendingCount = modsToDownload.size,
+                                totalCount = totalMods.size,
                             ),
                         infoText = "Downloading ${mod.getDisplayName()}",
                         progress = downloadedProgress.toInt(),
@@ -253,49 +218,21 @@ class ModsSyncService : SyncService {
         }
     }
 
-    /**
-     * @return The file that will be used, we use [ModSyncInfo.modSyncMarker] to support [isScriptModFile]
-     * will be the same file name from the [Mod.downloadUrl] if [ModSyncInfo.modSyncMarker] is null
-     *
-     * @see isScriptModFile
-     * */
-    private fun getModFilePath(mod: Mod): Path {
-        val modFileNameWithoutExtension =
-            Paths.get(getFileNameFromUrlOrError(mod.downloadUrl)).nameWithoutExtension
-        val modFileName =
-            buildString {
-                append(modFileNameWithoutExtension)
-                modSyncInfo.modSyncMarker?.let { append(it) }
-                append(".${MOD_FILE_EXTENSION}")
-            }
-        return modsDirectoryPath.resolve(modFileName)
-    }
-
-    /**
-     * @return if this mod is created/synced by the script
-     * it will be identified by [ModSyncInfo.modSyncMarker] and will always return true
-     * if [ModSyncInfo.modSyncMarker] is null
-     *
-     * @see getModFilePath
-     * */
-    private fun isScriptModFile(modFilePath: Path): Boolean =
-        modFilePath.name.endsWith(
-            "${modSyncInfo.modSyncMarker.orEmpty()}.${MOD_FILE_EXTENSION}",
+    private fun getModFilePath(mod: Mod): Path =
+        getAssetFilePath(
+            downloadUrl = mod.downloadUrl,
+            fileSyncMarker = modSyncInfo.fileSyncMarker,
         )
 
-    /**
-     * @return The message that will be used for the dialog that will show the progress
-     * of syncing, downloading and verifying mods
-     * */
-    private fun buildTitleMessage(
-        currentModIndex: Int,
-        pendingMods: Int,
-        totalMods: Int,
-    ): String =
-        buildString {
-            append("${currentModIndex + 1} of $pendingMods")
-            if (pendingMods != totalMods) {
-                append(" ($totalMods total)")
-            }
-        }
+    private fun isScriptModFile(modFilePath: Path): Boolean =
+        isScriptAssetFile(
+            assetFileFilePath = modFilePath,
+            fileSyncMarker = modSyncInfo.fileSyncMarker,
+        )
+
+    private suspend fun getScriptLocalModFilePathsOrAll(): List<Path> =
+        getScriptLocalAssetFilePathsOrAll(
+            allowUsingOtherAssets = modSyncInfo.allowUsingOtherMods,
+            isScriptAssetFile = { isScriptModFile(it) },
+        )
 }

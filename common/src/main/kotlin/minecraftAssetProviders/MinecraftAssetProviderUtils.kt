@@ -30,7 +30,9 @@ object MinecraftAssetProviderUtils {
     fun getAssetsProviders(syncInfo: SyncInfo): Result<Set<MinecraftAssetProvider>> {
         val assetsProviders = mutableSetOf<MinecraftAssetProvider>()
         syncInfo.modSyncInfo.mods.mapTo(assetsProviders) { getAssetProvider(it.downloadUrl).getOrThrow() }
-        // TODO: Add all kind of assets like Resource-packs and shaders
+        syncInfo.resourcePackSyncInfo.resourcePacks.mapTo(assetsProviders) { getAssetProvider(it.downloadUrl).getOrThrow() }
+
+        // TODO: Add all kind of assets like shaders
         return Result.success(assetsProviders)
     }
 }
