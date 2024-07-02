@@ -20,6 +20,7 @@ import syncInfo.data.SyncInfoDataSource
 import syncInfo.models.SyncInfo
 import syncInfo.models.instance
 import syncService.ModsSyncService
+import syncService.ResourcePacksSyncService
 import syncService.SyncService
 import utils.ExecutionTimer
 import utils.HttpService
@@ -243,13 +244,18 @@ suspend fun main(args: Array<String>) {
     // Use sync services to sync the content
 
     val syncServices: List<SyncService> =
-        listOf(
-            ModsSyncService(),
-        )
+        buildList {
+            add(ModsSyncService())
+            if (scriptConfig.environment.isClient()) {
+                add(ResourcePacksSyncService())
+            }
+        }
 
     syncServices.forEach { it.syncData() }
 
     // Finish the script
+
+    println()
 
     // The temporary folder usually contains the downloaded files which will be moved once finished
     // after finish syncing the contents successfully, we don't need it anymore.
