@@ -106,20 +106,21 @@ class ModsSyncService :
         }
         val currentEnvironmentMods =
             mods.filter { mod ->
-                if (!mod.shouldSyncOnCurrentEnvironment()) {
-                    val modFilePath = getModFilePath(mod)
-                    if (modFilePath.exists()) {
-                        println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
-                        modFilePath.deleteExistingOrTerminate(
-                            fileEntityType = "mod",
-                            reasonOfDelete = "it's not required on the current environment",
-                        )
-                    }
-                    // Exclude the mod as it's not needed in the current environment
-                    return@filter false
+                if (mod.shouldSyncOnCurrentEnvironment()) {
+                    // Include the mod if it should be synced on the current environment.
+                    return@filter true
                 }
-                // Include the mod
-                true
+
+                val modFilePath = getModFilePath(mod)
+                if (modFilePath.exists()) {
+                    println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
+                    modFilePath.deleteExistingOrTerminate(
+                        fileEntityType = "mod",
+                        reasonOfDelete = "it's not required on the current environment",
+                    )
+                }
+                // Exclude the mod as it's not needed in the current environment
+                return@filter false
             }
         return currentEnvironmentMods
     }
