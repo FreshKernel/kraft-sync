@@ -17,7 +17,7 @@ instance**.
 The script will sync the following:
 
 1. 🛠️ Mods (experimental)
-2. 🎨 Resource packs (not implemented yet)
+2. 🎨 Resource packs (highly experimental)
 3. ✨ Shader-packs (not implemented yet)
 4. 🌐 Server List (in-game) (not implemented yet)
 5. 🧩 Mods configurations (not implemented yet): These may be synced initially, since each player can have their own
