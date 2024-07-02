@@ -101,27 +101,27 @@ class ModsSyncService :
     }
 
     private fun getCurrentEnvironmentModsOrAll(mods: List<Mod>): List<Mod> {
-        if (modSyncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
-            val currentEnvironmentMods =
-                mods.filter { mod ->
-                    if (!mod.shouldSyncOnCurrentEnvironment()) {
-                        val modFilePath = getModFilePath(mod)
-                        if (modFilePath.exists()) {
-                            println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
-                            modFilePath.deleteExistingOrTerminate(
-                                fileEntityType = "mod",
-                                reasonOfDelete = "it's not required on the current environment",
-                            )
-                        }
-                        // Exclude the mod as it's not needed in the current environment
-                        return@filter false
-                    }
-                    // Include the mod
-                    true
-                }
-            return currentEnvironmentMods
+        if (!modSyncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
+            return mods
         }
-        return mods
+        val currentEnvironmentMods =
+            mods.filter { mod ->
+                if (!mod.shouldSyncOnCurrentEnvironment()) {
+                    val modFilePath = getModFilePath(mod)
+                    if (modFilePath.exists()) {
+                        println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
+                        modFilePath.deleteExistingOrTerminate(
+                            fileEntityType = "mod",
+                            reasonOfDelete = "it's not required on the current environment",
+                        )
+                    }
+                    // Exclude the mod as it's not needed in the current environment
+                    return@filter false
+                }
+                // Include the mod
+                true
+            }
+        return currentEnvironmentMods
     }
 
     private suspend fun getModsForDownloadAndValidateIfRequired(
