@@ -227,7 +227,7 @@ minimizedJar.configure {
 // Configure assemble task
 
 tasks.assemble {
-    // The `assemble` task is already depending on `shadowJar`
+    // The `assemble` task already depends on `shadowJar`
     dependsOn(tasks.shadowJar, minimizedJar)
 }
 
