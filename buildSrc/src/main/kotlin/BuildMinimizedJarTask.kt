@@ -1,6 +1,7 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -138,26 +139,17 @@ open class BuildMinimizedJarTask : DefaultTask() {
             generatedProguardConfigurationFiles.forEach { configuration(it) }
         }
 
+        // Execute the Proguard task
+
         // A workaround for executing ProGuard without getting the notes by disabling the logging
+        // when the `-i` or `--info` is not set
 
-        val oldStandardOut = System.out
-        val oldStandardErr = System.err
-        val noOpOutputStream =
-            object : OutputStream() {
-                override fun write(b: Int) {
-                    // Do nothing
-                }
+        if (project.gradle.startParameter.logLevel != LogLevel.INFO) {
+            suppressOutputAndExecute {
+                proguardTask.actions.forEach { it.execute(proguardTask) }
             }
-
-        try {
-            System.setOut(PrintStream(noOpOutputStream))
-            System.setErr(PrintStream(noOpOutputStream))
-
-            // Execute the Proguard task
+        } else {
             proguardTask.actions.forEach { it.execute(proguardTask) }
-        } finally {
-            System.setOut(oldStandardOut)
-            System.setErr(oldStandardErr)
         }
 
         logResultMessage()
@@ -176,5 +168,26 @@ open class BuildMinimizedJarTask : DefaultTask() {
             "📦 The size of the Proguard minimized JAR file (${minimized.name}) is $minimizedFileSizeInMegabytes MB." +
                 " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimized.path}",
         )
+    }
+
+    fun suppressOutputAndExecute(action: () -> Unit) {
+        val oldStandardOut = System.out
+        val oldStandardErr = System.err
+        val noOpOutputStream =
+            object : OutputStream() {
+                override fun write(b: Int) {
+                    // Do nothing
+                }
+            }
+
+        try {
+            System.setOut(PrintStream(noOpOutputStream))
+            System.setErr(PrintStream(noOpOutputStream))
+
+            action()
+        } finally {
+            System.setOut(oldStandardOut)
+            System.setErr(oldStandardErr)
+        }
     }
 }
