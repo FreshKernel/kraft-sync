@@ -24,7 +24,11 @@ class LoadingIndicatorDialog(
     private val detailsLabel: JLabel = JLabel("Loading...")
 
     companion object {
-        fun createIfGuiEnabled(
+        val instance: LoadingIndicatorDialog? by lazy {
+            createIfGuiEnabled("Syncing...")
+        }
+
+        private fun createIfGuiEnabled(
             title: String,
             onClose: () -> Unit = {},
         ): LoadingIndicatorDialog? =
@@ -80,13 +84,13 @@ class LoadingIndicatorDialog(
 
     fun updateComponentProperties(
         title: String?,
-        infoText: String,
-        progress: Int,
-        detailsText: String,
+        infoText: String?,
+        progress: Int?,
+        detailsText: String?,
     ) {
         title?.let { this.title = it }
-        infoLabel.text = infoText
-        progressBar.value = progress
-        detailsLabel.text = detailsText
+        infoText?.let { infoLabel.text = it }
+        progress?.let { progressBar.value = it }
+        detailsText?.let { detailsLabel.text = it }
     }
 }
