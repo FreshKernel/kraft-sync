@@ -46,28 +46,27 @@ class ResourcePacksSyncService :
         validateAssetDirectory()
         deleteUnSyncedLocalResourcePackFiles(resourcePacks = resourcePacks)
 
-        val loadingIndicatorDialog: LoadingIndicatorDialog? =
-            LoadingIndicatorDialog.createIfGuiEnabled("Syncing resource-packs...")
-        loadingIndicatorDialog?.isVisible = true
+        LoadingIndicatorDialog.instance?.updateComponentProperties(
+            title = "Syncing Resource Packs...",
+            infoText = "In progress",
+            progress = null,
+            detailsText = null,
+        )
 
         val resourcePacksToDownload =
             getResourcePacksForDownloadAndValidateIfRequired(
                 resourcePacks = resourcePacks,
-                loadingIndicatorDialog = loadingIndicatorDialog,
             )
         println("\n🔍 Resource Packs to download: ${resourcePacksToDownload.size}")
 
         downloadResourcePacks(
             resourcePacksToDownload = resourcePacksToDownload,
             totalResourcePacks = resourcePacks,
-            loadingIndicatorDialog = loadingIndicatorDialog,
         )
 
         if (resourcePackSyncInfo.shouldApplyResourcePacks) {
             applyResourcePacks()
         }
-
-        loadingIndicatorDialog?.isVisible = false
 
         println("\uD83D\uDD52 Finished syncing the resource-packs in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
     }
@@ -92,10 +91,7 @@ class ResourcePacksSyncService :
         }
     }
 
-    private suspend fun getResourcePacksForDownloadAndValidateIfRequired(
-        resourcePacks: List<ResourcePack>,
-        loadingIndicatorDialog: LoadingIndicatorDialog?,
-    ): List<ResourcePack> =
+    private suspend fun getResourcePacksForDownloadAndValidateIfRequired(resourcePacks: List<ResourcePack>): List<ResourcePack> =
         resourcePacks.filter { resourcePack ->
             val resourcePackFileName = getFileNameFromUrlOrError(resourcePack.downloadUrl)
             val resourcePackFilePath = getResourcePackFilePath(resourcePack)
@@ -105,10 +101,10 @@ class ResourcePacksSyncService :
                     return@filter false
                 }
 
-                loadingIndicatorDialog?.updateComponentProperties(
+                LoadingIndicatorDialog.instance?.updateComponentProperties(
                     title =
-                        "Verifying resource-packs",
-                    infoText = "Verifying ${resourcePack.getDisplayName()}",
+                        "Verifying Resource Packs",
+                    infoText = buildVerifyAssetFileMessage(assetDisplayName = resourcePack.getDisplayName()),
                     progress =
                         resourcePacks.calculateProgressByIndex(currentIndex = resourcePacks.indexOf(resourcePack)),
                     detailsText =
@@ -140,7 +136,6 @@ class ResourcePacksSyncService :
     private suspend fun downloadResourcePacks(
         resourcePacksToDownload: List<ResourcePack>,
         totalResourcePacks: List<ResourcePack>,
-        loadingIndicatorDialog: LoadingIndicatorDialog?,
     ) {
         for ((index, resourcePack) in resourcePacksToDownload.withIndex()) {
             val resourcePackFileName = getFileNameFromUrlOrError(resourcePack.downloadUrl)
@@ -155,14 +150,14 @@ class ResourcePacksSyncService :
                 downloadUrl = resourcePack.downloadUrl,
                 targetFilePath = resourcePackFilePath,
                 progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
-                    loadingIndicatorDialog?.updateComponentProperties(
+                    LoadingIndicatorDialog.instance?.updateComponentProperties(
                         title =
                             buildProgressMessage(
                                 currentIndex = index,
                                 pendingCount = resourcePacksToDownload.size,
                                 totalCount = totalResourcePacks.size,
                             ),
-                        infoText = "Downloading ${resourcePack.getDisplayName()}",
+                        infoText = buildDownloadAssetFileMessage(assetDisplayName = resourcePack.getDisplayName()),
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +

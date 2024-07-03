@@ -56,26 +56,25 @@ class ModsSyncService :
             val currentEnvironmentModsOrAll = getCurrentEnvironmentModsOrAll(mods = mods)
             println("📥 Current environment mods: ${currentEnvironmentModsOrAll.size}")
 
-            val loadingIndicatorDialog: LoadingIndicatorDialog? =
-                LoadingIndicatorDialog.createIfGuiEnabled("Syncing Mods...")
-            loadingIndicatorDialog?.isVisible = true
+            LoadingIndicatorDialog.instance?.updateComponentProperties(
+                title = "Syncing Mods...",
+                infoText = "In progress",
+                progress = null,
+                detailsText = null,
+            )
 
             // Download the missing/new mods && remove the modified or the ones that has invalid file integrity
 
             val modsToDownload =
                 getModsForDownloadAndValidateIfRequired(
                     mods = currentEnvironmentModsOrAll,
-                    loadingIndicatorDialog = loadingIndicatorDialog,
                 )
             println("\n🔍 Mods to download: ${modsToDownload.size}")
 
             downloadMods(
                 modsToDownload = modsToDownload,
                 totalMods = currentEnvironmentModsOrAll,
-                loadingIndicatorDialog = loadingIndicatorDialog,
             )
-
-            loadingIndicatorDialog?.isVisible = false
 
             println("\uD83D\uDD52 Finished syncing the mods in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
         }
@@ -125,10 +124,7 @@ class ModsSyncService :
         return currentEnvironmentMods
     }
 
-    private suspend fun getModsForDownloadAndValidateIfRequired(
-        mods: List<Mod>,
-        loadingIndicatorDialog: LoadingIndicatorDialog?,
-    ): List<Mod> {
+    private suspend fun getModsForDownloadAndValidateIfRequired(mods: List<Mod>): List<Mod> {
         return mods.filter { mod ->
             val modFileName = getFileNameFromUrlOrError(mod.downloadUrl)
             val modFilePath = getModFilePath(mod)
@@ -138,10 +134,10 @@ class ModsSyncService :
                     return@filter false
                 }
 
-                loadingIndicatorDialog?.updateComponentProperties(
+                LoadingIndicatorDialog.instance?.updateComponentProperties(
                     title =
                         "Verifying mods",
-                    infoText = "Verifying ${mod.getDisplayName()}",
+                    infoText = buildVerifyAssetFileMessage(assetDisplayName = mod.getDisplayName()),
                     progress =
                         mods.calculateProgressByIndex(currentIndex = mods.indexOf(mod)),
                     detailsText =
@@ -174,7 +170,6 @@ class ModsSyncService :
     private suspend fun downloadMods(
         modsToDownload: List<Mod>,
         totalMods: List<Mod>,
-        loadingIndicatorDialog: LoadingIndicatorDialog?,
     ) {
         for ((index, mod) in modsToDownload.withIndex()) {
             val modFileName = getFileNameFromUrlOrError(mod.downloadUrl)
@@ -189,14 +184,15 @@ class ModsSyncService :
                 downloadUrl = mod.downloadUrl,
                 targetFilePath = modFilePath,
                 progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
-                    loadingIndicatorDialog?.updateComponentProperties(
+                    LoadingIndicatorDialog.instance?.updateComponentProperties(
                         title =
                             buildProgressMessage(
                                 currentIndex = index,
                                 pendingCount = modsToDownload.size,
                                 totalCount = totalMods.size,
                             ),
-                        infoText = "Downloading ${mod.getDisplayName()}",
+                        infoText =
+                            buildDownloadAssetFileMessage(assetDisplayName = mod.getDisplayName()),
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +

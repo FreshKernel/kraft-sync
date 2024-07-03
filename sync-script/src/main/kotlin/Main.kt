@@ -6,6 +6,7 @@ import constants.SyncScriptDotMinecraftFiles
 import generated.BuildConfig
 import gui.GuiState
 import gui.dialogs.CreateScriptConfigDialog
+import gui.dialogs.LoadingIndicatorDialog
 import gui.dialogs.QuickPreferencesDialog
 import gui.dialogs.TrustAdminDialog
 import gui.utils.GuiUtils
@@ -187,6 +188,16 @@ suspend fun main(args: Array<String>) {
 
     // Fetch the sync info data from the url
 
+    LoadingIndicatorDialog.instance?.apply {
+        isVisible = true
+        updateComponentProperties(
+            title = "Initializing",
+            infoText = "Sending GET request",
+            progress = null,
+            detailsText = "Fetching Sync Info",
+        )
+    }
+
     val syncInfoDataSource: SyncInfoDataSource =
         RemoteSyncInfoDataSource(
             client = HttpService.client,
@@ -203,6 +214,13 @@ suspend fun main(args: Array<String>) {
                 )
                 return
             }
+
+    LoadingIndicatorDialog.instance?.updateComponentProperties(
+        title = "Synchronization",
+        infoText = "Performing initial checks and configurations...",
+        progress = null,
+        detailsText = "Preparing for Synchronization...",
+    )
 
     // Make sure the user trusts the admin
 
@@ -254,6 +272,8 @@ suspend fun main(args: Array<String>) {
     syncServices.forEach { it.syncData() }
 
     // Finish the script
+
+    LoadingIndicatorDialog.instance?.isVisible = false
 
     println()
 

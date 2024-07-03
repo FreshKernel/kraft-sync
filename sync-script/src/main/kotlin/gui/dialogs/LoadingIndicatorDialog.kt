@@ -13,18 +13,23 @@ import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JProgressBar
+import javax.swing.SwingConstants
 
 // TODO: Use onClose to close the file downloading process, might refactor this class to be subclass of JDialog
 class LoadingIndicatorDialog(
     title: String,
     private val onClose: () -> Unit = {},
 ) : BaseJFrame() {
-    private val infoLabel: JLabel = JLabel("In progress")
+    private val infoLabel: JLabel = JLabel("In progress", SwingConstants.CENTER)
     private val progressBar: JProgressBar = JProgressBar(0, 100)
     private val detailsLabel: JLabel = JLabel("Loading...")
 
     companion object {
-        fun createIfGuiEnabled(
+        val instance: LoadingIndicatorDialog? by lazy {
+            createIfGuiEnabled("Syncing...")
+        }
+
+        private fun createIfGuiEnabled(
             title: String,
             onClose: () -> Unit = {},
         ): LoadingIndicatorDialog? =
@@ -80,13 +85,13 @@ class LoadingIndicatorDialog(
 
     fun updateComponentProperties(
         title: String?,
-        infoText: String,
-        progress: Int,
-        detailsText: String,
+        infoText: String?,
+        progress: Int?,
+        detailsText: String?,
     ) {
         title?.let { this.title = it }
-        infoLabel.text = infoText
-        progressBar.value = progress
-        detailsLabel.text = detailsText
+        infoText?.let { infoLabel.text = it }
+        progress?.let { progressBar.value = it }
+        detailsText?.let { detailsLabel.text = it }
     }
 }
