@@ -51,12 +51,11 @@ tasks.clean {
     }
 }
 
-// Shadow JAR for building the fat JAR file
+// Shadow JAR for building the uber JAR file
 
 tasks.shadowJar {
     // If you change the file name or destination directory, also update it from the README.md and other markdown files
     archiveFileName.set("${rootProject.name}.jar")
-    destinationDirectory = distDirectory
     description =
         "A script that allows to sync mods, resource packs, shaders, and more seamlessly before launching the game."
     minimize {
@@ -66,11 +65,11 @@ tasks.shadowJar {
     }
 
     doLast {
-        val fatJarFile = archiveFile.get().asFile
-        val fatJarFileSizeInMegabytes = String.format("%.2f", fatJarFile.length().toDouble() / (1024L * 1024L))
+        val uberJarFile = archiveFile.get().asFile
+        val uberJarFileSizeInMegabytes = String.format("%.2f", uberJarFile.length().toDouble() / (1024L * 1024L))
 
         logger.lifecycle(
-            "📦 The size of the shadow JAR file (${fatJarFile.name}) is $fatJarFileSizeInMegabytes MB. Location: ${fatJarFile.path}",
+            "📦 The size of the shadow JAR file (${uberJarFile.name}) is $uberJarFileSizeInMegabytes MB. Location: ${uberJarFile.path}",
         )
     }
 }
@@ -81,20 +80,17 @@ val minimizedJar =
     tasks.register<BuildMinimizedJarTask>("minimizedJar") {
         dependsOn(tasks.shadowJar)
 
-        val fatJarFile = tasks.shadowJar.flatMap { it.archiveFile }
-        val fatJarFileDestinationDirectory = tasks.shadowJar.get().destinationDirectory
+        val uberJarFile = tasks.shadowJar.flatMap { it.archiveFile }
 
-        inputJarFile = fatJarFile
-        outputJarFile = fatJarFileDestinationDirectory.file("${fatJarFile.get().asFile.nameWithoutExtension}.min.jar")
+        inputJarFile = uberJarFile
+        outputJarFile =
+            distDirectory
+                .resolve("${uberJarFile.get().asFile.nameWithoutExtension}.jar")
 
         proguardConfigFile = project(projects.common.identityPath.path).file("proguard.pro")
-        obfuscate = true
+        obfuscate = false
         compileClasspath = sourceSets.main.get().compileClasspath
     }
-
-minimizedJar.configure {
-    dependsOn(tasks.shadowJar)
-}
 
 // Configure assemble task
 
@@ -135,7 +131,7 @@ private fun <T : Task?> registerExecuteJavaJarTask(
 }
 
 fun registerRunTasks() {
-    val getFatJarFile = {
+    val getUberJarFile = {
         tasks.shadowJar
             .get()
             .archiveFile
@@ -144,12 +140,12 @@ fun registerRunTasks() {
     registerExecuteJavaJarTask(
         taskName = "runJar",
         buildJarFileTaskProvider = tasks.shadowJar,
-        getJarFile = getFatJarFile,
+        getJarFile = getUberJarFile,
     )
     registerExecuteJavaJarTask(
         taskName = "runJarCli",
         buildJarFileTaskProvider = tasks.shadowJar,
-        getJarFile = getFatJarFile,
+        getJarFile = getUberJarFile,
         additionalArgs = listOf("nogui"),
     )
 
@@ -174,7 +170,7 @@ fun registerRunTasks() {
     registerExecuteJavaJarTask(
         "runHeadlessJar",
         tasks.shadowJar,
-        getFatJarFile,
+        getUberJarFile,
         overrideHeadless = true,
     )
 }

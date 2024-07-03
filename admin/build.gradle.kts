@@ -37,11 +37,13 @@ application {
     mainClass = "MainKt"
 }
 
+val distDirectory
+    get() = project.rootDir.resolve("dist")
+
 tasks.shadowJar {
     val scriptJarFileNameWithoutExtension = rootProject.name
     // If you change the file name or destination directory, also update it from the README.md and other markdown files
     archiveFileName.set("$scriptJarFileNameWithoutExtension-admin.jar")
-    destinationDirectory = project.rootDir.resolve("dist")
     description = "A admin utility program for $scriptJarFileNameWithoutExtension script."
     minimize {
         // Exclude the entire FlatLaf dependency from minimization to fix `no ComponentUI class for: javax.swing.<component>`
@@ -57,7 +59,28 @@ tasks.shadowJar {
     }
 }
 
+val minimizedJar =
+    tasks.register<BuildMinimizedJarTask>("minimizedJar") {
+        dependsOn(tasks.shadowJar)
+
+        val uberJarFile = tasks.shadowJar.flatMap { it.archiveFile }
+
+        inputJarFile = uberJarFile
+        outputJarFile =
+            distDirectory
+                .resolve("${uberJarFile.get().asFile.nameWithoutExtension}.jar")
+
+        proguardConfigFile = project(projects.common.identityPath.path).file("proguard.pro")
+        obfuscate = false
+        compileClasspath = sourceSets.main.get().compileClasspath
+        additionalJdkModules =
+            listOf(
+                // For Java Clipboard
+                "java.datatransfer",
+            )
+    }
+
 tasks.assemble {
     // The `assemble` task already depends on `shadowJar`
-    dependsOn(tasks.shadowJar)
+    dependsOn(tasks.shadowJar, minimizedJar)
 }
