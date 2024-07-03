@@ -137,7 +137,7 @@ class ModsSyncService :
                 LoadingIndicatorDialog.instance?.updateComponentProperties(
                     title =
                         "Verifying mods",
-                    infoText = "Verifying ${mod.getDisplayName()}",
+                    infoText = buildVerifyAssetFileMessage(assetDisplayName = mod.getDisplayName()),
                     progress =
                         mods.calculateProgressByIndex(currentIndex = mods.indexOf(mod)),
                     detailsText =
@@ -191,7 +191,8 @@ class ModsSyncService :
                                 pendingCount = modsToDownload.size,
                                 totalCount = totalMods.size,
                             ),
-                        infoText = "Downloading ${mod.getDisplayName()}",
+                        infoText =
+                            buildDownloadAssetFileMessage(assetDisplayName = mod.getDisplayName()),
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +

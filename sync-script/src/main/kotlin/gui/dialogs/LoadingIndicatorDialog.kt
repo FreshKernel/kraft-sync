@@ -13,13 +13,14 @@ import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JProgressBar
+import javax.swing.SwingConstants
 
 // TODO: Use onClose to close the file downloading process, might refactor this class to be subclass of JDialog
 class LoadingIndicatorDialog(
     title: String,
     private val onClose: () -> Unit = {},
 ) : BaseJFrame() {
-    private val infoLabel: JLabel = JLabel("In progress")
+    private val infoLabel: JLabel = JLabel("In progress", SwingConstants.CENTER)
     private val progressBar: JProgressBar = JProgressBar(0, 100)
     private val detailsLabel: JLabel = JLabel("Loading...")
 

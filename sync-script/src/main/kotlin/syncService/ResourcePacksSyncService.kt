@@ -104,7 +104,7 @@ class ResourcePacksSyncService :
                 LoadingIndicatorDialog.instance?.updateComponentProperties(
                     title =
                         "Verifying Resource Packs",
-                    infoText = "Verifying ${resourcePack.getDisplayName()}",
+                    infoText = buildVerifyAssetFileMessage(assetDisplayName = resourcePack.getDisplayName()),
                     progress =
                         resourcePacks.calculateProgressByIndex(currentIndex = resourcePacks.indexOf(resourcePack)),
                     detailsText =
@@ -157,7 +157,7 @@ class ResourcePacksSyncService :
                                 pendingCount = resourcePacksToDownload.size,
                                 totalCount = totalResourcePacks.size,
                             ),
-                        infoText = "Downloading ${resourcePack.getDisplayName()}",
+                        infoText = buildDownloadAssetFileMessage(assetDisplayName = resourcePack.getDisplayName()),
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
