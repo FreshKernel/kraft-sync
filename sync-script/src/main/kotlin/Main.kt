@@ -51,30 +51,8 @@ suspend fun main(args: Array<String>) {
     println("📋 Current project version: ${BuildConfig.PROJECT_VERSION}")
     println("\uD83D\uDCC1 Current working directory: ${SystemInfoProvider.getCurrentWorkingDirectoryPath()}")
 
-    when (OperatingSystem.current) {
-        OperatingSystem.Linux -> "\uD83D\uDC27 You are using Linux with the desktop environment ${LinuxDesktopEnvironment.current}. Enjoy!"
-        OperatingSystem.MacOS -> "\uD83C\uDF4F You are using macOS \uF8FF. Welcome to the world of Apple \uD83C\uDF4E."
-        OperatingSystem.Windows -> "\uD83E\uDE9F You are using Windows. Be safe!"
-        OperatingSystem.Unknown -> "❓Your operating system couldn't be identified. Let's hope everything works smoothly."
-    }.also { println(it) }
-
-    if (!GraphicsEnvironment.isHeadless()) {
-        if (GuiUtils.isSystemInDarkMode) {
-            "🌙 Welcome to the dark side! Your system is in dark mode. Enjoy the soothing darkness! 🌃"
-        } else {
-            "☀️ Brighten up your day! Your system is in the light mode. Embrace the light! 🌅"
-        }.also { println(it) }
-    }
-
-    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
-        if (exists()) {
-            println(
-                "ℹ\uFE0F The temporary folder: $pathString exist. " +
-                    "The script might not finished last time. Removing the folder.",
-            )
-            deleteRecursivelyWithLegacyJavaIo()
-        }
-    }
+    logSystemInfo()
+    handleTemporaryDirectory(isStart = true)
 
     // The script config file is not initialized/loaded yet, calling this is necessary to set the value
 
@@ -93,8 +71,70 @@ suspend fun main(args: Array<String>) {
         )
     }
 
-    // Loading the script config file from json file
+    val scriptConfig = loadScriptConfig()
 
+    // The script config has been loaded
+    // Allow overriding and use the one from the config instead of the launching args
+
+    GuiState.updateIsGuiEnabled()
+
+    println("ℹ\uFE0F Script Configuration: ${ScriptConfig.instance}")
+
+    // Switch to the themes specified by config
+    if (GuiState.isGuiEnabled) {
+        GuiUtils.applyThemeIfNeeded(
+            theme = ScriptConfig.getInstanceOrThrow().theme,
+            themeMode = ScriptConfig.getInstanceOrThrow().themeMode,
+        )
+    }
+
+    handleAutoUpdate(scriptConfig = scriptConfig)
+
+    requestOptionalPreferences()
+
+    fetchSyncInfo()
+
+    handleAdminTrustCheck()
+
+    performSyncServices(scriptConfig = scriptConfig)
+
+    finalize(applicationExecutionTimer = applicationExecutionTimer)
+}
+
+fun logSystemInfo() {
+    when (OperatingSystem.current) {
+        OperatingSystem.Linux -> "\uD83D\uDC27 You are using Linux with the desktop environment ${LinuxDesktopEnvironment.current}. Enjoy!"
+        OperatingSystem.MacOS -> "\uD83C\uDF4F You are using macOS \uF8FF. Welcome to the world of Apple \uD83C\uDF4E."
+        OperatingSystem.Windows -> "\uD83E\uDE9F You are using Windows. Be safe!"
+        OperatingSystem.Unknown -> "❓Your operating system couldn't be identified. Let's hope everything works smoothly."
+    }.also { println(it) }
+
+    if (!GraphicsEnvironment.isHeadless()) {
+        if (GuiUtils.isSystemInDarkMode) {
+            "🌙 Welcome to the dark side! Your system is in dark mode. Enjoy the soothing darkness! 🌃"
+        } else {
+            "☀️ Brighten up your day! Your system is in the light mode. Embrace the light! 🌅"
+        }.also { println(it) }
+    }
+}
+
+fun handleTemporaryDirectory(isStart: Boolean) {
+    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
+        if (exists()) {
+            println(
+                if (isStart) {
+                    "ℹ\uFE0F The temporary folder: $pathString exist. " +
+                        "The script might not finished last time. Removing the folder."
+                } else {
+                    "\uD83D\uDEAB Deleting the temporary folder: '$pathString' (no longer needed)."
+                },
+            )
+            deleteRecursivelyWithLegacyJavaIo()
+        }
+    }
+}
+
+suspend fun loadScriptConfig(): ScriptConfig {
     val scriptConfigFile = SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig.path
     if (!scriptConfigFile.exists()) {
         if (GuiState.isGuiEnabled) {
@@ -135,34 +175,28 @@ suspend fun main(args: Array<String>) {
                 title = "Configuration Error ⚠\uFE0F",
                 message =
                     buildString {
-                        append("An error occurred while parsing your script configuration file (${scriptConfigFile.pathString})\n\n")
+                        append(
+                            "An error occurred while parsing your script configuration file " +
+                                "(${scriptConfigFile.pathString})\n\n",
+                        )
                         append("Ensure it's valid JSON format.\n\n")
                         append("Error details: ${it.message?.trim()}")
                     },
             )
-            return
+            // This will never reach due to the previous statement stopping the application
+            exitProcess(1)
         }
     ScriptConfig.instance = scriptConfig
+    return scriptConfig
+}
 
-    // The script config has been loaded
-    // Allow overriding and use the one from the config instead of the launching args
-
-    GuiState.updateIsGuiEnabled()
-
-    println("ℹ\uFE0F Script Configuration: ${ScriptConfig.instance}")
-
-    // Switch to the themes specified by config
-    if (GuiState.isGuiEnabled) {
-        GuiUtils.applyThemeIfNeeded(
-            theme = ScriptConfig.getInstanceOrThrow().theme,
-            themeMode = ScriptConfig.getInstanceOrThrow().themeMode,
-        )
-    }
-
+suspend fun handleAutoUpdate(scriptConfig: ScriptConfig) {
     if (scriptConfig.autoUpdateEnabled) {
         JarAutoUpdater.updateIfAvailable()
     }
+}
 
+suspend fun requestOptionalPreferences() {
     // TODO: Plan if we should implement this in non GUI mode
     val isPreferencesConfiguredFilePath = SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.path
     if (GuiState.isGuiEnabled && !isPreferencesConfiguredFilePath.exists()) {
@@ -185,9 +219,9 @@ suspend fun main(args: Array<String>) {
             isPreferencesConfiguredFilePath.createFileWithParentDirectoriesOrTerminate()
         }
     }
+}
 
-    // Fetch the sync info data from the url
-
+suspend fun fetchSyncInfo() {
     LoadingIndicatorDialog.instance?.apply {
         isVisible = true
         updateComponentProperties(
@@ -221,9 +255,9 @@ suspend fun main(args: Array<String>) {
         progress = null,
         detailsText = "Preparing for Synchronization...",
     )
+}
 
-    // Make sure the user trusts the admin
-
+suspend fun handleAdminTrustCheck() {
     // TODO: Plan on how we will implement this in non GUI mode
     if (GuiState.isGuiEnabled && Constants.Features.TRUST_ADMIN_ENABLED) {
         val currentDoesUserTrustThisSource =
@@ -258,9 +292,9 @@ suspend fun main(args: Array<String>) {
             }
         }
     }
+}
 
-    // Use sync services to sync the content
-
+suspend fun performSyncServices(scriptConfig: ScriptConfig) {
     val syncServices: List<SyncService> =
         buildList {
             add(ModsSyncService())
@@ -270,7 +304,9 @@ suspend fun main(args: Array<String>) {
         }
 
     syncServices.forEach { it.syncData() }
+}
 
+fun finalize(applicationExecutionTimer: ExecutionTimer) {
     // Finish the script
 
     LoadingIndicatorDialog.instance?.isVisible = false
@@ -279,12 +315,7 @@ suspend fun main(args: Array<String>) {
 
     // The temporary folder usually contains the downloaded files which will be moved once finished
     // after finish syncing the contents successfully, we don't need it anymore.
-    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
-        if (exists()) {
-            println("\uD83D\uDEAB Deleting the temporary folder: '$pathString' (no longer needed).")
-            deleteRecursivelyWithLegacyJavaIo()
-        }
-    }
+    handleTemporaryDirectory(isStart = false)
 
     println(
         "\n\uD83C\uDF89 The script has successfully completed in " +
