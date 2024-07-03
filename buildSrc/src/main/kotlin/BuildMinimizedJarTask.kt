@@ -170,7 +170,7 @@ open class BuildMinimizedJarTask : DefaultTask() {
         )
     }
 
-    fun suppressOutputAndExecute(action: () -> Unit) {
+    private fun suppressOutputAndExecute(action: () -> Unit) {
         val oldStandardOut = System.out
         val oldStandardErr = System.err
         val noOpOutputStream =
