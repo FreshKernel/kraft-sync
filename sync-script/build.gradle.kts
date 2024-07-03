@@ -1,9 +1,3 @@
-import java.nio.file.NoSuchFileException
-import java.nio.file.Paths
-import java.util.jar.JarFile
-import kotlin.io.path.exists
-import kotlin.math.abs as kotlinMathAbs
-
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
@@ -83,141 +77,19 @@ tasks.shadowJar {
 
 // Proguard for minimizing the JAR file
 
-buildscript {
-    repositories { mavenCentral() }
-    dependencies {
-        classpath(
-            libs.plugins.proguard
-                .get()
-                .toString(),
-        ) {
-            // On older versions of proguard, Android build tools will be included
-            exclude("com.android.tools.build")
-        }
-    }
-}
-
-fun getMinimizedJarFile(
-    fatJarFileNameWithoutExtension: String,
-    fatJarFileDestinationDirectory: DirectoryProperty,
-): Provider<RegularFile> = fatJarFileDestinationDirectory.file("$fatJarFileNameWithoutExtension.min.jar")
-
 val minimizedJar =
-    tasks.register<proguard.gradle.ProGuardTask>("minimizedJar") {
+    tasks.register<BuildMinimizedJarTask>("minimizedJar") {
         dependsOn(tasks.shadowJar)
 
         val fatJarFile = tasks.shadowJar.flatMap { it.archiveFile }
         val fatJarFileDestinationDirectory = tasks.shadowJar.get().destinationDirectory
 
-        val minimizedJarFile =
-            getMinimizedJarFile(
-                fatJarFileNameWithoutExtension = fatJarFile.get().asFile.nameWithoutExtension,
-                fatJarFileDestinationDirectory = fatJarFileDestinationDirectory,
-            )
+        inputJarFile = fatJarFile
+        outputJarFile = fatJarFileDestinationDirectory.file("${fatJarFile.get().asFile.nameWithoutExtension}.min.jar")
 
-        injars(fatJarFile)
-        outjars(minimizedJarFile)
-
-        val javaHome = System.getProperty("java.home")
-        if (System.getProperty("java.version").startsWith("1.")) {
-            // Before Java 9, runtime classes are packaged in a single JAR file.
-            libraryjars(Paths.get(javaHome, "lib", "rt.jar").toString())
-        } else {
-
-            // Starting from Java 9, runtime classes are packaged in modular JMOD files.
-            fun includeJavaModuleFromJdk(jModFileNameWithoutExtension: String) {
-                val jModFilePath = Paths.get(javaHome, "jmods", "$jModFileNameWithoutExtension.jmod")
-                if (!jModFilePath.exists()) {
-                    throw NoSuchFileException("The '$jModFileNameWithoutExtension' at '$jModFilePath' doesn't exist.")
-                }
-                libraryjars(
-                    mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),
-                    jModFilePath,
-                )
-            }
-
-            val javaModules =
-                listOf(
-                    "java.base",
-                    // Needed to support Java Swing/Desktop
-                    "java.desktop",
-                    // Needed to support Java system preferences
-                    "java.prefs",
-                    // Needed to support Java logging utils (needed by Okio)
-                    "java.logging",
-                )
-            javaModules.forEach { includeJavaModuleFromJdk(jModFileNameWithoutExtension = it) }
-        }
-
-        // Includes the main source set's compile classpath for Proguard.
-        // Notice that Shadow JAR already includes Kotlin standard library and dependencies, yet this
-        // is essential for resolving Kotlin and other library warnings without using '-dontwarn kotlin.**'
-        injars(sourceSets.main.get().compileClasspath)
-
-        printmapping(
-            fatJarFileDestinationDirectory.get().file("${minimizedJarFile.get().asFile.nameWithoutExtension}.map"),
-        )
-
-        // Disabling obfuscation makes the JAR file size a bit larger, and the debugging process a bit less easy
-//        dontobfuscate()
-        // Kotlinx serialization breaks when using Proguard optimizations
-        dontoptimize()
-
-        configuration(file("proguard.pro"))
-
-        doFirst {
-            JarFile(fatJarFile.get().asFile).use { jarFile ->
-                val generatedRulesFiles =
-                    jarFile
-                        .entries()
-                        .asSequence()
-                        .filter { it.name.startsWith("META-INF/proguard") && !it.isDirectory }
-                        .map { entry ->
-                            jarFile.getInputStream(entry).bufferedReader().use { reader ->
-                                Pair(reader.readText(), entry)
-                            }
-                        }.toList()
-
-                val buildProguardDirectory =
-                    layout.buildDirectory
-                        .dir("proguard")
-                        .get()
-                        .asFile
-                if (!buildProguardDirectory.exists()) {
-                    buildProguardDirectory.mkdir()
-                }
-                generatedRulesFiles.forEach { (rulesContent, rulesFileEntry) ->
-                    val rulesFileNameWithExtension = rulesFileEntry.name.substringAfterLast("/")
-                    val generatedProguardFile = File(buildProguardDirectory, "generated-$rulesFileNameWithExtension")
-                    if (!generatedProguardFile.exists()) {
-                        generatedProguardFile.createNewFile()
-                    }
-                    generatedProguardFile.bufferedWriter().use { bufferedWriter ->
-                        bufferedWriter.appendLine("# Generated file from ($rulesFileEntry) - manual changes will be overwritten")
-                        bufferedWriter.appendLine()
-
-                        bufferedWriter.appendLine(rulesContent)
-                    }
-
-                    configuration(generatedProguardFile)
-                }
-            }
-        }
-
-        doLast {
-            val original = fatJarFile.get().asFile
-            val minimized = minimizedJarFile.get().asFile
-            val minimizedFileSizeInMegabytes = String.format("%.2f", minimized.length().toDouble() / (1024L * 1024L))
-
-            val percentageDifference =
-                ((minimized.length() - original.length()).toDouble() / original.length()) * 100
-            val formattedPercentageDifference = String.format("%.2f%%", kotlinMathAbs(percentageDifference))
-
-            logger.lifecycle(
-                "📦 The size of the Proguard minimized JAR file (${minimized.name}) is $minimizedFileSizeInMegabytes MB." +
-                    " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimized.path}",
-            )
-        }
+        proguardConfigFile = project(projects.common.identityPath.path).file("proguard.pro")
+        obfuscate = true
+        compileClasspath = sourceSets.main.get().compileClasspath
     }
 
 minimizedJar.configure {
@@ -246,13 +118,13 @@ val createTestDirectory =
 private fun <T : Task?> registerExecuteJavaJarTask(
     taskName: String,
     buildJarFileTaskProvider: TaskProvider<T>,
-    jarFile: RegularFile,
+    getJarFile: () -> RegularFile,
     additionalArgs: List<String> = emptyList(),
     overrideHeadless: Boolean? = null,
 ) {
     tasks.register<JavaExec>(taskName) {
         dependsOn(createTestDirectory, buildJarFileTaskProvider)
-        classpath = files(jarFile)
+        classpath = files(getJarFile())
         workingDir = devWorkingDirectory
         args = additionalArgs
         group = tasks.run.get().group
@@ -263,31 +135,38 @@ private fun <T : Task?> registerExecuteJavaJarTask(
 }
 
 fun registerRunTasks() {
-    val fatJarFile =
+    val getFatJarFile = {
         tasks.shadowJar
             .get()
             .archiveFile
             .get()
+    }
     registerExecuteJavaJarTask(
-        "runJar",
-        tasks.shadowJar,
-        fatJarFile,
+        taskName = "runJar",
+        buildJarFileTaskProvider = tasks.shadowJar,
+        getJarFile = getFatJarFile,
     )
     registerExecuteJavaJarTask(
-        "runJarCli",
-        tasks.shadowJar,
-        fatJarFile,
-        listOf("nogui"),
+        taskName = "runJarCli",
+        buildJarFileTaskProvider = tasks.shadowJar,
+        getJarFile = getFatJarFile,
+        additionalArgs = listOf("nogui"),
     )
 
-    val minimizedJarFile =
-        getMinimizedJarFile(
-            fatJarFileNameWithoutExtension =
-                fatJarFile.asFile.nameWithoutExtension,
-            fatJarFileDestinationDirectory = tasks.shadowJar.get().destinationDirectory,
-        ).get()
-    registerExecuteJavaJarTask("runMinimizedJar", minimizedJar, minimizedJarFile)
-    registerExecuteJavaJarTask("runMinimizedJarCli", minimizedJar, minimizedJarFile, listOf("nogui"))
+    val getMinimizedJarFile = {
+        minimizedJar.get().outputJarFile.get()
+    }
+    registerExecuteJavaJarTask(
+        taskName = "runMinimizedJar",
+        buildJarFileTaskProvider = minimizedJar,
+        getJarFile = getMinimizedJarFile,
+    )
+    registerExecuteJavaJarTask(
+        taskName = "runMinimizedJarCli",
+        buildJarFileTaskProvider = minimizedJar,
+        getJarFile = getMinimizedJarFile,
+        additionalArgs = listOf("nogui"),
+    )
 
     // A task that will help simulate as if we were running the
     // application in a system that doesn't support mouse and keyboard.
@@ -295,7 +174,7 @@ fun registerRunTasks() {
     registerExecuteJavaJarTask(
         "runHeadlessJar",
         tasks.shadowJar,
-        fatJarFile,
+        getFatJarFile,
         overrideHeadless = true,
     )
 }
