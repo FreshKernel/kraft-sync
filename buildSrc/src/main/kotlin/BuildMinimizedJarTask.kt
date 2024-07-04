@@ -152,12 +152,12 @@ open class BuildMinimizedJarTask : DefaultTask() {
         // A workaround for executing ProGuard without getting the notes by disabling the logging
         // when the `-i` or `--info` is not set
 
-        if (project.gradle.startParameter.logLevel != LogLevel.INFO) {
+        if (project.gradle.startParameter.logLevel == LogLevel.INFO) {
+            proguardTask.actions.forEach { it.execute(proguardTask) }
+        } else {
             suppressOutputAndExecute {
                 proguardTask.actions.forEach { it.execute(proguardTask) }
             }
-        } else {
-            proguardTask.actions.forEach { it.execute(proguardTask) }
         }
 
         logResultMessage(isObfuscatedEnabled = isObfuscatedEnabled)
