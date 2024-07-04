@@ -7,7 +7,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/ellet0/kraft-sync)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ellet0/kraft-sync)
 ![JAR Size](https://img.shields.io/badge/JAR_Size-2.46_MB-blue)
-![Obfuscated JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.59_MB-blue)
+![Obfuscated JAR Size](https://img.shields.io/badge/Obfuscated_JAR_Size-1.59_MB-blue)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ellet0/kraft-sync/total)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
 
