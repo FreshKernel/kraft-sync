@@ -18,6 +18,7 @@ import utils.getRunningJarFilePath
 import utils.moveToOrTerminate
 import utils.os.OperatingSystem
 import utils.terminateWithOrWithoutError
+import utils.version.SemanticVersion
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -73,6 +74,46 @@ object JarAutoUpdater {
             Result.failure(e)
         }
 
+    private suspend fun shouldUpdate(): Boolean {
+        val latestProjectVersionString =
+            getLatestProjectVersion().getOrElse {
+                println("❌ We couldn't get the latest project version: ${it.message}")
+                return false
+            }
+        if (latestProjectVersionString == null) {
+            println(
+                "⚠\uFE0F It seems that the project version is missing, it could have been moved somewhere else. " +
+                    "Consider updating manually.",
+            )
+            return false
+        }
+
+        val currentVersionString = BuildConfig.PROJECT_VERSION
+
+        val latestProjectSemanticVersion: SemanticVersion =
+            SemanticVersion.parse(latestProjectVersionString).getOrElse {
+                println("❌ Failed to parse the latest project version to SemanticVersion: ${it.message}")
+                return false
+            }
+        val currentSemanticVersion: SemanticVersion =
+            SemanticVersion.parse(currentVersionString).getOrElse {
+                println("❌ Failed to parse the current application version to SemanticVersion: ${it.message}")
+                return false
+            }
+
+        return when {
+            currentSemanticVersion == latestProjectSemanticVersion -> {
+                println("✨ You're using the latest version of the project.")
+                false
+            }
+            currentSemanticVersion > latestProjectSemanticVersion -> {
+                println("✨ You're using a version that's newer than the latest.")
+                false
+            }
+            else -> true
+        }
+    }
+
     suspend fun updateIfAvailable() {
         val currentRunningJarFilePath =
             getRunningJarFilePath()
@@ -80,20 +121,9 @@ object JarAutoUpdater {
                     println("⚠\uFE0F Auto update feature is only supported when running using JAR.")
                     return
                 }
-        val latestProjectVersion =
-            getLatestProjectVersion().getOrElse {
-                println("❌ We couldn't get the latest project version: ${it.message}")
-                return
-            }
-        if (latestProjectVersion == null) {
-            println(
-                "⚠\uFE0F It seems that the project version is missing, it could have been moved somewhere else. " +
-                    "Consider updating manually.",
-            )
-            return
-        }
-        if (latestProjectVersion == BuildConfig.PROJECT_VERSION) {
-            println("✨ You're using the latest version of the project.")
+
+        val shouldUpdate = shouldUpdate()
+        if (!shouldUpdate) {
             return
         }
         val newJarFile =
