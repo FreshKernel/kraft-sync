@@ -36,6 +36,8 @@ object JarAutoUpdater {
                     reasonOfDelete = "the script is downloading the new update",
                 )
             }
+            val latestJarFileDownloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL
+            println("\uD83D\uDD3D Downloading the new JAR file from: $latestJarFileDownloadUrl")
             FileDownloader(
                 downloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL,
                 targetFilePath = newJarFile,
@@ -106,10 +108,12 @@ object JarAutoUpdater {
                 println("✨ You're using the latest version of the project.")
                 false
             }
+
             currentSemanticVersion > latestProjectSemanticVersion -> {
                 println("✨ You're using a version that's newer than the latest.")
                 false
             }
+
             else -> true
         }
     }
