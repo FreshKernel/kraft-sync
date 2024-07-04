@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="runJarCli" />
+          <option value="sync-script:runJarCli" />
         </list>
       </option>
       <option name="vmOptions" />

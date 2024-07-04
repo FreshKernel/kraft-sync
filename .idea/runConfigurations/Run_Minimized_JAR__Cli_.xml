@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="runMinimizedJarCli" />
+          <option value="sync-script:runMinimizedJarCli" />
         </list>
       </option>
       <option name="vmOptions" />
