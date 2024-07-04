@@ -26,11 +26,13 @@ class FileDownloader(
     private val downloadUrl: String,
     private val targetFilePath: Path,
     val progressListener: (
-        downloadedBytes: Long,
-        // in percentage, from 0 to 100
-        downloadedProgress: Float,
-        bytesToDownload: Long,
-    ) -> Unit,
+        (
+            downloadedBytes: Long,
+            // in percentage, from 0 to 100
+            downloadedProgress: Float,
+            bytesToDownload: Long,
+        ) -> Unit
+    )?,
 ) {
     suspend fun downloadFile() {
         if (targetFilePath.exists()) {
@@ -84,7 +86,7 @@ class FileDownloader(
                             if (readBytes == -1L) break
                             downloadedBytes += readBytes
                             val progress = downloadedBytes.toFloat() / bytesToDownload.coerceAtLeast(1L) * 100
-                            progressListener(downloadedBytes, progress, bytesToDownload)
+                            progressListener?.invoke(downloadedBytes, progress, bytesToDownload)
                             sink.flush()
                         }
                     }

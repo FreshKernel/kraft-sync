@@ -41,7 +41,7 @@ object JarAutoUpdater {
             FileDownloader(
                 downloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL,
                 targetFilePath = newJarFile,
-                progressListener = { _, _, _ -> },
+                progressListener = null,
             ).downloadFile()
             Result.success(newJarFile)
         } catch (e: Exception) {
