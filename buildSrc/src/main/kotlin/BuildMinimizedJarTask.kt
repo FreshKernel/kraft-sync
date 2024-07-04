@@ -83,7 +83,10 @@ open class BuildMinimizedJarTask : DefaultTask() {
             }
         }
 
-        val proguardTask = project.tasks.create<ProGuardTask>("proguard")
+        val isObfuscatedEnabled = obfuscate.get()
+
+        val proguardTask =
+            project.tasks.create<ProGuardTask>(name = if (isObfuscatedEnabled) "proguardWithObfuscation" else "proguard")
         proguardTask.apply {
             injars(inputJarFile)
             outjars(outputJarFile)
@@ -130,7 +133,7 @@ open class BuildMinimizedJarTask : DefaultTask() {
                     .resolve("${outputJarFile.get().asFile.nameWithoutExtension}.map"),
             )
 
-            if (!obfuscate.get()) {
+            if (!isObfuscatedEnabled) {
                 // Disabling obfuscation makes the JAR file size a bit larger, and the debugging process a bit less easy
                 dontobfuscate()
             }
@@ -157,10 +160,10 @@ open class BuildMinimizedJarTask : DefaultTask() {
             proguardTask.actions.forEach { it.execute(proguardTask) }
         }
 
-        logResultMessage()
+        logResultMessage(isObfuscatedEnabled = isObfuscatedEnabled)
     }
 
-    private fun logResultMessage() {
+    private fun logResultMessage(isObfuscatedEnabled: Boolean) {
         val originalJarFile = inputJarFile.get().asFile
         val minimizedJarFile = outputJarFile.get().asFile
         val minimizedFileSizeInMegabytes = String.format("%.2f", minimizedJarFile.length().toDouble() / (1024L * 1024L))
@@ -170,7 +173,7 @@ open class BuildMinimizedJarTask : DefaultTask() {
         val formattedPercentageDifference = String.format("%.2f%%", kotlinMathAbs(percentageDifference))
 
         logger.lifecycle(
-            "📦 The size of the Proguard minimized JAR file (${minimizedJarFile.name}) is $minimizedFileSizeInMegabytes MB." +
+            "📦 The size of the Proguard ${if (isObfuscatedEnabled) "obfuscated" else "minimized"} JAR file (${minimizedJarFile.name}) is $minimizedFileSizeInMegabytes MB." +
                 " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimizedJarFile.path}",
         )
     }

@@ -76,8 +76,14 @@ tasks.shadowJar {
 
 // Proguard for minimizing the JAR file
 
-val minimizedJar =
-    tasks.register<BuildMinimizedJarTask>("minimizedJar") {
+val minimizedJar = registerMinimizedJarTask("minimizedJar", false)
+val obfuscatedJar = registerMinimizedJarTask("obfuscatedJar", true)
+
+fun registerMinimizedJarTask(
+    taskName: String,
+    obfuscationEnabled: Boolean,
+): TaskProvider<BuildMinimizedJarTask> =
+    tasks.register<BuildMinimizedJarTask>(taskName) {
         dependsOn(tasks.shadowJar)
 
         val uberJarFile = tasks.shadowJar.flatMap { it.archiveFile }
@@ -85,10 +91,18 @@ val minimizedJar =
         inputJarFile = uberJarFile
         outputJarFile =
             distDirectory
-                .resolve("${uberJarFile.get().asFile.nameWithoutExtension}.jar")
+                .resolve(
+                    buildString {
+                        append(uberJarFile.get().asFile.nameWithoutExtension)
+                        if (obfuscationEnabled) {
+                            append(".obfuscated")
+                        }
+                        append(".jar")
+                    },
+                )
 
         proguardConfigFile = project(projects.common.identityPath.path).file("proguard.pro")
-        obfuscate = false
+        obfuscate = obfuscationEnabled
         compileClasspath = sourceSets.main.get().compileClasspath
     }
 
@@ -96,7 +110,7 @@ val minimizedJar =
 
 tasks.assemble {
     // The `assemble` task already depends on `shadowJar`
-    dependsOn(tasks.shadowJar, minimizedJar)
+    dependsOn(tasks.shadowJar, minimizedJar, obfuscatedJar)
 }
 
 // Run tasks
@@ -137,6 +151,7 @@ fun registerRunTasks() {
             .archiveFile
             .get()
     }
+
     registerExecuteJavaJarTask(
         taskName = "runJar",
         buildJarFileTaskProvider = tasks.shadowJar,
@@ -152,6 +167,7 @@ fun registerRunTasks() {
     val getMinimizedJarFile = {
         minimizedJar.get().outputJarFile.get()
     }
+
     registerExecuteJavaJarTask(
         taskName = "runMinimizedJar",
         buildJarFileTaskProvider = minimizedJar,
@@ -161,6 +177,22 @@ fun registerRunTasks() {
         taskName = "runMinimizedJarCli",
         buildJarFileTaskProvider = minimizedJar,
         getJarFile = getMinimizedJarFile,
+        additionalArgs = listOf("nogui"),
+    )
+
+    val getObfuscatedJarFile = {
+        obfuscatedJar.get().outputJarFile.get()
+    }
+
+    registerExecuteJavaJarTask(
+        taskName = "runObfuscatedJar",
+        buildJarFileTaskProvider = obfuscatedJar,
+        getJarFile = getObfuscatedJarFile,
+    )
+    registerExecuteJavaJarTask(
+        taskName = "runObfuscatedJarCli",
+        buildJarFileTaskProvider = obfuscatedJar,
+        getJarFile = getObfuscatedJarFile,
         additionalArgs = listOf("nogui"),
     )
 
