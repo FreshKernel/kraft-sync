@@ -51,12 +51,11 @@ tasks.clean {
     }
 }
 
-// Shadow JAR for building the fat JAR file
+// Shadow JAR for building the uber JAR file
 
 tasks.shadowJar {
     // If you change the file name or destination directory, also update it from the README.md and other markdown files
     archiveFileName.set("${rootProject.name}.jar")
-    destinationDirectory = distDirectory
     description =
         "A script that allows to sync mods, resource packs, shaders, and more seamlessly before launching the game."
     minimize {
@@ -66,41 +65,52 @@ tasks.shadowJar {
     }
 
     doLast {
-        val fatJarFile = archiveFile.get().asFile
-        val fatJarFileSizeInMegabytes = String.format("%.2f", fatJarFile.length().toDouble() / (1024L * 1024L))
+        val uberJarFile = archiveFile.get().asFile
+        val uberJarFileSizeInMegabytes = String.format("%.2f", uberJarFile.length().toDouble() / (1024L * 1024L))
 
         logger.lifecycle(
-            "📦 The size of the shadow JAR file (${fatJarFile.name}) is $fatJarFileSizeInMegabytes MB. Location: ${fatJarFile.path}",
+            "📦 The size of the shadow JAR file (${uberJarFile.name}) is $uberJarFileSizeInMegabytes MB. Location: ${uberJarFile.path}",
         )
     }
 }
 
 // Proguard for minimizing the JAR file
 
-val minimizedJar =
-    tasks.register<BuildMinimizedJarTask>("minimizedJar") {
+val minimizedJar = registerMinimizedJarTask("minimizedJar", false)
+val obfuscatedJar = registerMinimizedJarTask("obfuscatedJar", true)
+
+fun registerMinimizedJarTask(
+    taskName: String,
+    obfuscationEnabled: Boolean,
+): TaskProvider<BuildMinimizedJarTask> =
+    tasks.register<BuildMinimizedJarTask>(taskName) {
         dependsOn(tasks.shadowJar)
 
-        val fatJarFile = tasks.shadowJar.flatMap { it.archiveFile }
-        val fatJarFileDestinationDirectory = tasks.shadowJar.get().destinationDirectory
+        val uberJarFile = tasks.shadowJar.flatMap { it.archiveFile }
 
-        inputJarFile = fatJarFile
-        outputJarFile = fatJarFileDestinationDirectory.file("${fatJarFile.get().asFile.nameWithoutExtension}.min.jar")
+        inputJarFile = uberJarFile
+        outputJarFile =
+            distDirectory
+                .resolve(
+                    buildString {
+                        append(uberJarFile.get().asFile.nameWithoutExtension)
+                        if (obfuscationEnabled) {
+                            append(".obfuscated")
+                        }
+                        append(".jar")
+                    },
+                )
 
         proguardConfigFile = project(projects.common.identityPath.path).file("proguard.pro")
-        obfuscate = true
+        obfuscate = obfuscationEnabled
         compileClasspath = sourceSets.main.get().compileClasspath
     }
-
-minimizedJar.configure {
-    dependsOn(tasks.shadowJar)
-}
 
 // Configure assemble task
 
 tasks.assemble {
     // The `assemble` task already depends on `shadowJar`
-    dependsOn(tasks.shadowJar, minimizedJar)
+    dependsOn(tasks.shadowJar, minimizedJar, obfuscatedJar)
 }
 
 // Run tasks
@@ -135,27 +145,29 @@ private fun <T : Task?> registerExecuteJavaJarTask(
 }
 
 fun registerRunTasks() {
-    val getFatJarFile = {
+    val getUberJarFile = {
         tasks.shadowJar
             .get()
             .archiveFile
             .get()
     }
+
     registerExecuteJavaJarTask(
         taskName = "runJar",
         buildJarFileTaskProvider = tasks.shadowJar,
-        getJarFile = getFatJarFile,
+        getJarFile = getUberJarFile,
     )
     registerExecuteJavaJarTask(
         taskName = "runJarCli",
         buildJarFileTaskProvider = tasks.shadowJar,
-        getJarFile = getFatJarFile,
+        getJarFile = getUberJarFile,
         additionalArgs = listOf("nogui"),
     )
 
     val getMinimizedJarFile = {
         minimizedJar.get().outputJarFile.get()
     }
+
     registerExecuteJavaJarTask(
         taskName = "runMinimizedJar",
         buildJarFileTaskProvider = minimizedJar,
@@ -168,13 +180,29 @@ fun registerRunTasks() {
         additionalArgs = listOf("nogui"),
     )
 
+    val getObfuscatedJarFile = {
+        obfuscatedJar.get().outputJarFile.get()
+    }
+
+    registerExecuteJavaJarTask(
+        taskName = "runObfuscatedJar",
+        buildJarFileTaskProvider = obfuscatedJar,
+        getJarFile = getObfuscatedJarFile,
+    )
+    registerExecuteJavaJarTask(
+        taskName = "runObfuscatedJarCli",
+        buildJarFileTaskProvider = obfuscatedJar,
+        getJarFile = getObfuscatedJarFile,
+        additionalArgs = listOf("nogui"),
+    )
+
     // A task that will help simulate as if we were running the
     // application in a system that doesn't support mouse and keyboard.
     // Will be helpful to test the application on the current development machine instead of a server or virtual machine
     registerExecuteJavaJarTask(
         "runHeadlessJar",
         tasks.shadowJar,
-        getFatJarFile,
+        getUberJarFile,
         overrideHeadless = true,
     )
 }

@@ -73,13 +73,17 @@ Use one of the shared run configurations of IntelliJ IDEA in `.idea` which will 
 If you're not using any of the supported IDEs, text editor or something like `vim` and you want to test the changes,
 and you want to test the code changes, you can use the following Gradle tasks:
 
-- `./gradlew build` to build the project, running checks, tests and build JAR files
-- `./gradlew minimizedJar` to build the full JAR file to build the minimized one
+- `./gradlew build` to build the project, running checks, lints, tests and build JAR files
 - `./gradlew run` to run the application
-- `./gradlew runJar` to run the application using the JAR file in GUI mode
-- `./gradlew runJarCli` to run the application using the JAR file in non-GUI mode
+- `./gradlew shadowJar` to build the uber JAR file
+- `./gradlew runJar` to run the application using the uber JAR file in GUI mode
+- `./gradlew runJarCli` to run the application using the uber JAR file in non-GUI mode
+- `./gradlew minimizedJar` to build the minimized JAR file.
 - `./gradlew runMinimizedJar` to run the application using the minimized JAR file in GUI mode
 - `./gradlew runMinimizedJarCli` to run the application using the minimized JAR file in non-GUI mode
+- `./gradlew obfuscatedJar` to build the obfuscated JAR file.
+- `./gradlew runObfuscatedJar` to run the application using the obfuscated JAR file in GUI mode
+- `./gradlew runObfuscatedJarCli` to run the application using the obfuscated JAR file in non-GUI mode
 
 </details>
 
@@ -155,7 +159,7 @@ discussed above
 - When doing any code changes, use the Kotlin Run configuration to test them, if possible, also try to run the JAR
   using the run configurations that are provided as in `.idea` and as a Gradle task to make it work with other IDEs and
   text editor, as a bonus, you could also test the minimized JAR and modify the Proguard rules and configurations if
-  necessary
+  necessary.
 - Usually when we add a new fields or modify existing ones in the data classes, like, for example, adding `description`
   field in the `Mod` data class, we will try to update the [Admin](./admin) module too to convert the new
   data from other launchers to make the process easier for administrations

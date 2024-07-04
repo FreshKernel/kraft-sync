@@ -77,7 +77,7 @@ data class ScriptConfig(
      * The user will have to launch once again to run the updated JAR.
      * 4. Currently, it lacks the ability to check for updates, such as on a weekly basis.
      * 5. Lacks the option to ask if the user wants to update or skip.
-     * 6. At the moment we have minimized JAR and the fat JAR,
+     * 6. At the moment we have minimized JAR and the obfuscated JAR,
      * the update process will always update to the minimized JAR.
      * */
     val autoUpdateEnabled: Boolean = false,

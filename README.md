@@ -6,8 +6,8 @@
 ![Build and test](https://github.com/ellet0/kraft-sync/actions/workflows/build.yml/badge.svg?branch=main)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ellet0/kraft-sync)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ellet0/kraft-sync)
-![JAR Size](https://img.shields.io/badge/JAR_Size-4.60_MB-blue)
-![Minimized JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.55_MB-blue)
+![JAR Size](https://img.shields.io/badge/JAR_Size-2.46_MB-blue)
+![Obfuscated JAR Size](https://img.shields.io/badge/Minimized_JAR_Size-1.59_MB-blue)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ellet0/kraft-sync/total)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
 
@@ -339,7 +339,7 @@ issues, it's easier to set up and maintain yet less flexible and simpler
 </details>
 
 <details>
-<summary id="q6">Why is the JAR file size not smaller?</summary>
+<summary id="q6">Can the JAR file be smaller?</summary>
 Although the script has only one task, the bundle size is not too small. You might wonder why this is the case if
 Java is already installed on the system/launcher.
 
@@ -371,14 +371,9 @@ There are some technical reasons:
 4. **Features**: The script provides some features like dark and light mode support with different themes
    which makes the bundle size a little bit larger
 
-We will try to find a good balance between the features and the bundle size, we
-use a tool called [Proguard](https://www.guardsquare.com/proguard) which makes it easy to shrink and minimize
-the JAR file, sometimes it doesn't if it should keep something or remove it due to reflections and dynamic class
-loading, we will try to always test it and make sure the minimized JAR works as expected and will also provide both
-the minimized JAR and the full JAR files in the release assets which can be found in the [Releases].
-
-if the JAR file is a priority, use the minimized JAR.
-if you would rather not risk getting unexpected errors at runtime, use the normal JAR
+We will try to find a good balance between the features and the bundle size.
+We use a tool called [Proguard](https://www.guardsquare.com/proguard) to shrink and minimize
+the JAR file.
 
 </details>
 

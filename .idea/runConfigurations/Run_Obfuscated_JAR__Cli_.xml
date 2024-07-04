@@ -1,16 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Build Minimized JAR (Warnings &amp; Notes)" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Run Obfuscated JAR (Cli)" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-i --rerun-tasks" />
+      <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
         <list>
-          <option value="minimizedJar" />
+          <option value="sync-script:runObfuscatedJarCli" />
         </list>
       </option>
       <option name="vmOptions" />

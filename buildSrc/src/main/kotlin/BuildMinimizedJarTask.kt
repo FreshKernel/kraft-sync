@@ -2,6 +2,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -9,6 +10,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.property
 import proguard.gradle.ProGuardTask
 import java.io.File
@@ -35,6 +37,9 @@ open class BuildMinimizedJarTask : DefaultTask() {
 
     @get:InputFiles
     val compileClasspath: ConfigurableFileCollection = project.objects.fileCollection()
+
+    @get:Input
+    val additionalJdkModules: ListProperty<String> = project.objects.listProperty()
 
     @TaskAction
     fun execute() {
@@ -78,7 +83,10 @@ open class BuildMinimizedJarTask : DefaultTask() {
             }
         }
 
-        val proguardTask = project.tasks.create<ProGuardTask>("proguard")
+        val isObfuscatedEnabled = obfuscate.get()
+
+        val proguardTask =
+            project.tasks.create<ProGuardTask>(name = if (isObfuscatedEnabled) "proguardWithObfuscation" else "proguard")
         proguardTask.apply {
             injars(inputJarFile)
             outjars(outputJarFile)
@@ -100,7 +108,7 @@ open class BuildMinimizedJarTask : DefaultTask() {
                     )
                 }
 
-                val javaModules =
+                val javaModules: List<String> =
                     listOf(
                         "java.base",
                         // Needed to support Java Swing/Desktop
@@ -109,7 +117,7 @@ open class BuildMinimizedJarTask : DefaultTask() {
                         "java.prefs",
                         // Needed to support Java logging utils (needed by Okio)
                         "java.logging",
-                    )
+                    ) + additionalJdkModules.get()
                 javaModules.forEach { includeJavaModuleFromJdk(jModFileNameWithoutExtension = it) }
             }
 
@@ -125,7 +133,7 @@ open class BuildMinimizedJarTask : DefaultTask() {
                     .resolve("${outputJarFile.get().asFile.nameWithoutExtension}.map"),
             )
 
-            if (!obfuscate.get()) {
+            if (!isObfuscatedEnabled) {
                 // Disabling obfuscation makes the JAR file size a bit larger, and the debugging process a bit less easy
                 dontobfuscate()
             }
@@ -152,21 +160,21 @@ open class BuildMinimizedJarTask : DefaultTask() {
             proguardTask.actions.forEach { it.execute(proguardTask) }
         }
 
-        logResultMessage()
+        logResultMessage(isObfuscatedEnabled = isObfuscatedEnabled)
     }
 
-    private fun logResultMessage() {
-        val original = inputJarFile.get().asFile
-        val minimized = outputJarFile.get().asFile
-        val minimizedFileSizeInMegabytes = String.format("%.2f", minimized.length().toDouble() / (1024L * 1024L))
+    private fun logResultMessage(isObfuscatedEnabled: Boolean) {
+        val originalJarFile = inputJarFile.get().asFile
+        val minimizedJarFile = outputJarFile.get().asFile
+        val minimizedFileSizeInMegabytes = String.format("%.2f", minimizedJarFile.length().toDouble() / (1024L * 1024L))
 
         val percentageDifference =
-            ((minimized.length() - original.length()).toDouble() / original.length()) * 100
+            ((minimizedJarFile.length() - originalJarFile.length()).toDouble() / originalJarFile.length()) * 100
         val formattedPercentageDifference = String.format("%.2f%%", kotlinMathAbs(percentageDifference))
 
         logger.lifecycle(
-            "📦 The size of the Proguard minimized JAR file (${minimized.name}) is $minimizedFileSizeInMegabytes MB." +
-                " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimized.path}",
+            "📦 The size of the Proguard ${if (isObfuscatedEnabled) "obfuscated" else "minimized"} JAR file (${minimizedJarFile.name}) is $minimizedFileSizeInMegabytes MB." +
+                " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimizedJarFile.path}",
         )
     }
 
