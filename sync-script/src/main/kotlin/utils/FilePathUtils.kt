@@ -70,6 +70,10 @@ fun Path.createParentDirectoriesIfDoesNotExist() {
 
 fun Path.createFileWithParentDirectoriesOrTerminate() {
     createParentDirectoriesIfDoesNotExist()
+    createFileOrTerminate()
+}
+
+fun Path.createFileOrTerminate() {
     try {
         createFile()
     } catch (e: Exception) {
