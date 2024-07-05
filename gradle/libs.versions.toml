@@ -1,5 +1,5 @@
 [versions]
-project = "0.0.1-experimental"
+project = "0.0.1-alpha"
 
 kotlin = "2.0.0"
 kotlinx-serialization = "1.7.0"
