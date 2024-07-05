@@ -70,16 +70,10 @@ fun Path.createParentDirectoriesIfDoesNotExist() {
 
 fun Path.createFileWithParentDirectoriesOrTerminate() {
     createParentDirectoriesIfDoesNotExist()
-    if (!parent.exists()) {
-        try {
-            createParentDirectories()
-        } catch (e: Exception) {
-            showErrorMessageAndTerminate(
-                title = "File Creation Error ⚠\uFE0F",
-                message = "❌ Failed to create the directory '${this.name}': $e",
-            )
-        }
-    }
+    createFileOrTerminate()
+}
+
+fun Path.createFileOrTerminate() {
     try {
         createFile()
     } catch (e: Exception) {
