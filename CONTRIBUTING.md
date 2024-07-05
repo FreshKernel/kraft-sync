@@ -129,10 +129,18 @@ discussed above
    Use pull requests and code reviews to discuss proposed changes and improvements.
 6. **Versioning and Releases**:
 
-   Try to follow semantic versioning for releases (https://semver.org/) when possible.
+   The project uses standard practices for versioning and releases:
+    - **Versioning**: [Semantic Versioning](https://semver.org/) which use `MAJOR.MINOR.PATCH` format to indicate
+      changes.
+    - **Commit messages**: [Conventional Commits](https://www.conventionalcommits.org/) for clear and consistent commit
+      messages.
+    - **Pull Request Titles**: [PR title using conventional commits](https://flank.github.io/flank/pr_titles/) style for
+      clarity and consistency.
+    - **Changelog**: [Keep a Changelog](https://keepachangelog.com/) to document release notes and changes.
+
    Clearly document release notes and changes for each version.
-   For now, we might introduce breaking changes in non-major versions.
-   guide in each release info
+
+   We might introduce breaking changes even in non-major versions. We plan to avoid doing this someday.
 7. **Consistency**:
 
    Adhere to a consistent coding style throughout the project to improve readability and maintainability
