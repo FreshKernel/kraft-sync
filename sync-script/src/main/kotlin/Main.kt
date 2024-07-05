@@ -313,8 +313,6 @@ fun finalize(applicationExecutionTimer: ExecutionTimer) {
 
     LoadingIndicatorDialog.instance?.isVisible = false
 
-    println()
-
     // The temporary folder usually contains the downloaded files which will be moved once finished
     // after finish syncing the contents successfully, we don't need it anymore.
     handleTemporaryDirectory(isStart = false)
