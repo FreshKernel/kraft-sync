@@ -152,11 +152,12 @@ open class BuildMinimizedJarTask : DefaultTask() {
         // A workaround for executing ProGuard without getting the notes by disabling the logging
         // when the `-i` or `--info` is not set
 
-        if (project.gradle.startParameter.logLevel == LogLevel.INFO) {
-            proguardTask.actions.forEach { it.execute(proguardTask) }
-        } else {
-            suppressOutputAndExecute {
-                proguardTask.actions.forEach { it.execute(proguardTask) }
+        when (project.gradle.startParameter.logLevel) {
+            LogLevel.INFO -> proguardTask.actions.forEach { it.execute(proguardTask) }
+            else -> {
+                suppressOutputAndExecute {
+                    proguardTask.actions.forEach { it.execute(proguardTask) }
+                }
             }
         }
 
@@ -173,7 +174,8 @@ open class BuildMinimizedJarTask : DefaultTask() {
         val formattedPercentageDifference = String.format("%.2f%%", kotlinMathAbs(percentageDifference))
 
         logger.lifecycle(
-            "📦 The size of the Proguard ${if (isObfuscatedEnabled) "obfuscated" else "minimized"} JAR file (${minimizedJarFile.name}) is $minimizedFileSizeInMegabytes MB." +
+            "📦 The size of the Proguard ${if (isObfuscatedEnabled) "obfuscated" else "minimized"} JAR file " +
+                "(${minimizedJarFile.name}) is $minimizedFileSizeInMegabytes MB." +
                 " The size has been reduced \uD83D\uDCC9 by $formattedPercentageDifference. Location: ${minimizedJarFile.path}",
         )
     }
