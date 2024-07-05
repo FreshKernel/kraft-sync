@@ -118,9 +118,7 @@ class SyncScriptInstallerTab : Tab() {
             SyncScriptInstallerInstance.configureInstallation(
                 installationConfig = installationConfig,
                 launcherInstanceDirectoryPathString =
-                    (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
-                        "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
-                    ),
+                    (launcherInstanceDirectoryComboBox.selectedItem as? String).orEmpty(),
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
                 confirmReplaceExistingPreLaunchCommand = confirmReplaceExistingPreLaunchCommand,
             )

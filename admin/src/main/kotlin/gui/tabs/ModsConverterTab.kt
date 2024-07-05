@@ -134,9 +134,7 @@ class ModsConverterTab : Tab() {
             ModsConverterInstance.convertMods(
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
                 launcherInstanceDirectoryPathString =
-                    (launcherInstanceDirectoryComboBox.selectedItem as? String) ?: throw IllegalStateException(
-                        "The selected item of ${::launcherInstanceDirectoryComboBox.name} is null",
-                    ),
+                    (launcherInstanceDirectoryComboBox.selectedItem as? String).orEmpty(),
                 convertMode = modsConvertModeComboBox.getSelectedItemOrThrow(),
                 prettyFormat = prettyFormatCheckBox.isSelected,
                 overrideCurseForgeApiKey = overrideCurseForgeApiKey,
