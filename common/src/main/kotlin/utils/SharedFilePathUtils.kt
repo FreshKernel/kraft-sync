@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import java.nio.file.FileSystemException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.fileSize
 import kotlin.io.path.name
 import kotlin.streams.toList
 
@@ -31,3 +32,5 @@ suspend fun Path.listFilteredPaths(filter: (path: Path) -> Boolean): Result<List
     } catch (e: Exception) {
         Result.failure(e)
     }
+
+fun Path.isFileEmpty(): Boolean = fileSize() == 0L
