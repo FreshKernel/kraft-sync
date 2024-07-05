@@ -5,10 +5,10 @@ import constants.DotMinecraftFileNames
 import curseForgeDataSource
 import launchers.Instance
 import launchers.LauncherDataSource
-import okio.IOException
 import syncInfo.models.mod.Mod
 import utils.SystemFileProvider
 import utils.listFilteredPaths
+import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
