@@ -19,7 +19,7 @@ The script will sync the following:
 1. 🛠️ Mods (experimental)
 2. 🎨 Resource packs (highly experimental)
 3. ✨ Shader-packs (not implemented yet)
-4. 🌐 Server List (in-game) (not implemented yet)
+4. 🌐 In-Game Server List (Alpha): It is subject to potential changes or removal in future updates.
 5. 🧩 Mods configurations (not implemented yet): These may be synced initially, since each player can have their own
    configurations.
    We have not yet found a solution, except by enforcing the same mod settings for all players.
