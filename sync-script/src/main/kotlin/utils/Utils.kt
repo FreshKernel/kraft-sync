@@ -19,6 +19,9 @@ import kotlin.system.exitProcess
  * we might call [showErrorMessageAndTerminate] when having error while loading the [ScriptConfig]
  * (for example), which is why we can't [ScriptConfig.getInstanceOrThrow] because we will get not initialized error
  * while showing an error message
+ *
+ * TODO: Some usages pass HTML message to [message], which will cause unreadable message in CLI mode, we need to
+ *  either provide a different message parameter for the CLI or convert the HTML to plain text
  * */
 fun showErrorMessageAndTerminate(
     title: String,
