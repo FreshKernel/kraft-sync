@@ -5,6 +5,7 @@ kotlin = "2.0.0"
 kotlinx-serialization = "1.7.0"
 kolinx-coroutines = "1.9.0-RC"
 okhttp = "4.12.0"
+okio = "3.9.0"
 flatlaf = "3.4.1"
 ktoml = "0.5.2"
 knbt = "0.11.5"
@@ -25,6 +26,7 @@ java = "11"
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kolinx-coroutines" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 flatlaf-core = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 flatlaf-extras = { module = "com.formdev:flatlaf-extras", version.ref = "flatlaf" }
 ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }

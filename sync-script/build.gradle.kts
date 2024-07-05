@@ -14,9 +14,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.okhttp)
+    // Explicitly including Okio to use the latest version to solve some Proguard warnings
+    implementation(libs.okio)
     implementation(libs.flatlaf.core)
     implementation(libs.flatlaf.extras)
-    // TODO: Explicitly implement Okio will solve Proguard issue with Knbt to use 3.9.0 instead of 3.6.0
     implementation(libs.knbt)
 
     testImplementation(libs.kotlin.test)
