@@ -28,11 +28,6 @@ data class Mod(
      * */
     val name: String? = null,
     /**
-     * Used to check if the mod required or not to allow the user to ignore some mods
-     * // TODO: Currently not implemented or might removed
-     * */
-    val isRequired: Boolean = false,
-    /**
      * The script needs this info to know if it should download the mod based on the [Environment]
      * if you're using a client side only and not needed in server,
      * pass [ModSupport.Required] to [clientSupport] and [ModSupport.Unsupported] to [serverSupport]
