@@ -16,14 +16,14 @@ instance**.
 
 The script will sync the following:
 
-1. 🛠️ Mods (experimental)
-2. 🎨 Resource packs (highly experimental)
-3. ✨ Shader-packs (not implemented yet)
+1. 🛠️ Mods (Experimental): In the experimental phase and subject to changes.
+2. 🎨 Resource Packs (Highly Experimental): In the highly experimental phase and subject to changes.
+3. ✨ Shader Packs (Not Implemented Yet): This feature is not available yet. Future updates may implement it
 4. 🌐 In-Game Server List (Alpha): It is subject to potential changes or removal in future updates.
-5. 🧩 Mods configurations (not implemented yet): These may be synced initially, since each player can have their own
+5. 🧩 Mods configurations (Not Implemented Yet): These may be synced initially, since each player can have their own
    configurations.
    We have not yet found a solution, except by enforcing the same mod settings for all players.
-6. ⌨️ Keybindings (not implemented yet): These may be synced initially since each player can have their own
+6. ⌨️ Keybindings (Not Implemented Yet): These may be synced initially since each player can have their own
    keybindings.
    We have not yet found a solution for this, except by enforcing the same keybindings for all players
 
