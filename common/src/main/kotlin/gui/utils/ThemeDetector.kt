@@ -41,7 +41,6 @@ object ThemeDetector {
                 false
             }
 
-            // TODO: Test this on more advance use-cases in KDE Plasma desktop
             LinuxDesktopEnvironment.KdePlasma -> {
                 fun getCurrentLookAndFeelPackageName(): Result<String?> {
                     val kdeGlobalsFile =
@@ -86,7 +85,6 @@ object ThemeDetector {
                 return knownDarkLookAndFeelPackageNames.contains(currentLookAndFeelPackageName)
             }
 
-            // TODO: Test on Linux Mint with different cases
             LinuxDesktopEnvironment.Cinnamon -> {
                 val currentCinnamonThemeNameOutput =
                     commandLine(
