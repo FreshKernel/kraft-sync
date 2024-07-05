@@ -237,7 +237,7 @@ suspend fun fetchSyncInfo() {
         RemoteSyncInfoDataSource(
             client = HttpService.client,
         )
-    // TODO: Might want to add a loading screen for this if taking longer than expected
+
     SyncInfo.instance =
         syncInfoDataSource
             .fetchSyncInfo(
