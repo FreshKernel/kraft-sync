@@ -22,6 +22,7 @@ import syncInfo.models.SyncInfo
 import syncInfo.models.instance
 import syncService.ModsSyncService
 import syncService.ResourcePacksSyncService
+import syncService.ServersSyncService
 import syncService.SyncService
 import utils.ExecutionTimer
 import utils.HttpService
@@ -300,6 +301,7 @@ suspend fun performSyncServices(scriptConfig: ScriptConfig) {
             add(ModsSyncService())
             if (scriptConfig.environment.isClient()) {
                 add(ResourcePacksSyncService())
+                add(ServersSyncService())
             }
         }
 
