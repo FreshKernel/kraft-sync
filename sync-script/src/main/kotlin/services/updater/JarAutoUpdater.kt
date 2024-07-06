@@ -3,12 +3,15 @@ package services.updater
 import constants.ProjectInfoConstants
 import constants.SyncScriptDotMinecraftFiles
 import generated.BuildConfig
+import gui.dialogs.LoadingIndicatorDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 import utils.FileDownloader
 import utils.HttpService
 import utils.SystemInfoProvider
+import utils.buildHtml
+import utils.convertBytesToReadableMegabytesAsString
 import utils.createFileWithParentDirectoriesOrTerminate
 import utils.deleteExistingOrTerminate
 import utils.executeAsync
@@ -38,10 +41,34 @@ object JarAutoUpdater {
             }
             val latestJarFileDownloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL
             println("\uD83D\uDD3D Downloading the new JAR file from: $latestJarFileDownloadUrl")
+
+            LoadingIndicatorDialog.instance?.updateComponentProperties(
+                title = "Updating...",
+                infoText =
+                    "Sending HTTP request...",
+                progress = 0,
+                detailsText =
+                    "Initiating network request for the update.",
+            )
             FileDownloader(
                 downloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL,
                 targetFilePath = newJarFile,
-                progressListener = null,
+                progressListener = { downloadedBytes, downloadedProgress, bytesToDownload ->
+                    LoadingIndicatorDialog.instance?.updateComponentProperties(
+                        title = "Updating...",
+                        infoText =
+                            buildHtml {
+                                text("Downloading ")
+                                boldText(ProjectInfoConstants.DISPLAY_NAME)
+                                text(" Update")
+                            }.buildBodyAsText(),
+                        progress = downloadedProgress.toInt(),
+                        // TODO: This is duplicated twice
+                        detailsText =
+                            "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
+                                " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
+                    )
+                },
             ).downloadFile()
             Result.success(newJarFile)
         } catch (e: Exception) {
@@ -77,6 +104,12 @@ object JarAutoUpdater {
         }
 
     private suspend fun shouldUpdate(): Boolean {
+        LoadingIndicatorDialog.instance?.updateComponentProperties(
+            title = "Checking for Update...",
+            infoText = "Checking for a new update...",
+            progress = 0,
+            detailsText = "Determining if a new version is available.",
+        )
         val latestProjectVersionString =
             getLatestProjectVersion().getOrElse {
                 println("❌ We couldn't get the latest project version: ${it.message}")
@@ -125,6 +158,8 @@ object JarAutoUpdater {
                     println("⚠\uFE0F Auto update feature is only supported when running using JAR.")
                     return
                 }
+
+        LoadingIndicatorDialog.instance?.isVisible = true
 
         val shouldUpdate = shouldUpdate()
         if (!shouldUpdate) {
@@ -176,11 +211,11 @@ object JarAutoUpdater {
                 withContext(Dispatchers.IO) {
                     updateBatScriptFile.createFileWithParentDirectoriesOrTerminate()
                 }
-                val secondsToWait = 2
+                val secondsToWait = 1
 
                 val windowTitle = "Update Complete"
                 val message = "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version."
-                // TODO: This file can't be deleted in the same batch script
+
                 val messageVbsFilePath =
                     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path
                         .resolve("updateMessage.vbs")
@@ -189,7 +224,7 @@ object JarAutoUpdater {
                     """
                     @echo off
                     
-                    echo Waiting for $secondsToWait seconds to ensure application closure...
+                    echo Waiting for $secondsToWait second to ensure application closure...
                     timeout /t $secondsToWait > nul
                     del "${currentRunningJarFilePath.absolutePathString()}"
                     move "${newJarFilePath.absolutePathString()}" "${currentRunningJarFilePath.absolutePathString()}"
