@@ -117,7 +117,7 @@ class QuickPreferencesDialog : JDialog() {
         return ScriptConfig.getInstanceOrThrow().copy(
             theme = themeComboBox.getSelectedItemOrThrow(),
             themeMode = themeModeComboBox.getSelectedItemOrThrow(),
-            overrideIsGuiEnabled = getOverrideIsGuiEnabled(),
+            guiEnabled = getOverrideIsGuiEnabled(),
         )
     }
 

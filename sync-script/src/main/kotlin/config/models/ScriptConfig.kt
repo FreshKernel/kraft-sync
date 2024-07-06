@@ -16,7 +16,7 @@ import syncInfo.models.SyncInfo
 data class ScriptConfig(
     /**
      * The public download url for the [SyncInfo] json file
-     * it's needed so the script can fetch the [SyncInfo] from it as it's containing the server data
+     * it's needed so the script can fetch the [SyncInfo] from it as it contains the server data
      * to get the latest info about the mods and other resources in addition to another server customization
      * */
     val syncInfoUrl: String,
@@ -38,7 +38,7 @@ data class ScriptConfig(
      * it should be automatically disabled.
      *
      * */
-    val overrideIsGuiEnabled: Boolean? = null,
+    val guiEnabled: Boolean? = null,
     /**
      * The theme mode for the GUI, this only take effect if the GUI mode is enabled.
      * */
@@ -62,7 +62,7 @@ data class ScriptConfig(
      * The accepted values are `client` or `server`
      *
      * If you are using [Environment.Server] and the server doesn't support graphical interface
-     * then consider passing false to [overrideIsGuiEnabled]
+     * then consider passing false to [guiEnabled]
      * */
     val environment: Environment = Environment.Client,
     /**
