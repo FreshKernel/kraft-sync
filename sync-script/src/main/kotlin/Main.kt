@@ -243,6 +243,7 @@ suspend fun fetchSyncInfo() {
             .fetchSyncInfo(
                 url = ScriptConfig.getInstanceOrThrow().syncInfoUrl,
             ).getOrElse {
+                it.printStackTrace()
                 showErrorMessageAndTerminate(
                     title = "Sync Info Unavailable \uD83D\uDD04",
                     message = "An error occurred while trying to fetch sync info from the server: ${it.message}",

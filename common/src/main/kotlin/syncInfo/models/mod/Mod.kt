@@ -55,6 +55,10 @@ data class Mod(
      * for a specific mod
      * */
     val verifyFileIntegrity: Boolean? = null,
+    /**
+     * Will override [ModSyncInfo.syncAllOptionalForCurrentEnv] for a specific mod
+     * */
+    val syncOptionalForCurrentEnv: Boolean? = null,
 ) {
     @Serializable
     enum class ModSupport {
