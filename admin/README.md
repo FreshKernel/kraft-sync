@@ -5,7 +5,16 @@ extract mod info from launchers or install the script to a Minecraft launcher in
 
 This page isn't complete yet, and this tool is experimental and can have many breaking changes
 
-[//]: # (TODO: Complete this page)
+## ✅ Supported Launchers
+
+- [**Prism Launcher**](https://prismlauncher.org/): Supports both [Mods Info Converter](#-mods-info-converter)
+  and [Script Installer](#-script-installer)
+- [**ATLauncher**](https://atlauncher.com/): Supports both [Mods Info Converter](#-mods-info-converter)
+  and [Script Installer](#-script-installer)
+- [**Modrinth App**](https://modrinth.com/app): Supports only [Mods Info Converter](#-mods-info-converter),
+  [Script Installer](#-script-installer) support is blocked due to missing support for environment variables,
+  See [Feature Request #1238](https://github.com/modrinth/code/issues/1238)
+- [**MultiMC**](https://multimc.org/): We're still working on supporting this launcher.
 
 ## 🔁 Mods Info Converter
 

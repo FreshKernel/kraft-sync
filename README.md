@@ -6,8 +6,8 @@
 ![Build and test](https://github.com/ellet0/kraft-sync/actions/workflows/build.yml/badge.svg?branch=main)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ellet0/kraft-sync)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ellet0/kraft-sync)
-![JAR Size](https://img.shields.io/badge/JAR_Size-2.46_MB-blue)
-![Obfuscated JAR Size](https://img.shields.io/badge/Obfuscated_JAR_Size-1.59_MB-blue)
+![JAR Size](https://img.shields.io/badge/JAR_Size-2.8_MB-blue)
+![Obfuscated JAR Size](https://img.shields.io/badge/Obfuscated_JAR_Size-1.78_MB-blue)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ellet0/kraft-sync/total)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
 
@@ -16,7 +16,7 @@ instance**.
 
 The script will sync the following:
 
-1. 🛠️ Mods (Experimental): In the experimental phase and subject to changes.
+1. 🛠️ Mods (Alpha): In the experimental phase and subject to changes.
 2. 🎨 Resource Packs (Highly Experimental): In the highly experimental phase and subject to changes.
 3. ✨ Shader Packs (Not Implemented Yet): This feature is not available yet. Future updates may implement it
 4. 🌐 In-Game Server List (Alpha): It is subject to potential changes or removal in future updates.
@@ -43,7 +43,8 @@ subsidiaries.**
 
 - 📖 [About](#-about)
 - ✨ [Features](#-features)
-- 🔧 [How it works?](#-how-it-works)
+- 🔧 [How it works](#-how-it-works)
+- ✅ [Supported Launchers](#-supported-launchers)
 - 🖥 [Usage️](#-usage)
 - 💬 [Frequently Asked Questions](#-frequently-asked-questions)
 - 🔰 [Admin Utility](#-admin-utility)
@@ -77,139 +78,177 @@ info.
 
 List the key features of the script
 
-```markdown
+- 🛠️ **Easy to Use**: Simple and customizable for various needs.
+- 🔍 **Validation Methods**: Various ways to validate assets or disable file integrity checks.
+- 🖥️ **Simple GUI**: Support both dark and light modes with different themes (can be disabled).
+- 🚫 **Error Handling**: Manages different types of errors.
+- 🌐 **Multiplatform**: Works on any JVM-compatible system.
+  You don't need different binaries for different desktop platforms.
+- 📦 **Small Bundle Size**: Compact and efficient.
+- ⚙️ **Java 11+ Compatibility**: Works with Java 11 and newer versions.
+- 📜 **Public Source Code** Fully documented and open-source code.
+- 🔌 **Game Restart is not required**: No need to restart the game after syncing the data; it will work once you open the
+  game.
+- 🛡️ **Server-Side Mod is not required**: No need for a server-side mod on modded servers (e.g., Fabric, Quilt,
+  NeoForge, Forge).
+- 🧩 **Flexible Sync Options**: Define what to sync or exclude.
+- 🔄 **Client and Server Sync**: Use the script for both client-side and server-side mod syncing.
+  Exclude or include some mods to be downloaded on the client or the server.
+- 💾 **Mod Info Conversion**: Convert mod info from other launchers.
+- ⚡ **Quick Play Feature**: Automatically join a Minecraft server on launch (limited to supported launchers).
 
-## Features
+## 🔧 How it works
 
-- 🛠️ Easy to use and customizable.
-- 🔍 Different ways to validate the assets (e.g., Mods, Resource-packs) or disable the file integrity validation.
-- 🖥️ Simple GUI for download indicators and errors for both dark and light with different themes (can be disabled).
-- 🚫 Handles different errors.
-- 🌐 Multiplatform: Works using JVM, which means you don't need different binaries for different desktop platforms.
-- 📦 Relatively small bundle size.
-- ⚙️ Compatibility with Java 11 and newer versions
-  features.
-- 📜 Completely open-source and documented code.
-- 🔌 No need to restart the game after syncing the data; it will work once you open the game.
-- 🛡️ No need for a server-side mod to be installed on your Fabric/Forge server.
-- 🧩 You define what to be synced and what not to.
-- 🔄 You can use the exact same script for syncing server mods (if you have access to running JAR files) and you can
-  exclude or include some mods to be downloaded on the client or server.
-- 💾 Easily convert the info of the mods from other launchers.
-- ⚡ Support for quick play feature for automatically joining a Minecraft server on launch (limited to supported
-  launchers)
+The process is straightforward.
 
-```
+1. The player launches the game.
+2. The script will automate the syncing process.
+3. Once the syncing process finishes, the game launches with the new synced content.
 
-## 🔧 How it works?
+The script is designed to be independent of the used **Minecraft Launcher**, we highly recommend using
+a **Minecraft launcher** that has some features for optimal and seamless experience.
 
-To provide an easy way to use for the players without doing anything manually, all you need is to use a
-Minecraft launcher that supports running a command before launching the game
+The script JAR file will need to be shipped to each player if you're using a **Minecraft Launcher**
+that supports **Exporting and Importing**.
+You can include it, so they only have to download the exported profile/instance and then import it,
+and the script will be executed once the player launches the game.
 
-You can use [MultiMC Launcher] or [Prism Launcher] which provide more features than the original
-[Minecraft Launcher], features like:
+See [Supported Launchers](#-supported-launchers) section for more details.
 
-1. Exporting the instance, each instance has its assets (e.g., Mods, Resource-packs, Shader-packs)
-2. Configurations and data in a way so no instance will affect another
-3. Other features like allow to launch
-   `Pre-launch` command is needed by this script to automate the process, otherwise if you're using the
-   official [Minecraft Launcher], then the players need to run the script each time they launch the game or only when
-   they want to (when new mods are added etc...) or you could create a `bat` (Windows) or `sh` (Linux, macOS) script
-   that launches this script first then the launcher, This way the players are forced to use your mods and resource
-   packs, etc... even if they don't want to use the mods, still [Minecraft Launcher] doesn't provide a way to separate
-   the mods and settings for different instances and servers, to get the best experience, use one of the supported
-   launchers or a launcher that supports running a command before launching the game
-4. Many other features, like automatically joining a Minecraft server when launching the game
+## ✅ Supported Launchers
 
-You will need to ship the script with the exported instance and configure the instance to launch the script before each
-game launch and export it.
-It's important to check the script files; otherwise, it won't be shipped.
+The project can work with any Minecraft launcher, though we recommend
+a launcher that supports the following features for optimal experience:
 
-The process is straightforward; don't get confused by the required steps.
+1. **Separation of data**
+    - **What it does**: Split all the data of Minecraft into **instances/profiles**, each
+      **instance/profile** has its own data
+      (e.g., worlds, servers, mods, resource-packs, shaders, mod loader, game version)
+      which allow the player to switch between them
+    - **Why is it recommended**: The player can have more flexibility, this feature allows not affecting
+      their own data in case if they want to join your **modded server**.
+2. **Hooks/Custom Commands**
+    - **What it does**: Supports running **commands/hooks** to allow executing the script before launching the game.
+      Each instance supports running a command or executing something and waiting for the
+      result before launching the game
+    - **Why is it recommended**: To allow executing the script before launching the game for seamless experience, this
+      allows launching the game without doing anything else.
+      Like running the script each time before launching the game manually.
+3. **Hooks/Custom commands environment variables**:
+    - **What it does**: An extension for the previous feature that **allows to
+      make the instance/profile portable to the players**.
+      The player only has to install the launcher, download the exported **instance/profile**, import it and launch
+      the game.
+    - **Why is it recommenced**: To avoid hardcoding the paths as each player has their own user profile/name and might
+      have a different **operating system** or installed the launcher to somewhere else other than the default.
+
+      The following environment variables are recommended:
+        - **Java Binary Executable**: To execute the script using the same Java version that's used for launching
+          Minecraft.
+          Eliminating the needs for installing Java on the player system.
+        - **Instance Directory Path**: To locate the script JAR file without hardcoding the instance path.
+
+<details>
+<summary>Click to expand the Tested Launchers</summary>
+
+- [**MultiMC**](https://multimc.org/): has recommended features for an optimal experience.
+  Take a look at
+  [MultiMC Instance Custom Commands Settings](https://github.com/MultiMC/Launcher/wiki/Instance-settings#custom-commands)
+- [**Prism Launcher**](https://prismlauncher.org/): has recommended features for an optimal experience.
+  Take a look at [Prism Launcher Custom Commands](https://prismlauncher.org/wiki/help-pages/custom-commands/)
+- [**ATLauncher**](https://atlauncher.com/): has recommended features for an optimal experience.
+- [**Modrinth App**](https://modrinth.com/app): has recommended features except hooks environment variables.
+  Take a look at the active [Feature Request #952](https://github.com/modrinth/code/issues/952).
+- [**GDLauncher Carbon**](https://gdlauncher.com/): has recommended features except hooks environment variables.
+  the project might not have an active issue, take a look at
+  [GDLauncher Issue Tracker](https://github.com/gorilla-devs/GDLauncher/issues) for details.
+
+</details>
+
+Take a look at the [Usage](#-usage) section.
+
+If you use the official [Minecraft Launcher], the player won't be able to:
+
+- Switch between their own data and the synced content seamlessly, most **Minecraft Launchers** support
+  profiles/instances.
+- Sync the content and launch the game directly using the `Play` button in the launcher,
+  instead will have to provide a `sh` or `bat` script that run the project script and launch the game after that,
+  which means the player will have to do this manually each time they want to launch the game.
+- Import the instance/profile directly and launch without any additional setup or configurations.
 
 ## 🖥 Usage
 
-[//]: # (TODO: Add supported launchers section)
+We suggest to read [How it works](#-how-it-works) and [Supported Launchers](#-supported-launchers) sections
+before starting reading this section.
 
-[//]: # (TODO: Share the common steps between the manual and automated way)
-Use the manual or automated method to get started 🚀:
-
-<details>
-<summary>The automated way to use the script</summary>
-
-1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#-admin-utility)
-2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
-   launcher, and hooks/custom commands feature.
-3. **Create a new instance**, choose the version, and mod loader, and download the mods you want to use.
-
-   Consider using [Modrinth] **as an asset provider** to make the process easier and faster with a smaller possibility
-   of
-   errors for the utility as it will be an offline task
-4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, and upload the new file
-   you get from the admin application to somewhere public, like [GitHub](https://github.com/)
-5. To prepare the instance that will be used by the players, **create a new instance**, choose the same version
-   and mod loader as in the previous instance while refraining from downloading the mods.
-   This instance will be configured to use the script.
-
-   The previous one will be used by [Admin Utility] to convert the mods' info to the script format.
-6. Use the [Admin Utility] to install the script into the new instance, navigate
-   to [Admin Script Installer](./admin/README.md#-script-installer) for details.
-7. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
-   from **Step 4**.
-   Enter it and then wait for the sync process to finish, the game will launch with the new synced
-   content.
-8. To make this process easier for all the players, export the instance from **Step 5** that's configured
-   to use the script, make sure to include the `kraft-sync.jar` file and the `kraft-sync-data` folder
-   and exclude the content that will be synced like the `mods` as the script will download them once the player import
-   the instance and launch the instance, you can include them though, the script will sync them if they're outdated.
-
-</details>
+The easiest way to start using the script 🚀:
 
 <details>
-<summary>The manual way to use the script</summary>
+<summary>Click to expand the steps</summary>
 
 1. Download the JAR file from the [Releases] for both the script and the [Admin Utility](#-admin-utility)
-2. Download and install your favorite Minecraft launcher that has built-in support for downloading mods inside the
-   launcher.
+2. Download and install a **Minecraft Launcher** that is supported by both the script
+   (see [Supported Launchers](#-supported-launchers)) and [Admin Utility]
+   (see [Admin Supported Launchers](./admin/README.md#-supported-launchers)).
+3. **Create a new instance**, choose the **Minecraft Version**, **Mod Loader** and download
+   the **Mods** you want to use.
+   This instance will be used to convert the Mods' info using [Admin Utility] into the **Script data format**.
+   <br></br>
+   Consider using [Modrinth] as an **asset provider** to make the process faster as this will make the task offline.
+4. Use the [Admin Utility] to extract the Mods' info and convert them into the **Script data format**,
+   upload the file to somewhere public (e.g., [GitHub](https://github.com/))
+5. Prepare the instance/profile that will be imported by the players, **create a new instance**,
+   choose the same **Minecraft Version** and **Mod Loader** as **Step 3**.
+   Refrain from downloading anything (e.g., Mods, Resource Packs)
+   as this instance/profile will be configured to use the script.
+6. Now we will install the script into the instance/profile from **Step 5**.
 
-   Consider using [Modrinth] **as asset provider** to make the process easier and faster with a smaller possibility of
-   errors for the utility as it will be an offline task
-3. **Create a new instance**, choose the version, mod loader, and download the mods you want to use
-4. Use the [Admin Utility] to convert the mod info from the launcher to the script format, and upload the new file
-   you get from the admin application to somewhere public, like [GitHub](https://github.com/)
-5. To prepare the instance that the players will use, **create a new instance**, choose the same version
-   and mod loader as the previous instance while refraining from downloading the mods.
-   This instance will be configured to use the script.
+   <details>
+   <summary>The automated way to install the Script</summary>
 
-   The previous one will be used by [Admin Utility] to convert the mods' info to the script format
-6. Move the downloaded script JAR file to the instance directory where it has the `mods` and other folders
-7. Go to the settings of the newly created instance, try to find the section of the custom commands,
-   or the command to run before launching the game.
-   For example, for [MultiMC Launcher], it's
-   in [here](https://github.com/MultiMC/Launcher/wiki/Instance-settings#custom-commands), the same applies
-   the launchers based on it like [Prism Launcher]
-8. Once you find the `Pre-launch command` or something similar, enter the following:
-   ```
-   $INST_JAVA -jar $INST_MC_DIR/kraft-sync.jar
-   ```
-   and replace `kraft-sync` with the JAR file name from **Step 6** if necessary.
-   You might need to replace `$INST_JAVA` and `$INST_MC_DIR` environment variables with something else depending on the
-   launcher, [MultiMC Launcher] and the launchers that are based on it use those variables,
-   and other launchers like [ATLauncher] use the same for compatibility
-9. Now launch the instance to run the game, if this is the first time, it will ask you for the URL
-   from **Step 4**.
-   Enter it and then wait for the sync process to finish, the game will launch with the new synced
-   content
-10. To make this process easier for all the players, export the instance from **Step 5** that's configured
-    to use the script, make sure to include the used JAR file and the `kraft-sync-data` folder
-    and exclude the content that will be synced like the `mods` as the script will download them once the player import
-    the instance and launch the instance, you can include them though, the script will sync them if they're outdated.
+   Use [Script Installer] to use the script into the newly created instance/profile from **Step 5**,
+   the process is automated (limited to supported launchers).
+
+   </details>
+
+   <details>
+   <summary>The manual way to install the Script</summary>
+
+   Apply the following to the newly created instance/profile from **Step 5**:
+
+    - Move the downloaded **JAR file** from **Step 1** into the instance directory, the same directory that has
+      the `mods`, `resourcepacks` and other Minecraft related folders.
+    - Go to the settings of the instance/profile, navigate to
+      the hooks/custom commands options, this process is manual and depends on the launcher.
+    - Find the `Pre-Launch` option or something similar, enter the following:
+    ```
+    $INST_JAVA -jar $INST_MC_DIR/kraft-sync.jar
+    ```
+
+   Replace `kraft-sync.jar` with the **JAR file name** from **Step 1** if necessary.
+   You also might need to replace `$INST_JAVA` and `$INST_MC_DIR` with something else depending
+   on the launcher, most launchers support those two environment variables.
+
+   </details>
+
+7. Launch the game with the instance/profile that has the script installed in **Step 6**.
+   The script will ask you for the **URL** from **Step 4**, once succeeded, the game will launch with the
+   new synced content.
+8. To avoid repeating those steps for all the players, export the instance from **Step 6** that's configured to use the
+   script.
+   When the launcher asks you which files should be included or excluded,
+   exclude the assets (e.g., Mods, Resource Packs)
+   and include the JAR file (`kraft-sync.jar`) and `kraft-sync-data` folder.
+   If you include the assets, the script will sync them if they are outdated, to make the instance smaller to share;
+   we suggest to excluding those folders.
+
+**To update the assets that will be synced**:
+
+You only need to update the file from **Step 4**,
+you can extract the Mods' info once again and replace the content,
+the script will sync the content once the player starts the game.
 
 </details>
-
-This section will be updated in the future for improvements.
-
-[//]: # (TODO: Update or rework this section)
 
 ## 💬 Frequently Asked Questions
 
@@ -291,9 +330,8 @@ will automate the process of updating and installing the required Java version f
 As for the Minecraft version, unfortunately, we currently don't sync it as some launchers
 might store such information, and we can't update and cover all the launchers, breaking changes might be introduced, and
 the goal of this script is to make it simple and work for most use cases, if there is a new Minecraft version, the
-player
-needs to update the Minecraft version along with the mod loader manually, launching the game to update the assets (e.g.
-Mods, Resource-packs) then they can get back to playing the game
+player needs to update the Minecraft version along with the mod loader manually, launching the game to update the
+assets (e.g. Mods, Resource-packs) then they can get back to playing the game
 
 We might add a feature that will display a warning or require the player to update the mod loader
 version using their launcher or manually downloading it from the web.
@@ -328,13 +366,14 @@ if you have a question, use the Discussions tab instead
 </details>
 
 <details>
-<summary id="q5">What happens to the old script?</summary>
+<summary id="q5">What about MC Mods Sync?</summary>
 
 We have another script called [MC Mods Sync](https://github.com/ellet0/mc-mods-sync)
 which is limited to syncing the mods only, requiring the admin
 to upload the mods on GitHub and then download them,
 other than many issues we discussed like storage limitation and LICENSE
-issues, it's easier to set up and maintain yet less flexible and simpler
+issues, it's easier to set up and maintain for the admin side yet less flexible
+and simpler.
 
 </details>
 
@@ -363,9 +402,8 @@ There are some technical reasons:
    or provide separate ones for each operating system, Windows players have to download the Windows version of the
    instance in order to work, some of the solutions require installing the language on the machine, and the goal of
    the script is to make it as easy as possible to run without installing anything extra or too many manual
-   configurations
-   which is one reason why this script uses JVM as most Minecraft Java Launchers already have it installed, which
-   make it easier to write a cross-platform script from a single code base, the script
+   configurations which is one reason why this script uses JVM as most Minecraft Java Launchers already have it
+   installed, which make it easier to write a cross-platform script from a single code base, the script
    will use [Java Swing](https://docs.oracle.com/javase/tutorial/uiswing/) for GUI support
    without making the bundle size larger, and we will use imports from Java when possible
 4. **Features**: The script provides some features like dark and light mode support with different themes
@@ -394,8 +432,7 @@ to use Minecraft mods with players
 3. Server and Client Flexibility, Mod-packs are usually for syncing the client side, while it's possible to get the
    updates of a Minecraft mod pack into a server, or most server hosting providers already support a wide range of
    mod-packs with one click, this script allows you to split the used mods between the server and the client or use them
-   on
-   both sides, and it can work on any server even on localhost
+   on both sides, and it can work on any server even on localhost
 4. Allow you to use a mix of mods from multiple providers, the script only needs the URL to the mod, and it can be from
    anywhere, it doesn't store anything specific about any mod provider, only the links to the mod providers which will
    be used to detect the mod provider, if it's unknown or unverified, then it will warn the user before continuing for
@@ -460,7 +497,7 @@ If you want to build from source for the latest version:
 
 1. Install the [Requirements](./CONTRIBUTING.md#-requirements)
 2. Run `./gradlew assemble` or `./gradlew.bat assemble` on **Microsoft Windows**
-3. Navigate to [dist](./dist) folder where you should find the Jar
+3. Navigate to [dist](./dist) folder where you should find the JAR files.
 
 ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
@@ -499,13 +536,7 @@ Thanks to:
 
 [Releases]: https://github.com/ellet0/kraft-sync/releases
 
-[Prism Launcher]: https://prismlauncher.org/
-
-[MultiMC Launcher]: https://multimc.org/
-
 [Minecraft Launcher]: https://www.minecraft.net/download
-
-[ATLauncher]: https://atlauncher.com/
 
 [Modrinth]: https://www.modrinth.com/
 
@@ -514,5 +545,7 @@ Thanks to:
 [Admin Utility]: ./admin/README.md
 
 [Mods Info Converter]: ./admin/README.md#-mods-info-converter
+
+[Script Installer]: ./admin/README.md#-script-installer
 
 [Contributing]: ./CONTRIBUTING.md
