@@ -15,29 +15,32 @@ import kotlin.system.exitProcess
  * */
 fun Mod.getDisplayName(): String = name ?: getFileNameFromUrlOrError(downloadUrl)
 
+private fun Mod.shouldSyncOptionalModForCurrentEnvironment() =
+    syncOptionalForCurrentEnv
+        ?: SyncInfo.instance.modSyncInfo.syncAllOptionalForCurrentEnv
+
 /**
  * If this mod should be downloaded on the current [Environment].
  *
  * For example, if this is a client side-only mod and the environment is [Environment.Server],
  * it will return false
  * */
-fun Mod.shouldSyncOnCurrentEnvironment(): Boolean {
-    // TODO: Currently, this function will always download the mod even if it's optional on both client and server.
-    //  Consider providing an option for the admin to decide if the optional mods or a specific mods will be downloaded
-    return when (ScriptConfig.getInstanceOrThrow().environment) {
+fun Mod.shouldSyncOnCurrentEnvironment(): Boolean =
+    when (ScriptConfig.getInstanceOrThrow().environment) {
         Environment.Client ->
             when (clientSupport) {
-                Mod.ModSupport.Required, Mod.ModSupport.Optional -> true
+                Mod.ModSupport.Required -> true
+                Mod.ModSupport.Optional -> shouldSyncOptionalModForCurrentEnvironment()
                 Mod.ModSupport.Unsupported -> false
             }
 
         Environment.Server ->
             when (serverSupport) {
-                Mod.ModSupport.Required, Mod.ModSupport.Optional -> true
+                Mod.ModSupport.Required -> true
+                Mod.ModSupport.Optional -> shouldSyncOptionalModForCurrentEnvironment()
                 Mod.ModSupport.Unsupported -> false
             }
     }
-}
 
 /**
  * Allow overriding the value for a specific mod, or all the mods, or use a global value for all the assets.
