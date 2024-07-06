@@ -1,9 +1,9 @@
 package syncInfo.data
 
-import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import syncInfo.models.SyncInfo
+import utils.JsonIgnoreUnknownKeys
 import utils.executeAsync
 import utils.getBodyOrThrow
 
@@ -29,7 +29,7 @@ class RemoteSyncInfoDataSource(
                 )
             }
             val responseBody: String = response.getBodyOrThrow().string()
-            val syncInfo = Json.decodeFromString<SyncInfo>(responseBody)
+            val syncInfo = JsonIgnoreUnknownKeys.decodeFromString<SyncInfo>(responseBody)
             return Result.success(syncInfo)
         } catch (e: Exception) {
             return Result.failure(e)
