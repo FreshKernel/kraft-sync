@@ -43,21 +43,21 @@ data class ModSyncInfo(
      * You will get an error from the mod loader.
      *
      * */
-    val syncOnlyForCurrentEnv: Boolean = true,
+    val syncOnlyModsForCurrentEnv: Boolean = true,
     /**
      * Indicates whether optional mods for the current [Environment] should be synced.
      *
      * Some mods might be optional to install on either server or client side or both.
      *
-     * This setting only takes effect if [syncOnlyForCurrentEnv] is `true`.
-     * If [syncOnlyForCurrentEnv] is `false`, this property has no impact.
+     * This setting only takes effect if [syncOnlyModsForCurrentEnv] is `true`.
+     * If [syncOnlyModsForCurrentEnv] is `false`, this property has no impact.
      *
-     * if [syncAllOptionalForCurrentEnv] is `false`, then will only sync the
+     * if [syncOptionalModsForCurrentEnv] is `false`, then will only sync the
      * required mods for the current system [Environment].
      *
      * @see Mod.syncOptionalForCurrentEnv
      * */
-    val syncAllOptionalForCurrentEnv: Boolean = true,
+    val syncOptionalModsForCurrentEnv: Boolean = true,
     /**
      * Determines whether the script allows the player to use mods other than those synchronized by the script.
      *

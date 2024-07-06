@@ -17,7 +17,7 @@ fun Mod.getDisplayName(): String = name ?: getFileNameFromUrlOrError(downloadUrl
 
 private fun Mod.shouldSyncOptionalModForCurrentEnvironment() =
     syncOptionalForCurrentEnv
-        ?: SyncInfo.instance.modSyncInfo.syncAllOptionalForCurrentEnv
+        ?: SyncInfo.instance.modSyncInfo.syncOptionalModsForCurrentEnv
 
 /**
  * If this mod should be downloaded on the current [Environment].

@@ -56,7 +56,7 @@ data class Mod(
      * */
     val verifyFileIntegrity: Boolean? = null,
     /**
-     * Will override [ModSyncInfo.syncAllOptionalForCurrentEnv] for a specific mod
+     * Will override [ModSyncInfo.syncOptionalModsForCurrentEnv] for a specific mod
      * */
     val syncOptionalForCurrentEnv: Boolean? = null,
 ) {

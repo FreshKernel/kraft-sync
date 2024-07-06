@@ -97,7 +97,7 @@ class ModsSyncService :
     }
 
     private fun getCurrentEnvironmentModsOrAll(mods: List<Mod>): List<Mod> {
-        if (!modSyncInfo.syncOnlyForCurrentEnv) {
+        if (!modSyncInfo.syncOnlyModsForCurrentEnv) {
             return mods
         }
         val currentEnvironmentMods =
