@@ -12,14 +12,14 @@ data class ModSyncInfo(
      * */
     val mods: List<Mod> = emptyList(),
     /**
-     * Will override [SyncInfo.shouldVerifyAssetFilesIntegrity] for the mods
+     * Will override [SyncInfo.verifyAssetFilesIntegrity] for the mods
      *
-     * See [Mod.overrideShouldVerifyFileIntegrity] to override this value for a specific mod
+     * See [Mod.verifyFileIntegrity] to override this value for a specific mod
      *
      * @see FileIntegrityInfo
      *
      * */
-    val shouldVerifyFilesIntegrity: Boolean? = null,
+    val verifyFilesIntegrity: Boolean? = null,
     /**
      * if [Environment] value is [Environment.Client] then will download/sync only the mods that'd need to be
      * on te client side like client side mods and the mods that's needed to be in both Client and Server
@@ -43,7 +43,7 @@ data class ModSyncInfo(
      * You will get an error from the mod loader.
      *
      * */
-    val shouldSyncOnlyModsForCurrentEnvironment: Boolean = true,
+    val syncOnlyForCurrentEnvironment: Boolean = true,
     /**
      * Determines whether the script allows the player to use mods other than those synchronized by the script.
      *
@@ -58,7 +58,7 @@ data class ModSyncInfo(
      *  however the user can still install (sodium.jar) resulting in mod duplication which will cause the game to not run
      *  (for most mod loaders), we can solve this by reading the mod id from the jar and make sure there are no duplication
      * */
-    val allowUsingOtherMods: Boolean = false,
+    val allowUsingOthers: Boolean = false,
     /**
      * Specifies a suffix to append to the file names of mods downloaded by the script,
      * allowing the script to distinguish
@@ -66,16 +66,16 @@ data class ModSyncInfo(
      * For example, a mod file might be saved as `my-mod.synced.jar`
      * instead of `my-mod.jar`.
      *
-     * This will allow [allowUsingOtherMods] to check if a mod is installed by the script or the player.
+     * This will allow [allowUsingOthers] to check if a mod is installed by the script or the player.
      *
      * Pass `null` if you want to disable this and install the mod with the file name just like how it's on the source.
-     * In that case make sure to not pass `true` to [allowUsingOtherMods] because it won't work.
+     * In that case make sure to not pass `true` to [allowUsingOthers] because it won't work.
      *
      * If you want to change it to something like `my-mod.sync.jar` pass `.sync` instead
      *
      * if there is already existing players that has the installed mods with a specific [fileSyncMarker] and you change
      * it from (`.synced` to `.sync` for example), then the script would identify the mods with (`.sync`) as mods
-     * installed by the player resulting in duplication, However, this occurs only if [allowUsingOtherMods] is true, otherwise
+     * installed by the player resulting in duplication, However, this occurs only if [allowUsingOthers] is true, otherwise
      * will be deleted and downloaded again in case of this changed
      * */
     val fileSyncMarker: String? = ".synced",

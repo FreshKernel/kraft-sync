@@ -51,10 +51,10 @@ data class Mod(
      * */
     val description: String? = null,
     /**
-     * Will override [ModSyncInfo.shouldVerifyFilesIntegrity] and [SyncInfo.shouldVerifyAssetFilesIntegrity]
+     * Will override [ModSyncInfo.verifyFilesIntegrity] and [SyncInfo.verifyAssetFilesIntegrity]
      * for a specific mod
      * */
-    val overrideShouldVerifyFileIntegrity: Boolean? = null,
+    val verifyFileIntegrity: Boolean? = null,
 ) {
     @Serializable
     enum class ModSupport {

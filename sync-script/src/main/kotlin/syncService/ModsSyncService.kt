@@ -26,9 +26,6 @@ import kotlin.io.path.name
 // TODO: Use JarFile(modFile).manifest.mainAttributes to read the mod name, id and some info to solve the duplicating
 //  mods issue when allowing the user to install other mods
 
-// TODO: Review the classes ModSyncInfo, Mod and ModsSyncService to be consistent with classes related
-//  to Resource Pack feature (e.g, ResourcePack, ResourcePackSyncInfo, ResourcePacksSyncService)
-
 class ModsSyncService :
     AssetSyncService(
         assetDirectory = SyncScriptDotMinecraftFiles.Mods.path,
@@ -100,7 +97,7 @@ class ModsSyncService :
     }
 
     private fun getCurrentEnvironmentModsOrAll(mods: List<Mod>): List<Mod> {
-        if (!modSyncInfo.shouldSyncOnlyModsForCurrentEnvironment) {
+        if (!modSyncInfo.syncOnlyForCurrentEnvironment) {
             return mods
         }
         val currentEnvironmentMods =
@@ -228,7 +225,7 @@ class ModsSyncService :
 
     private suspend fun getScriptLocalModFilePathsOrAll(): List<Path> =
         getScriptLocalAssetFilePathsOrAll(
-            allowUsingOtherAssets = modSyncInfo.allowUsingOtherMods,
+            allowUsingOtherAssets = modSyncInfo.allowUsingOthers,
             isScriptAssetFile = { isScriptModFile(it) },
         )
 }

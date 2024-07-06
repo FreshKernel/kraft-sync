@@ -24,7 +24,7 @@ data class SyncInfo(
      * Will only validate the file name
      *
      */
-    val shouldVerifyAssetFilesIntegrity: Boolean = true,
+    val verifyAssetFilesIntegrity: Boolean = true,
     /**
      * The method/option preferred to validate the assets, will fall back to other methods if not available
      *
