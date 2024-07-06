@@ -23,8 +23,8 @@ class RemoteSyncInfoDataSource(
             val response = client.newCall(request).executeAsync()
             if (!response.isSuccessful) {
                 return Result.failure(
-                    RuntimeException(
-                        "Unknown error while getting the sync info data. status code: ${response.code}, body: ${response.body?.string()}",
+                    IllegalStateException(
+                        "Unknown error while getting the sync info data. status code: ${response.code}.",
                     ),
                 )
             }

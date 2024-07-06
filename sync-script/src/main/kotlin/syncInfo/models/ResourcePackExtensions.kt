@@ -18,8 +18,8 @@ fun ResourcePack.getDisplayName(): String = name ?: getFileNameFromUrlOrError(do
  * Allow overriding the value for a specific resource-pack, or all the resource-packs, or use a global value for all the assets.
  * */
 fun ResourcePack.shouldVerifyFileIntegrity(): Boolean =
-    overrideShouldVerifyFileIntegrity ?: SyncInfo.instance.resourcePackSyncInfo.shouldVerifyFilesIntegrity
-        ?: SyncInfo.instance.shouldVerifyAssetFilesIntegrity
+    verifyFileIntegrity ?: SyncInfo.instance.resourcePackSyncInfo.verifyFilesIntegrity
+        ?: SyncInfo.instance.verifyAssetFilesIntegrity
 
 suspend fun ResourcePack.hasValidFileIntegrityOrError(resourcePackFilePath: Path): Boolean? =
     this.fileIntegrityInfo.hasValidIntegrity(filePath = resourcePackFilePath).getOrElse {

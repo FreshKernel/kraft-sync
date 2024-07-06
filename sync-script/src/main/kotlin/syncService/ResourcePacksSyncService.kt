@@ -64,7 +64,7 @@ class ResourcePacksSyncService :
             totalResourcePacks = resourcePacks,
         )
 
-        if (resourcePackSyncInfo.shouldApplyResourcePacks) {
+        if (resourcePackSyncInfo.applyResourcePacks) {
             applyResourcePacks()
         }
 
@@ -195,7 +195,7 @@ class ResourcePacksSyncService :
             resourcePacks =
                 buildList {
                     builtInOptionsResourcePacks?.let { addAll(it) }
-                    if (resourcePackSyncInfo.allowUsingOtherResourcePacks) {
+                    if (resourcePackSyncInfo.allowUsingOthers) {
                         val userOptionsResourcePacks =
                             optionsResourcePacks?.filter {
                                 it is MinecraftOptionsManager.ResourcePack.File &&
@@ -225,7 +225,7 @@ class ResourcePacksSyncService :
 
     private suspend fun getScriptLocalResourcePackFilePathsOrAll(): List<Path> =
         getScriptLocalAssetFilePathsOrAll(
-            allowUsingOtherAssets = resourcePackSyncInfo.allowUsingOtherResourcePacks,
+            allowUsingOtherAssets = resourcePackSyncInfo.allowUsingOthers,
             isScriptAssetFile = { isScriptResourcePackFile(resourcePackFilePath = it) },
         )
 }

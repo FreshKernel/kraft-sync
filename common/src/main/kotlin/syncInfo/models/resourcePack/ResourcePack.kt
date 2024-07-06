@@ -20,8 +20,8 @@ data class ResourcePack(
      * */
     val name: String? = null,
     /**
-     * Will override [ResourcePackSyncInfo.shouldVerifyFilesIntegrity] and [SyncInfo.shouldVerifyAssetFilesIntegrity]
+     * Will override [ResourcePackSyncInfo.verifyFilesIntegrity] and [SyncInfo.verifyAssetFilesIntegrity]
      * for a specific resource-pack
      * */
-    val overrideShouldVerifyFileIntegrity: Boolean? = null,
+    val verifyFileIntegrity: Boolean? = null,
 )
