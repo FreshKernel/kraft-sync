@@ -38,10 +38,11 @@ import kotlin.io.path.exists
 import kotlin.io.path.pathString
 import kotlin.system.exitProcess
 
-val scriptConfigDataSource: ScriptConfigDataSource = LocalJsonScriptConfigDataSource()
-val scriptPreferencesDataSource: ScriptPreferencesDataSource = SystemScriptPreferencesDataSource()
+private val scriptConfigDataSource: ScriptConfigDataSource = LocalJsonScriptConfigDataSource()
+private val scriptPreferencesDataSource: ScriptPreferencesDataSource = SystemScriptPreferencesDataSource()
 
 lateinit var passedArgs: Array<String>
+    private set
 
 suspend fun main(args: Array<String>) {
     val applicationExecutionTimer = ExecutionTimer()
@@ -102,7 +103,7 @@ suspend fun main(args: Array<String>) {
     finalize(applicationExecutionTimer = applicationExecutionTimer)
 }
 
-fun logSystemInfo() {
+private fun logSystemInfo() {
     when (OperatingSystem.current) {
         OperatingSystem.Linux -> "\uD83D\uDC27 You are using Linux with the desktop environment ${LinuxDesktopEnvironment.current}. Enjoy!"
         OperatingSystem.MacOS -> "\uD83C\uDF4F You are using macOS \uF8FF. Welcome to the world of Apple \uD83C\uDF4E."
@@ -119,7 +120,7 @@ fun logSystemInfo() {
     }
 }
 
-fun handleTemporaryDirectory(isStart: Boolean) {
+private fun handleTemporaryDirectory(isStart: Boolean) {
     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
         if (exists()) {
             println(
@@ -135,7 +136,7 @@ fun handleTemporaryDirectory(isStart: Boolean) {
     }
 }
 
-suspend fun loadScriptConfig(): ScriptConfig {
+private suspend fun loadScriptConfig(): ScriptConfig {
     val scriptConfigFile = SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig.path
     if (!scriptConfigFile.exists()) {
         if (GuiState.isGuiEnabled) {
@@ -191,13 +192,13 @@ suspend fun loadScriptConfig(): ScriptConfig {
     return scriptConfig
 }
 
-suspend fun handleAutoUpdate(scriptConfig: ScriptConfig) {
+private suspend fun handleAutoUpdate(scriptConfig: ScriptConfig) {
     if (scriptConfig.autoUpdateEnabled) {
         JarAutoUpdater.updateIfAvailable()
     }
 }
 
-suspend fun requestOptionalPreferences() {
+private suspend fun requestOptionalPreferences() {
     // TODO: Plan if we should implement this in non GUI mode
     val isPreferencesConfiguredFilePath = SyncScriptDotMinecraftFiles.SyncScriptData.IsPreferencesConfigured.path
     if (GuiState.isGuiEnabled && !isPreferencesConfiguredFilePath.exists()) {
@@ -222,7 +223,7 @@ suspend fun requestOptionalPreferences() {
     }
 }
 
-suspend fun fetchSyncInfo() {
+private suspend fun fetchSyncInfo() {
     LoadingIndicatorDialog.instance?.apply {
         isVisible = true
         updateComponentProperties(
@@ -259,7 +260,7 @@ suspend fun fetchSyncInfo() {
     )
 }
 
-suspend fun handleAdminTrustCheck() {
+private suspend fun handleAdminTrustCheck() {
     // TODO: Plan on how we will implement this in non GUI mode
     if (GuiState.isGuiEnabled && Constants.Features.TRUST_ADMIN_ENABLED) {
         val currentDoesUserTrustThisSource =
@@ -296,7 +297,7 @@ suspend fun handleAdminTrustCheck() {
     }
 }
 
-suspend fun performSyncServices(scriptConfig: ScriptConfig) {
+private suspend fun performSyncServices(scriptConfig: ScriptConfig) {
     val syncServices: List<SyncService> =
         buildList {
             add(ModsSyncService())
@@ -309,7 +310,7 @@ suspend fun performSyncServices(scriptConfig: ScriptConfig) {
     syncServices.forEach { it.syncData() }
 }
 
-fun finalize(applicationExecutionTimer: ExecutionTimer) {
+private fun finalize(applicationExecutionTimer: ExecutionTimer) {
     // Finish the script
 
     LoadingIndicatorDialog.instance?.isVisible = false
