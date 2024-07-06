@@ -76,7 +76,7 @@ info.
 
 ## ✨ Features
 
-List the key features of the script
+List the key features of the project:
 
 - 🛠️ **Easy to Use**: Simple and customizable for various needs.
 - 🔍 **Validation Methods**: Various ways to validate assets or disable file integrity checks.
@@ -125,13 +125,13 @@ a launcher that supports the following features for optimal experience:
       **instance/profile** has its own data
       (e.g., worlds, servers, mods, resource-packs, shaders, mod loader, game version)
       which allow the player to switch between them
-    - **Why is it recommended**: The player can have more flexibility, this feature allows not affecting
+    - **Why it’s recommended**: The player can have more flexibility, this feature allows not affecting
       their own data in case if they want to join your **modded server**.
 2. **Hooks/Custom Commands**
     - **What it does**: Supports running **commands/hooks** to allow executing the script before launching the game.
       Each instance supports running a command or executing something and waiting for the
       result before launching the game
-    - **Why is it recommended**: To allow executing the script before launching the game for seamless experience, this
+    - **Why it’s recommended**: To allow executing the script before launching the game for seamless experience, this
       allows launching the game without doing anything else.
       Like running the script each time before launching the game manually.
 3. **Hooks/Custom commands environment variables**:
@@ -139,7 +139,7 @@ a launcher that supports the following features for optimal experience:
       make the instance/profile portable to the players**.
       The player only has to install the launcher, download the exported **instance/profile**, import it and launch
       the game.
-    - **Why is it recommenced**: To avoid hardcoding the paths as each player has their own user profile/name and might
+    - **Why it’s recommended**: To avoid hardcoding the paths as each player has their own user profile/name and might
       have a different **operating system** or installed the launcher to somewhere else other than the default.
 
       The following environment variables are recommended:
@@ -270,7 +270,7 @@ answer.
 3. [**Is there a GUI for admins?**](#q3)
 4. [**I have an issue/bug or feature request**](#q4)
 5. [**What happens to the old script?**](#q5)
-6. [**Why is the JAR file size not smaller?**](#q6)
+6. [**Can the JAR file be smaller?**](#q6)
 7. [**Why not Mod packs?**](#q7)
 8. [**Will there be Bedrock support?**](#q8)
 
