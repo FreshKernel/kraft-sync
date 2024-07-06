@@ -164,20 +164,40 @@ object JarAutoUpdater {
             }
 
             OperatingSystem.Windows -> {
-                // On Windows, we can't rename, delete or modify the current running JAR file due to file locking
+                // On Windows, we can't rename, delete or modify the current running JAR file due to file locking.
+                // Will create a batch script, execute it in a different windows process
+                // and close the application immediately; the batch script expects
+                // the application to be closed after a short delay.
+                // The batch script will handle the update process
+
                 val updateBatScriptFile =
                     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path
                         .resolve("update.bat")
                 withContext(Dispatchers.IO) {
                     updateBatScriptFile.createFileWithParentDirectoriesOrTerminate()
                 }
+                val secondsToWait = 2
+
+                val windowTitle = "Update Complete"
+                val message = "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version."
+                // TODO: This file can't be deleted in the same batch script
+                val messageVbsFilePath =
+                    SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path
+                        .resolve("updateMessage.vbs")
+
                 updateBatScriptFile.writeText(
                     """
                     @echo off
-                    echo Waiting for 2 seconds to ensure application closure...
-                    timeout /t 2 > nul
+                    
+                    echo Waiting for $secondsToWait seconds to ensure application closure...
+                    timeout /t $secondsToWait > nul
                     del "${currentRunningJarFilePath.absolutePathString()}"
                     move "${newJarFilePath.absolutePathString()}" "${currentRunningJarFilePath.absolutePathString()}"
+                    
+                    echo MsgBox "$message", 64, "$windowTitle" > "${messageVbsFilePath.absolutePathString()}"
+                    cscript //nologo "${messageVbsFilePath.absolutePathString()}"
+                    del "${messageVbsFilePath.absolutePathString()}"
+
                     exit
                     """.trimIndent(),
                 )
