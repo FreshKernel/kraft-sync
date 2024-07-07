@@ -11,5 +11,6 @@ interface SyncScriptInstaller {
         launcher: MinecraftLauncher,
         launcherInstanceDirectoryPathString: String,
         confirmReplaceExistingPreLaunchCommand: Boolean,
+        shouldEnableGui: Boolean,
     ): SyncScriptInstallationResult
 }

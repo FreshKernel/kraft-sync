@@ -2,6 +2,7 @@ package services.syncScriptInstaller
 
 import constants.DotMinecraftFileNames
 import constants.ProjectInfoConstants
+import constants.SharedConstants
 import launchers.LauncherDataSource
 import launchers.LauncherDataSourceFactory
 import launchers.MinecraftLauncher
@@ -17,6 +18,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
         launcher: MinecraftLauncher,
         launcherInstanceDirectoryPathString: String,
         confirmReplaceExistingPreLaunchCommand: Boolean,
+        shouldEnableGui: Boolean,
     ): SyncScriptInstallationResult {
         return try {
             if (launcherInstanceDirectoryPathString.isBlank()) {
@@ -99,28 +101,42 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                 }
             }
 
-            val newCommand =
+            // Without arguments
+            val newLaunchCommand =
                 when (launcher) {
                     MinecraftLauncher.Official -> throw NotImplementedError()
                     MinecraftLauncher.MultiMc, MinecraftLauncher.PrismLauncher, MinecraftLauncher.ATLauncher ->
                         "\$INST_JAVA -jar \$INST_MC_DIR/$newSyncScriptJarFileName"
 
-                    MinecraftLauncher.ModrinthApp -> TODO()
+                    MinecraftLauncher.ModrinthApp -> TODO() // TODO: https://github.com/modrinth/code/pull/1254
                     MinecraftLauncher.GDLauncher -> TODO()
                 }
 
-            val newCommandToSet = if (installationConfig is SyncScriptInstallationConfig.Install) newCommand else null
+            // With arguments
+            val newFullCommand =
+                buildString {
+                    append(newLaunchCommand)
+                    if (!shouldEnableGui) {
+                        append(" ${SharedConstants.DISABLE_GUI_ARG_NAME}")
+                    }
+                }
+
+            val newCommandToSet = if (installationConfig is SyncScriptInstallationConfig.Install) newFullCommand else null
 
             val currentCommand =
                 launcherDataSource
                     .getPreLaunchCommand(launcherInstanceDirectoryPath = launcherInstanceDirectoryPath)
                     .getOrThrow()
 
-            if ((currentCommand != null && currentCommand != newCommand) && !confirmReplaceExistingPreLaunchCommand) {
-                return SyncScriptInstallationResult.RequiresUserConfirmationToReplacePreLaunchCommand(
-                    existingCommand = currentCommand,
-                    newCommand = newCommandToSet.toString(),
-                )
+            if (!confirmReplaceExistingPreLaunchCommand) {
+                // If there is already a command exists, confirm if the user wants to replace the current
+                // unless if the command is used to launch the script that the user trying to install
+                if ((currentCommand != null && !currentCommand.startsWith(newLaunchCommand))) {
+                    return SyncScriptInstallationResult.RequiresUserConfirmationToReplacePreLaunchCommand(
+                        existingCommand = currentCommand,
+                        newCommand = newCommandToSet.toString(),
+                    )
+                }
             }
 
             launcherDataSource

@@ -1,6 +1,7 @@
 package config.models
 
 import constants.Constants
+import constants.SharedConstants
 import constants.SyncScriptDotMinecraftFiles
 import gui.theme.Theme
 import gui.theme.ThemeMode
@@ -22,14 +23,14 @@ data class ScriptConfig(
     val syncInfoUrl: String,
     /**
      * Override the value set using launch arguments, by default,
-     * the script will use [Constants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT] if GUI mode supported.
+     * the script will use [SharedConstants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT] if GUI mode supported.
      *
      * If not, then will automatically disable the GUI mode.
      *
-     * If you want to explicit disable the GUI mode, use [Constants.DISABLE_GUI_ARG_NAME] instead of overriding it
+     * If you want to explicit disable the GUI mode, use [SharedConstants.DISABLE_GUI_ARG_NAME] instead of overriding it
      * in here because if an error occurred while loading [ScriptConfig] from the file,
      * we will fall back to use the one from application arguments if set,
-     * if not then will use [Constants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT]
+     * if not then will use [SharedConstants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT]
      * if GUI is supported, otherwise will disable the GUI.
      *
      * This will **only take effect** after loading the [ScriptConfig].

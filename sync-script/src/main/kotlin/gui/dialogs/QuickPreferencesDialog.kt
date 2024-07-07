@@ -1,7 +1,7 @@
 package gui.dialogs
 
 import config.models.ScriptConfig
-import constants.Constants
+import constants.SharedConstants
 import gui.GuiState
 import gui.components.labeledInputField
 import gui.theme.Theme
@@ -86,14 +86,14 @@ class QuickPreferencesDialog : JDialog() {
                         text("Check to enable the graphical user interface (GUI) version of the script.")
                         newLines(2)
                         text("Consider using ")
-                        boldText(Constants.DISABLE_GUI_ARG_NAME)
+                        boldText(SharedConstants.DISABLE_GUI_ARG_NAME)
                         text(" as a launch argument to disable the GUI. This ensures smooth execution, ")
                         text("avoiding potential unexpected behavior during configuration file loading.")
                         newLines(2)
                         text("Because this property will be stored in the config file, if an error happened while loading the ")
                         text("config file and your system support GUI,")
                         newLine()
-                        if (Constants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT) {
+                        if (SharedConstants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT) {
                             text("will use GUI mode even if you specified to not use it in the config file.")
                         } else {
                             text("will not GUI mode even if you specified to use it in the config file.")

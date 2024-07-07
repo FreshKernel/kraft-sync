@@ -1,16 +1,16 @@
 package gui
 
 import config.models.ScriptConfig
-import constants.Constants
+import constants.SharedConstants
 import passedArgs
 import java.awt.GraphicsEnvironment
 
 object GuiState {
     /**
-     * By default, will load it from the program arguments by [Constants.DISABLE_GUI_ARG_NAME]
+     * By default, will load it from the program arguments by [SharedConstants.DISABLE_GUI_ARG_NAME]
      * the value can be overridden using [ScriptConfig.guiEnabled] when the [ScriptConfig] is initialized
      * */
-    var isGuiEnabled: Boolean = Constants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT
+    var isGuiEnabled: Boolean = SharedConstants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT
         private set
 
     /**
@@ -25,7 +25,7 @@ object GuiState {
             return
         }
         // Check if the user overrides the default value in the launch arguments
-        val isDisableGuiArgumentPassed = passedArgs.isNotEmpty() && passedArgs[0] == Constants.DISABLE_GUI_ARG_NAME
+        val isDisableGuiArgumentPassed = passedArgs.isNotEmpty() && passedArgs[0] == SharedConstants.DISABLE_GUI_ARG_NAME
         if (isDisableGuiArgumentPassed) {
             isGuiEnabled = false
             return
