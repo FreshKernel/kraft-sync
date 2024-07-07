@@ -189,7 +189,7 @@ class ModsConverterTab : Tab() {
                     is ModsConvertError.CouldNotConvertMods -> {
                         GuiUtils.showErrorMessage(
                             title = "❌ Error Converting Mods",
-                            message = "An error occurred while converting the mods \uD83D\uDEE0: ${result.error.message}️",
+                            message = "An error occurred while converting the mods: ${result.error.message}",
                             parentComponent = this@ModsConverterTab,
                         )
                     }

@@ -25,7 +25,6 @@ import syncService.ResourcePacksSyncService
 import syncService.ServersSyncService
 import syncService.SyncService
 import utils.ExecutionTimer
-import utils.HttpService
 import utils.SystemInfoProvider
 import utils.createFileWithParentDirectoriesOrTerminate
 import utils.deleteRecursivelyWithLegacyJavaIo
@@ -234,10 +233,7 @@ private suspend fun fetchSyncInfo() {
         )
     }
 
-    val syncInfoDataSource: SyncInfoDataSource =
-        RemoteSyncInfoDataSource(
-            client = HttpService.client,
-        )
+    val syncInfoDataSource: SyncInfoDataSource = RemoteSyncInfoDataSource()
 
     SyncInfo.instance =
         syncInfoDataSource
