@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.Request
 import okio.buffer
 import okio.sink
+import services.HttpClient
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import kotlin.io.path.exists
@@ -51,11 +52,25 @@ class FileDownloader(
 
         return withContext(Dispatchers.IO) {
             try {
-                val response = HttpService.client.newCall(request).executeAsync()
+                val response = HttpClient.okHttpClient.newCall(request).executeAsync()
                 if (!response.isSuccessful) {
                     showErrorMessageAndTerminate(
                         title = "Failed to download",
-                        message = "Response status: ${response.code}, response body : ${response.body?.string()}",
+                        message =
+                            buildHtml {
+                                boldText("Response status: ")
+                                text(response.code.toString())
+                                newLine()
+                                response.body?.let {
+                                    boldText("Response Body: ")
+                                    text(it.string())
+                                }
+                                if (response.message.isNotBlank()) {
+                                    newLine()
+                                    boldText("Http Status message: ")
+                                    text(response.message)
+                                }
+                            }.buildBodyAsText(),
                     )
                 }
 

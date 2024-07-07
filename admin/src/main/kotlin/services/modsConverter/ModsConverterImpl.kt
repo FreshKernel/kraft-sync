@@ -91,7 +91,7 @@ class ModsConverterImpl : ModsConverter {
                         return ModsConvertResult.Failure(
                             error =
                                 ModsConvertError.CouldNotConvertMods(
-                                    message = it.toString(),
+                                    message = it.message.toString(),
                                     exception = it,
                                 ),
                         )

@@ -6,17 +6,15 @@ import generated.BuildConfig
 import gui.dialogs.LoadingIndicatorDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Request
+import services.HttpClient
+import services.HttpResponse
 import utils.FileDownloader
-import utils.HttpService
 import utils.SystemInfoProvider
 import utils.buildHtml
 import utils.convertBytesToReadableMegabytesAsString
 import utils.createFileWithParentDirectoriesOrTerminate
 import utils.deleteExistingOrTerminate
-import utils.executeAsync
 import utils.executeBatchScriptInSeparateWindow
-import utils.getBodyOrThrow
 import utils.getRunningJarFilePath
 import utils.moveToOrTerminate
 import utils.os.OperatingSystem
@@ -76,32 +74,25 @@ object JarAutoUpdater {
             Result.failure(e)
         }
 
-    private suspend fun getLatestProjectVersion(): Result<String?> =
-        try {
-            val url = ProjectInfoConstants.LIBS_VERSIONS_TOML_FILE_URL
-            println("\uD83D\uDCE5 Sending GET request to: $url")
-            val request =
-                Request
-                    .Builder()
-                    .url(url)
-                    .get()
-                    .build()
-            val response = HttpService.client.newCall(request).executeAsync()
-            val responseBody: String = response.getBodyOrThrow().string()
+    private suspend fun getLatestProjectVersion(): Result<String?> {
+        val url = ProjectInfoConstants.LIBS_VERSIONS_TOML_FILE_URL
+        println("\uD83D\uDCE5 Sending GET request to: $url")
+        return when (val response = HttpClient.get(url = url)) {
+            is HttpResponse.Success -> {
+                val projectVersionRegex = Regex("""project\s*=\s*"(.+?)"""")
 
-            val projectVersionRegex = Regex("""project\s*=\s*"(.+?)"""")
-
-            val projectVersion =
-                projectVersionRegex
-                    .find(responseBody)
-                    ?.groups
-                    ?.get(1)
-                    ?.value
-            Result.success(projectVersion)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
+                val projectVersion =
+                    projectVersionRegex
+                        .find(response.body)
+                        ?.groups
+                        ?.get(1)
+                        ?.value
+                Result.success(projectVersion)
+            }
+            is HttpResponse.HttpFailure -> Result.failure(response.exception())
+            is HttpResponse.UnknownError -> Result.failure(response.exception)
         }
+    }
 
     private suspend fun shouldUpdate(): Boolean {
         LoadingIndicatorDialog.instance?.updateComponentProperties(
