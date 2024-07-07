@@ -113,7 +113,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                 }
 
             // With arguments
-            val newFullCommand =
+            val newFullCommandWithArgs =
                 buildString {
                     append(newLaunchCommand)
                     if (!shouldEnableGui) {
@@ -121,7 +121,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
                     }
                 }
 
-            val newCommandToSet = if (installationConfig is SyncScriptInstallationConfig.Install) newFullCommand else null
+            val newCommandToSet = if (installationConfig is SyncScriptInstallationConfig.Install) newFullCommandWithArgs else null
 
             val currentCommand =
                 launcherDataSource
