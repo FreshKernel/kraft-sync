@@ -1,6 +1,7 @@
 package gui.tabs
 
 import constants.ProjectInfoConstants
+import constants.SharedConstants
 import gui.Tab
 import gui.components.instanceDirectoryInputField
 import gui.components.labeledInputField
@@ -24,6 +25,7 @@ import services.syncScriptInstaller.SyncScriptInstallationResult
 import services.syncScriptInstaller.SyncScriptInstallerInstance
 import utils.buildHtml
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JFileChooser
@@ -36,6 +38,7 @@ class SyncScriptInstallerTab : Tab() {
 
     private val launcherInstanceDirectoryComboBox: JComboBox<ComboItem<Instance>> = JComboBox()
     private val launcherComboBox: JComboBox<MinecraftLauncher> = JComboBox()
+    private val shouldEnableGuiCheckBox: JCheckBox = JCheckBox()
 
     init {
         setupTabContent()
@@ -72,6 +75,20 @@ class SyncScriptInstallerTab : Tab() {
                 launcherComboBox = launcherComboBox,
                 preferredLabelWidth = PREFERRED_LABEL_WIDTH,
                 parentComponent = this@SyncScriptInstallerTab,
+            ),
+            labeledInputField(
+                labelText = "Enable GUI",
+                tooltipText =
+                    buildHtml {
+                        text("Check to enable the graphical user interface (GUI) version of the script.")
+                        newLine()
+                        text("The GUI mode will be automatically disabled if the system doesn't support it.")
+                    }.buildAsText(),
+                inputComponent =
+                    shouldEnableGuiCheckBox.apply {
+                        isSelected = SharedConstants.GUI_ENABLED_WHEN_AVAILABLE_DEFAULT
+                    },
+                preferredLabelWidth = PREFERRED_LABEL_WIDTH,
             ).padding(bottom = 24),
             row(
                 JButton("Install").onClick {
@@ -121,6 +138,7 @@ class SyncScriptInstallerTab : Tab() {
                     (launcherInstanceDirectoryComboBox.selectedItem as? String).orEmpty(),
                 launcher = launcherComboBox.getSelectedItemOrThrow(),
                 confirmReplaceExistingPreLaunchCommand = confirmReplaceExistingPreLaunchCommand,
+                shouldEnableGui = shouldEnableGuiCheckBox.isSelected,
             )
         when (result) {
             is SyncScriptInstallationResult.Failure -> {

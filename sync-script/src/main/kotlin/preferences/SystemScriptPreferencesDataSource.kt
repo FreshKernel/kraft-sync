@@ -12,26 +12,24 @@ class SystemScriptPreferencesDataSource : ScriptPreferencesDataSource {
 
     private val preferences = Preferences.userRoot()
 
-    override suspend fun doesUserTrustSource(sourceUrl: String): Result<Boolean> {
-        return try {
+    override suspend fun doesUserTrustSource(sourceUrl: String): Result<Boolean> =
+        try {
             val result = preferences.getBoolean(getDoesUserTrustSourceOfUrl(sourceUrl), false)
             Result.success(result)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 
     override suspend fun updateDoesUserTrustSource(
         sourceUrl: String,
         newValue: Boolean,
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> =
+        try {
             val result = preferences.putBoolean(getDoesUserTrustSourceOfUrl(sourceUrl), newValue)
             Result.success(result)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.failure(e)
         }
-    }
 }
