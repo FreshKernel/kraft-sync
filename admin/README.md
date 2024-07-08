@@ -35,7 +35,7 @@ way, the script will get information like the hashing, the mod side (if it's ser
 (required) and all the available information like the mod name
 
 if you have a launcher that have downloading mods directly from the launcher, and it's not supported in this list, feel
-free to submit a feature request in the [issues](https://github.com/ellet0/kraft-sync/issues)
+free to submit a feature request in the [issues](https://github.com/FreshKernel/kraft-sync/issues)
 
 ### ⭐️ Important for mods uploaded to Curse Forge:
 

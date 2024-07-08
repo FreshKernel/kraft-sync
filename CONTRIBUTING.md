@@ -8,7 +8,7 @@ changes
 and commit them, then push the branch to your fork, and you will get a link to send a PR to the upstream repository
 
 If you don't have anything specific in mind to improve or fix, you can take a look at
-the [issues](https://github.com/ellet0/kraft-sync/issues) or take a look at
+the [issues](https://github.com/FreshKernel/kraft-sync/issues) or take a look at
 the todos of the project, they all start with `TODO:` so you can search in your IDE or use the todos tab of the IDE
 
 > We highly recommend contacting us if you're planning to make big changes.
@@ -47,7 +47,7 @@ To set up your IDE for this project, so you can test the changes:
 <summary>IntelliJ IDEA Community Edition</summary>
 Use one of the shared run configurations of IntelliJ IDEA in `.idea` which will be available in:
 
-![IntelliJ IDEA Run Configurations](https://github.com/ellet0/kraft-sync/assets/73608287/e852c5c7-2133-4c96-95b4-2daa75f5464e)
+![IntelliJ IDEA Run Configurations](https://github.com/FreshKernel/kraft-sync/assets/73608287/e852c5c7-2133-4c96-95b4-2daa75f5464e)
 
 <details>
 <summary>Or if you want to add custom run configurations</summary>

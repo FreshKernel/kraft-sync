@@ -1,15 +1,15 @@
 # Kraft Sync Script ⛏️🔄
 
-![GitHub Release](https://img.shields.io/github/v/release/ellet0/kraft-sync)
-![GitHub Pre-Release](https://img.shields.io/github/v/release/ellet0/kraft-sync?include_prereleases&label=pre-release)
-![License](https://img.shields.io/github/license/ellet0/kraft-sync)
-![Build and test](https://github.com/ellet0/kraft-sync/actions/workflows/build.yml/badge.svg?branch=main)
-![GitHub repo size](https://img.shields.io/github/repo-size/ellet0/kraft-sync)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ellet0/kraft-sync)
+![GitHub Release](https://img.shields.io/github/v/release/FreshKernel/kraft-sync)
+![GitHub Pre-Release](https://img.shields.io/github/v/release/FreshKernel/kraft-sync?include_prereleases&label=pre-release)
+![License](https://img.shields.io/github/license/FreshKernel/kraft-sync)
+![Build and test](https://github.com/FreshKernel/kraft-sync/actions/workflows/build.yml/badge.svg?branch=main)
+![GitHub repo size](https://img.shields.io/github/repo-size/FreshKernel/kraft-sync)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/FreshKernel/kraft-sync)
 ![JAR Size](https://img.shields.io/badge/JAR_Size-2.8_MB-blue)
 ![Obfuscated JAR Size](https://img.shields.io/badge/Obfuscated_JAR_Size-1.78_MB-blue)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ellet0/kraft-sync/total)
-![GitHub Repo stars](https://img.shields.io/github/stars/ellet0/kraft-sync)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/FreshKernel/kraft-sync/total)
+![GitHub Repo stars](https://img.shields.io/github/stars/FreshKernel/kraft-sync)
 
 AN **experimental** lightweight & simple and quick script that helps you to sync the content of a **Minecraft Java
 instance**.
@@ -30,7 +30,7 @@ The script will sync the following:
 If you're a player interested in joining a server, **make sure you trust the server administration** on this
 matter—unless you're confident you know what you're doing.
 
-![Screenshot](https://github.com/ellet0/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
+![Screenshot](https://github.com/FreshKernel/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
 
 The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
 instructions if there is any breaking change in each release. Some features might not be available yet, or unstable.
@@ -358,7 +358,7 @@ custom URL.
 <details>
 <summary id="q4">I have an issue/bug or feature request</summary>
 
-File an issue in the [issues](https://github.com/ellet0/kraft-sync/issues) with detailed information as much as you can,
+File an issue in the [issues](https://github.com/FreshKernel/kraft-sync/issues) with detailed information as much as you can,
 with the error and what are you trying to do and how to reproduce it.
 We will do our best to help fix it.
 
@@ -372,7 +372,7 @@ We have another script called [MC Mods Sync](https://github.com/ellet0/mc-mods-s
 which is limited to syncing the mods only, requiring the admin
 to upload the mods on GitHub and then download them,
 other than many issues we discussed like storage limitation and LICENSE
-issues, it's easier to set up and maintain for the admin side yet less flexible
+issues, it's easier to set up and maintain the admin side yet less flexible
 and simpler.
 
 </details>
@@ -534,7 +534,7 @@ Thanks to:
 
 [Kotlin]: https://kotlinlang.org/
 
-[Releases]: https://github.com/ellet0/kraft-sync/releases
+[Releases]: https://github.com/FreshKernel/kraft-sync/releases
 
 [Minecraft Launcher]: https://www.minecraft.net/download
 

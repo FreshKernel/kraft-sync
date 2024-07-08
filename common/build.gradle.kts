@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.ktlint)
 }
 
-group = "net.freshplatform"
+group = "org.freshkernel"
 version = libs.versions.project.get()
 
 dependencies {
