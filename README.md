@@ -32,7 +32,8 @@ matter—unless you're confident you know what you're doing.
 
 ![Screenshot](https://github.com/FreshKernel/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
 
-The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
+> [!CAUTION]
+> The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
 instructions if there is any breaking change in each release. Some features might not be available yet, or unstable.
 
 **Kraft Sync is not affiliated
@@ -67,6 +68,7 @@ a public download URL for the mod (e.g, **Modrinth**) and it will download the m
 You don't have to do that manually, see [Mods Info Converter] 💾 for more
 info.
 
+> [!TIP]
 > Kraft Sync
 > <img src="common/src/main/resources/apple.png" height="30px" align="center"/> <br>
 > The meaning of this name:

@@ -11,6 +11,7 @@ If you don't have anything specific in mind to improve or fix, you can take a lo
 the [issues](https://github.com/FreshKernel/kraft-sync/issues) or take a look at
 the todos of the project, they all start with `TODO:` so you can search in your IDE or use the todos tab of the IDE
 
+> [!IMPORTANT]
 > We highly recommend contacting us if you're planning to make big changes.
 
 ## 📋 Requirements
@@ -91,14 +92,16 @@ If you need to change the working directory for the script, for example, when te
 launcher, then you will need to manually create a run configuration like we
 discussed above
 
+> [!TIP]
 > The sync script might ask you the url for the sync info where it will send the GET request.<br>
 > Consider uploading the file on your local machine on `localhost` server
 > to speed up the development and lower the resource cost.
 >
 > The same applies for the mods, resource-packs, etc...
 >
-> Use [dev-local-server](dev-local-server/README.md) module
+> Use [dev-local-server](dev-local-server/README.md) module.
 
+> [!NOTE]
 > If you're on **Microsoft Windows**, replace `gradlew` with `gradlew.bat`.
 
 ## 📝 Guidelines
