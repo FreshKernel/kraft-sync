@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.ktlint)
 }
 
-group = "net.freshplatform"
+group = "org.freshkernel"
 version = libs.versions.project.get()
 
 dependencies {
@@ -16,7 +16,11 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.java.get().toInt())
+    jvmToolchain(
+        libs.versions.java
+            .get()
+            .toInt(),
+    )
 }
 
 application {
