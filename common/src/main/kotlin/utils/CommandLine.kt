@@ -9,8 +9,8 @@ import kotlin.io.path.absolutePathString
  * Run a command in the command line of the system
  * @param args The arguments that is used to run the command, the reason this is not a String to
  * prevent some issues and bugs with the paths or the arguments that have spacing
- * @param reasonOfRunningTheCommand This is used to tell the user why we're running this command on the system
- * should be something like `to check if the system in dark mode`
+ * @param reasonOfRunningTheCommand This is used to tell the user why we're running this command on the system.
+ * Should be something like `to check if the system in dark mode`
  * @param isLoggingEnabled Should we print the result, output and errors to the log?
  * */
 fun commandLine(
@@ -56,6 +56,16 @@ fun commandLine(
         Result.failure(e)
     }
 }
+
+/**
+ * Similar to [commandLine] without logging and waiting for the result.
+ * It doesn't handle the output or specific error to the output of the command.
+ * */
+fun commandLineNonBlocking(vararg args: String): Result<Unit> =
+    runCatching {
+        ProcessBuilder(listOf(*args))
+            .start()
+    }
 
 /**
  * Has the similar functionality as [commandLine] specifically for using powershell commands in Windows
