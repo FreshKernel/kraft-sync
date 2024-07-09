@@ -8,7 +8,10 @@ This page isn't complete yet, and this tool is experimental and can have many br
 ## ✅ Supported Launchers
 
 - [**Prism Launcher**](https://prismlauncher.org/): Supports both [Mods Info Converter](#-mods-info-converter)
-  and [Script Installer](#-script-installer)
+  and [Script Installer](#-script-installer).
+
+  Enabling the option `Disable using metadata for mods` in the launcher settings will prevent the application
+  from detecting the mods.
 - [**ATLauncher**](https://atlauncher.com/): Supports both [Mods Info Converter](#-mods-info-converter)
   and [Script Installer](#-script-installer)
 - [**Modrinth App**](https://modrinth.com/app): Supports only [Mods Info Converter](#-mods-info-converter),
