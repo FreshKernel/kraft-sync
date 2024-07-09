@@ -174,7 +174,7 @@ If you use the official [Minecraft Launcher], the player won't be able to:
 - Switch between their own data and the synced content seamlessly, most **Minecraft Launchers** support
   profiles/instances.
 - Sync the content and launch the game directly using the `Play` button in the launcher,
-  instead will have to provide a `sh` or `bat` script that run the project script and launch the game after that,
+  instead will have to execute using a `sh` or `bat` script that run the project script and launch the game after that,
   which means the player will have to do this manually each time they want to launch the game.
 - Import the instance/profile directly and launch without any additional setup or configurations.
 
