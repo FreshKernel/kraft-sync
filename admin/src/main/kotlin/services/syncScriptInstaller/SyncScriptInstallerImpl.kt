@@ -131,7 +131,7 @@ class SyncScriptInstallerImpl : SyncScriptInstaller {
             if (!confirmReplaceExistingPreLaunchCommand) {
                 // If there is already a command exists, confirm if the user wants to replace the current
                 // unless if the command is used to launch the script that the user trying to install
-                if ((currentCommand != null && !currentCommand.startsWith(newLaunchCommand))) {
+                if (currentCommand != null && !currentCommand.startsWith(newLaunchCommand)) {
                     return SyncScriptInstallationResult.RequiresUserConfirmationToReplacePreLaunchCommand(
                         existingCommand = currentCommand,
                         newCommand = newCommandToSet.toString(),
