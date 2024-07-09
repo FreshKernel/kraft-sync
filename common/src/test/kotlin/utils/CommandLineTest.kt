@@ -13,12 +13,18 @@ class CommandLineTest {
         assertThrows<IOException> {
             commandLine("java-incorrect", "--version", reasonOfRunningTheCommand = null).getOrThrow()
         }
+        assertThrows<IOException> {
+            commandLineNonBlocking("java-incorrect", "--version").getOrThrow()
+        }
     }
 
     @Test
     fun `test commandLine when using correct command`() {
         assertDoesNotThrow {
             commandLine("java", "--version", reasonOfRunningTheCommand = null).getOrThrow()
+        }
+        assertDoesNotThrow {
+            commandLineNonBlocking("java", "--version").getOrThrow()
         }
     }
 

@@ -11,12 +11,14 @@ import services.HttpResponse
 import utils.FileDownloader
 import utils.SystemInfoProvider
 import utils.buildHtml
+import utils.commandLineNonBlocking
 import utils.convertBytesToReadableMegabytesAsString
 import utils.createFileWithParentDirectoriesOrTerminate
 import utils.deleteExistingOrTerminate
 import utils.executeBatchScriptInSeparateWindow
 import utils.getRunningJarFilePath
 import utils.moveToOrTerminate
+import utils.os.LinuxDesktopEnvironment
 import utils.os.OperatingSystem
 import utils.terminateWithOrWithoutError
 import utils.version.SemanticVersion
@@ -89,6 +91,7 @@ object JarAutoUpdater {
                         ?.value
                 Result.success(projectVersion)
             }
+
             is HttpResponse.HttpFailure -> Result.failure(response.exception())
             is HttpResponse.UnknownError -> Result.failure(response.exception)
         }
@@ -185,6 +188,44 @@ object JarAutoUpdater {
                             overwrite = true,
                             fileEntityType = "JAR",
                         )
+
+                        // The Application has been updated without automatically relaunching it, showing a message
+                        val (windowTitle, message) = buildUpdateSuccessMessage()
+                        val commandArgs: Array<String> =
+                            when (OperatingSystem.current) {
+                                OperatingSystem.Linux ->
+                                    when (LinuxDesktopEnvironment.current) {
+                                        LinuxDesktopEnvironment.KdePlasma ->
+                                            arrayOf(
+                                                "kdialog",
+                                                "--title",
+                                                windowTitle,
+                                                "--msgbox",
+                                                message,
+                                            )
+                                        else ->
+                                            arrayOf(
+                                                "zenity",
+                                                "--info",
+                                                "--title",
+                                                windowTitle,
+                                                "--text",
+                                                message,
+                                            )
+                                    }
+
+                                OperatingSystem.MacOS ->
+                                    arrayOf(
+                                        "osascript",
+                                        "-e",
+                                        "display dialog \"$message\" with title \"$windowTitle\" buttons {\"OK\"} default button \"OK\"",
+                                    )
+
+                                else -> error("The operating system is expected to be either Linux or macOS in the current check.")
+                            }
+                        commandLineNonBlocking(
+                            *commandArgs,
+                        ).getOrThrow()
                     },
                 )
             }
@@ -204,8 +245,7 @@ object JarAutoUpdater {
                 }
                 val secondsToWait = 1
 
-                val windowTitle = "Update Complete"
-                val message = "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version."
+                val (windowTitle, message) = buildUpdateSuccessMessage()
 
                 val messageVbsFilePath =
                     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path
@@ -239,4 +279,10 @@ object JarAutoUpdater {
         // Will require the user to launch once again after the update.
         terminateWithOrWithoutError()
     }
+
+    private fun buildUpdateSuccessMessage(): Pair<String, String> =
+        Pair(
+            "Update Complete",
+            "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version.",
+        )
 }
