@@ -14,7 +14,7 @@ the todos of the project, they all start with `TODO:` so you can search in your 
 > [!IMPORTANT]
 > We highly recommend contacting us if you're planning to make big changes.
 
-## 📋 Requirements
+## 📋 Development Prerequisites
 
 [//]: # (This section is referenced by the README.md file)
 
@@ -37,7 +37,7 @@ Make sure you installed the following:
 
 ## 🧪 Test your changes
 
-Make sure you have the [Requirement](#-requirements) installed and configured correctly
+Make sure you have the [Development Prerequisites](#-development-prerequisites) installed and configured correctly
 
 To set up your IDE for this project, so you can test the changes:
 

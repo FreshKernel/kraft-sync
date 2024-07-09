@@ -497,7 +497,7 @@ launchers, for more details, navigate to the [Admin Utility] page.
 
 If you want to build from source for the latest version:
 
-1. Install the [Requirements](./CONTRIBUTING.md#-requirements)
+1. Install the [Development Prerequisites](./CONTRIBUTING.md#-development-prerequisites)
 2. Run `./gradlew assemble` or `./gradlew.bat assemble` on **Microsoft Windows**
 3. Navigate to [dist](./dist) folder where you should find the JAR files.
 
