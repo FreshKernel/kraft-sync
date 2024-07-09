@@ -189,7 +189,7 @@ object JarAutoUpdater {
                             fileEntityType = "JAR",
                         )
 
-                        // The Application has been updated without automatically relaunch it, show a message
+                        // The Application has been updated without automatically relaunching it, showing a message
                         val (windowTitle, message) = buildUpdateSuccessMessage()
                         val commandArgs: Array<String> =
                             when (OperatingSystem.current) {
