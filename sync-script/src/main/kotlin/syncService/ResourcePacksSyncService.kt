@@ -152,9 +152,7 @@ class ResourcePacksSyncService :
             val resourcePackFileName = getFileNameFromUrlOrError(resourcePack.downloadUrl)
             val resourcePackFilePath = getResourcePackFilePath(resourcePack)
             if (resourcePackFilePath.exists()) {
-                Logger.warning {
-                    "⚠\uFE0F The resource-pack: '$resourcePackFileName' already exists."
-                }
+                Logger.warning { "⚠\uFE0F The resource-pack: '$resourcePackFileName' already exists." }
             }
 
             Logger.info { "\uD83D\uDD3D Downloading resource-pack '$resourcePackFileName' from ${resourcePack.downloadUrl}" }

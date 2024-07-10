@@ -174,7 +174,7 @@ class ModsSyncService :
             val modFileName = getFileNameFromUrlOrError(mod.downloadUrl)
             val modFilePath = getModFilePath(mod)
             if (modFilePath.exists()) {
-                Logger.info { "⚠\uFE0F The mod: '$modFileName' already exists." }
+                Logger.warning { "⚠\uFE0F The mod: '$modFileName' already exists." }
             }
 
             Logger.info { "\uD83D\uDD3D Downloading mod '$modFileName' from ${mod.downloadUrl}" }
