@@ -3,6 +3,7 @@ package services.updater
 import constants.ProjectInfoConstants
 import constants.SyncScriptDotMinecraftFiles
 import generated.BuildConfig
+import gui.GuiState
 import gui.dialogs.LoadingIndicatorDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -192,6 +193,10 @@ object JarAutoUpdater {
                             fileEntityType = "JAR",
                         )
 
+                        if (!shouldShowSuccessMessage()) {
+                            return@Thread
+                        }
+
                         // The Application has been updated without automatically relaunching it, showing a message
                         val (windowTitle, message) = buildUpdateSuccessMessage()
                         val commandArgs: Array<String> =
@@ -264,9 +269,17 @@ object JarAutoUpdater {
                     del "${currentRunningJarFilePath.absolutePathString()}"
                     move "${newJarFilePath.absolutePathString()}" "${currentRunningJarFilePath.absolutePathString()}"
                     
-                    echo MsgBox "$message", 64, "$windowTitle" > "${messageVbsFilePath.absolutePathString()}"
-                    cscript //nologo "${messageVbsFilePath.absolutePathString()}"
-                    del "${messageVbsFilePath.absolutePathString()}"
+                    ${
+                        if (shouldShowSuccessMessage()) {
+                            """
+                            echo MsgBox "$message", 64, "$windowTitle" > "${messageVbsFilePath.absolutePathString()}"
+                            cscript //nologo "${messageVbsFilePath.absolutePathString()}"
+                            del "${messageVbsFilePath.absolutePathString()}"
+                            """.trimIndent()
+                        } else {
+                            ""
+                        }
+                    }
 
                     exit
                     """.trimIndent(),
@@ -289,4 +302,6 @@ object JarAutoUpdater {
             "Update Complete",
             "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version.",
         )
+
+    private fun shouldShowSuccessMessage(): Boolean = GuiState.isGuiEnabled
 }
