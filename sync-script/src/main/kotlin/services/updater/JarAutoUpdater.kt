@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import services.HttpClient
 import services.HttpResponse
 import utils.FileDownloader
+import utils.Logger
 import utils.SystemInfoProvider
 import utils.buildHtml
 import utils.commandLineNonBlocking
@@ -40,7 +41,7 @@ object JarAutoUpdater {
                 )
             }
             val latestJarFileDownloadUrl = ProjectInfoConstants.LATEST_SYNC_SCRIPT_JAR_FILE_URL
-            println("\uD83D\uDD3D Downloading the new JAR file from: $latestJarFileDownloadUrl")
+            Logger.info { "\uD83D\uDD3D Downloading the new JAR file from: $latestJarFileDownloadUrl" }
 
             LoadingIndicatorDialog.instance?.updateComponentProperties(
                 title = "Updating...",
@@ -78,7 +79,9 @@ object JarAutoUpdater {
 
     private suspend fun getLatestProjectVersion(): Result<String?> {
         val url = ProjectInfoConstants.LIBS_VERSIONS_TOML_FILE_URL
-        println("\uD83D\uDCE5 Sending GET request to: $url")
+
+        Logger.info { "\uD83D\uDCE5 Sending GET request to: $url" }
+
         return when (val response = HttpClient.get(url = url)) {
             is HttpResponse.Success -> {
                 val projectVersionRegex = Regex("""project\s*=\s*"(.+?)"""")
@@ -106,14 +109,14 @@ object JarAutoUpdater {
         )
         val latestProjectVersionString =
             getLatestProjectVersion().getOrElse {
-                println("❌ We couldn't get the latest project version: ${it.message}")
+                Logger.error { "❌ We couldn't get the latest project version: ${it.message}" }
                 return false
             }
         if (latestProjectVersionString == null) {
-            println(
+            Logger.error {
                 "⚠\uFE0F It seems that the project version is missing, it could have been moved somewhere else. " +
-                    "Consider updating manually.",
-            )
+                    "Consider updating manually."
+            }
             return false
         }
 
@@ -121,23 +124,23 @@ object JarAutoUpdater {
 
         val latestProjectSemanticVersion: SemanticVersion =
             SemanticVersion.parse(latestProjectVersionString).getOrElse {
-                println("❌ Failed to parse the latest project version to SemanticVersion: ${it.message}")
+                Logger.error { "❌ Failed to parse the latest project version to SemanticVersion: ${it.message}" }
                 return false
             }
         val currentSemanticVersion: SemanticVersion =
             SemanticVersion.parse(currentVersionString).getOrElse {
-                println("❌ Failed to parse the current application version to SemanticVersion: ${it.message}")
+                Logger.error { "❌ Failed to parse the current application version to SemanticVersion: ${it.message}" }
                 return false
             }
 
         return when {
             currentSemanticVersion == latestProjectSemanticVersion -> {
-                println("✨ You're using the latest version of the project.")
+                Logger.info { "✨ You're using the latest version of the project." }
                 false
             }
 
             currentSemanticVersion > latestProjectSemanticVersion -> {
-                println("✨ You're using a version that's newer than the latest.")
+                Logger.info { "✨ You're using a version that's newer than the latest." }
                 false
             }
 
@@ -149,7 +152,7 @@ object JarAutoUpdater {
         val currentRunningJarFilePath =
             getRunningJarFilePath()
                 .getOrElse {
-                    println("⚠\uFE0F Auto update feature is only supported when running using JAR.")
+                    Logger.warning { "⚠\uFE0F Auto update feature is only supported when running using JAR." }
                     return
                 }
 
@@ -161,10 +164,10 @@ object JarAutoUpdater {
         }
         val newJarFile =
             downloadLatestJarFile().getOrElse {
-                println("❌ An error occurred while downloading the latest version: ${it.message}")
+                Logger.error { "❌ An error occurred while downloading the latest version: ${it.message}" }
                 return
             }
-        println("ℹ\uFE0F The new update has been downloaded, will close the application.")
+        Logger.info { "ℹ\uFE0F The new update has been downloaded, will close the application." }
         updateApplication(
             currentRunningJarFilePath = currentRunningJarFilePath,
             newJarFilePath = newJarFile,
@@ -203,6 +206,7 @@ object JarAutoUpdater {
                                                 "--msgbox",
                                                 message,
                                             )
+
                                         else ->
                                             arrayOf(
                                                 "zenity",
@@ -273,7 +277,7 @@ object JarAutoUpdater {
             }
 
             OperatingSystem.Unknown -> {
-                println("⚠\uFE0F Auto update feature is not supported on ${SystemInfoProvider.getOperatingSystemName()}.")
+                Logger.error { "⚠\uFE0F Auto update feature is not supported on ${SystemInfoProvider.getOperatingSystemName()}." }
             }
         }
         // Will require the user to launch once again after the update.

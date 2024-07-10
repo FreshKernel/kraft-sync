@@ -1,6 +1,7 @@
 package syncService.common
 
 import syncService.SyncService
+import utils.Logger
 import utils.buildHtml
 import utils.getFileNameFromUrlOrError
 import utils.listFilteredPaths
@@ -25,7 +26,7 @@ abstract class AssetSyncService(
 ) : SyncService {
     protected fun validateAssetDirectory() {
         if (!assetDirectory.exists()) {
-            println("\uD83D\uDCC1 The '${assetDirectory.name}' folder doesn't exist, creating it..")
+            Logger.info { "\uD83D\uDCC1 The '${assetDirectory.name}' folder doesn't exist, creating it..\n" }
             assetDirectory.createDirectories()
         }
 

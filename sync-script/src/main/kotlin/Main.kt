@@ -25,6 +25,7 @@ import syncService.ResourcePacksSyncService
 import syncService.ServersSyncService
 import syncService.SyncService
 import utils.ExecutionTimer
+import utils.Logger
 import utils.SystemInfoProvider
 import utils.createFileWithParentDirectoriesOrTerminate
 import utils.deleteRecursivelyWithLegacyJavaIo
@@ -49,8 +50,8 @@ suspend fun main(args: Array<String>) {
 
     passedArgs = args
 
-    println("📋 Current project version: ${BuildConfig.PROJECT_VERSION}")
-    println("\uD83D\uDCC1 Current working directory: ${SystemInfoProvider.getCurrentWorkingDirectoryPath()}")
+    Logger.info { "📋 Current project version: ${BuildConfig.PROJECT_VERSION}" }
+    Logger.info { "\uD83D\uDCC1 Current working directory: ${SystemInfoProvider.getCurrentWorkingDirectoryPath()}" }
 
     logSystemInfo()
     handleTemporaryDirectory(isStart = true)
@@ -79,7 +80,7 @@ suspend fun main(args: Array<String>) {
 
     GuiState.updateIsGuiEnabled()
 
-    println("ℹ\uFE0F Script Configuration: ${ScriptConfig.instance}")
+    Logger.info { "ℹ\uFE0F Script Configuration: ${ScriptConfig.instance}" }
 
     // Switch to the themes specified by config
     if (GuiState.isGuiEnabled) {
@@ -108,28 +109,28 @@ private fun logSystemInfo() {
         OperatingSystem.MacOS -> "\uD83C\uDF4F You are using macOS \uF8FF. Welcome to the world of Apple \uD83C\uDF4E."
         OperatingSystem.Windows -> "\uD83E\uDE9F You are using Windows. Be safe!"
         OperatingSystem.Unknown -> "❓Your operating system couldn't be identified. Let's hope everything works smoothly."
-    }.also { println(it) }
+    }.also { Logger.info { it } }
 
     if (!GraphicsEnvironment.isHeadless()) {
         if (GuiUtils.isSystemInDarkMode) {
             "🌙 Welcome to the dark side! Your system is in dark mode. Enjoy the soothing darkness! 🌃"
         } else {
             "☀️ Brighten up your day! Your system is in the light mode. Embrace the light! 🌅"
-        }.also { println(it) }
+        }.also { Logger.info { it } }
     }
 }
 
 private fun handleTemporaryDirectory(isStart: Boolean) {
     SyncScriptDotMinecraftFiles.SyncScriptData.Temp.path.apply {
         if (exists()) {
-            println(
+            Logger.info {
                 if (isStart) {
                     "ℹ\uFE0F The temporary folder: $pathString exist. " +
                         "The script might not finished last time. Removing the folder."
                 } else {
                     "\uD83D\uDEAB Deleting the temporary folder: '$pathString' (no longer needed)."
-                },
-            )
+                }
+            }
             deleteRecursivelyWithLegacyJavaIo()
         }
     }
@@ -139,10 +140,10 @@ private suspend fun loadScriptConfig(): ScriptConfig {
     val scriptConfigFile = SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig.path
     if (!scriptConfigFile.exists()) {
         if (GuiState.isGuiEnabled) {
-            println(
-                "Configuration Missing! ⚠\uFE0F. Since you're in GUI mode, we'll launch a quick " +
-                    "dialog to gather the necessary information",
-            )
+            Logger.info {
+                "ℹ\uFE0F Configuration Missing. Since you're in GUI mode, we'll launch a quick " +
+                    "dialog to gather the necessary information"
+            }
 
             val scriptConfig = CreateScriptConfigDialog().showDialog()
             runBlocking { scriptConfigDataSource.replaceConfig(scriptConfig) }
@@ -248,6 +249,8 @@ private suspend fun fetchSyncInfo() {
                 return
             }
 
+    Logger.debug { "\uD83D\uDC1E Sync Info: ${SyncInfo.instance}" }
+
     LoadingIndicatorDialog.instance?.updateComponentProperties(
         title = "Synchronization",
         infoText = "Performing initial checks and configurations...",
@@ -275,10 +278,10 @@ private suspend fun handleAdminTrustCheck() {
             // If the user doesn't say he/she trusts the admin yet, then we will ask him
             val doesUserTrustThisSource = TrustAdminDialog.showDialog()
             if (!doesUserTrustThisSource) {
-                println(
+                Logger.info {
                     "\uD83D\uDD12 Script is closing because trust in the administration is lacking. " +
-                        "Feel free to reach out if you have any concerns.",
-                )
+                        "Feel free to reach out if you have any concerns."
+                }
                 terminateWithOrWithoutError()
             }
             runBlocking {
@@ -315,9 +318,9 @@ private fun finalize(applicationExecutionTimer: ExecutionTimer) {
     // after finish syncing the contents successfully, we don't need it anymore.
     handleTemporaryDirectory(isStart = false)
 
-    println(
-        "\n\uD83C\uDF89 The script has successfully completed in " +
-            "(${applicationExecutionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms)! \uD83D\uDE80",
-    )
+    Logger.info(extraLine = true) {
+        "\uD83C\uDF89 The script has successfully completed in " +
+            "(${applicationExecutionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms)! \uD83D\uDE80"
+    }
     exitProcess(0)
 }

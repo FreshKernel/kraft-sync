@@ -11,6 +11,7 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf
 import constants.SharedAssetConstants
 import gui.theme.Theme
 import gui.theme.ThemeMode
+import utils.Logger
 import utils.getResourceAsURLOrThrow
 import utils.os.OperatingSystem
 import java.awt.Component
@@ -152,14 +153,14 @@ object GuiUtils {
             e.printStackTrace()
 
             if (e is UnsupportedLookAndFeelException) {
-                println(
-                    "⚠️ Couldn't switch to the selected theme \uD83C\uDFA8. It looks like this theme is not supported on your system.",
-                )
+                Logger.error {
+                    "⚠️ Couldn't switch to the selected theme \uD83C\uDFA8. It looks like this theme is not supported on your system."
+                }
                 return
             }
-            println(
-                "❌ Failed to switch to the selected theme \uD83C\uDFA8: ${e.message}",
-            )
+            Logger.error {
+                "❌ Failed to switch to the selected theme \uD83C\uDFA8: ${e.message}"
+            }
         }
     }
 

@@ -18,8 +18,15 @@ object Logger {
         logMessage(lazyMessage = lazyMessage, logLevel = "Debug")
     }
 
-    fun info(lazyMessage: () -> String) {
-        logMessage(lazyMessage = lazyMessage, logLevel = "Info")
+    fun info(
+        extraLine: Boolean = false,
+        lazyMessage: () -> String,
+    ) {
+        logMessage(
+            extraLine = extraLine,
+            lazyMessage = lazyMessage,
+            logLevel = "Info",
+        )
     }
 
     fun warning(lazyMessage: () -> String) {
@@ -31,11 +38,18 @@ object Logger {
     }
 
     private fun logMessage(
+        /**
+         * Add an extra new line before printing the message
+         * */
+        extraLine: Boolean = false,
         lazyMessage: () -> String,
         logLevel: String,
     ) {
         val message =
             buildString {
+                if (extraLine) {
+                    append("\n")
+                }
                 if (BuildConfig.DEVELOPMENT_MODE) {
                     append("$logLevel - ")
                 }

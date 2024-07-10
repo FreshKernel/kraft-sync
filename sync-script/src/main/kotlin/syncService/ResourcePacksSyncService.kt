@@ -12,6 +12,7 @@ import syncInfo.models.shouldVerifyFileIntegrity
 import syncService.common.AssetSyncService
 import utils.ExecutionTimer
 import utils.FileDownloader
+import utils.Logger
 import utils.calculateProgressByIndex
 import utils.convertBytesToReadableMegabytesAsString
 import utils.deleteExistingOrTerminate
@@ -37,11 +38,11 @@ class ResourcePacksSyncService :
         val executionTimer = ExecutionTimer()
         executionTimer.setStartTime()
 
-        println("\n\uD83D\uDD04 Syncing resource-packs...")
+        Logger.info(extraLine = true) { "\uD83D\uDD04 Syncing resource-packs..." }
 
         // Resource packs from the remote
         val resourcePacks = resourcePackSyncInfo.resourcePacks
-        println("📥 Total received resource-packs from server: ${resourcePacks.size}")
+        Logger.info { "📥 Total received resource-packs from server: ${resourcePacks.size}" }
 
         validateAssetDirectory()
         deleteUnSyncedLocalResourcePackFiles(resourcePacks = resourcePacks)
@@ -57,7 +58,7 @@ class ResourcePacksSyncService :
             getResourcePacksForDownloadAndValidateIfRequired(
                 resourcePacks = resourcePacks,
             )
-        println("\n🔍 Resource Packs to download: ${resourcePacksToDownload.size}")
+        Logger.info(extraLine = true) { "🔍 Resource Packs to download: ${resourcePacksToDownload.size}" }
 
         downloadResourcePacks(
             resourcePacksToDownload = resourcePacksToDownload,
@@ -68,7 +69,9 @@ class ResourcePacksSyncService :
             applyResourcePacks()
         }
 
-        println("\uD83D\uDD52 Finished syncing the resource-packs in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
+        Logger.info {
+            "\uD83D\uDD52 Finished syncing the resource-packs in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms."
+        }
     }
 
     private suspend fun deleteUnSyncedLocalResourcePackFiles(resourcePacks: List<ResourcePack>) {
@@ -82,7 +85,9 @@ class ResourcePacksSyncService :
         val remoteResourcePackFileNames: List<String> = resourcePacks.map { getResourcePackFilePath(it).name }
         for (localResourcePackFilePath in localResourcePackFilePathsToProcess) {
             if (localResourcePackFilePath.name !in remoteResourcePackFileNames) {
-                println("\uD83D\uDEAB Deleting the resource-pack '${localResourcePackFilePath.name}' as it's no longer on the server.")
+                Logger.info {
+                    "\uD83D\uDEAB Deleting the resource-pack '${localResourcePackFilePath.name}' as it's no longer on the server."
+                }
                 localResourcePackFilePath.deleteExistingOrTerminate(
                     fileEntityType = "resource-pack",
                     reasonOfDelete = "it's no longer on the server",
@@ -97,7 +102,9 @@ class ResourcePacksSyncService :
             val resourcePackFilePath = getResourcePackFilePath(resourcePack)
             if (resourcePackFilePath.exists()) {
                 if (!resourcePack.shouldVerifyFileIntegrity()) {
-                    println("ℹ️ The resource-pack: '$resourcePackFileName' is set to not be verified. Skipping to the next resource-pack.")
+                    Logger.info {
+                        "ℹ️ The resource-pack: '$resourcePackFileName' is set to not be verified. Skipping to the next resource-pack."
+                    }
                     return@filter false
                 }
 
@@ -112,17 +119,21 @@ class ResourcePacksSyncService :
                 )
                 val hasValidResourcePackFileIntegrity = resourcePack.hasValidFileIntegrityOrError(resourcePackFilePath)
                 if (hasValidResourcePackFileIntegrity == null) {
-                    println("❓ The resource-pack: '$resourcePackFileName' has an unknown integrity. Skipping to the next resource-pack.")
+                    Logger.info {
+                        "❓ The resource-pack: '$resourcePackFileName' has an unknown integrity. Skipping to the next resource-pack."
+                    }
                     return@filter false
                 }
                 if (hasValidResourcePackFileIntegrity) {
-                    println("✅ The resource-pack: '$resourcePackFileName' has valid file integrity. Skipping to the next resource-pack.")
+                    Logger.info {
+                        "✅ The resource-pack: '$resourcePackFileName' has valid file integrity. Skipping to the next resource-pack."
+                    }
                     return@filter false
                 }
-                println(
-                    "❌ The resource-pack: '$resourcePackFileName' has invalid integrity. Deleting the resource-pack " +
-                        "and downloading it again.",
-                )
+                Logger.info {
+                    "\uD83D\uDEAB The resource-pack: '$resourcePackFileName' has invalid integrity. Deleting the resource-pack " +
+                        "and downloading it again."
+                }
                 resourcePackFilePath.deleteExistingOrTerminate(
                     fileEntityType = "resource-pack",
                     reasonOfDelete = "it has invalid file integrity",
@@ -141,10 +152,12 @@ class ResourcePacksSyncService :
             val resourcePackFileName = getFileNameFromUrlOrError(resourcePack.downloadUrl)
             val resourcePackFilePath = getResourcePackFilePath(resourcePack)
             if (resourcePackFilePath.exists()) {
-                println("⚠\uFE0F The resource-pack: '$resourcePackFileName' already exists.")
+                Logger.warning {
+                    "⚠\uFE0F The resource-pack: '$resourcePackFileName' already exists."
+                }
             }
 
-            println("\uD83D\uDD3D Downloading resource-pack '$resourcePackFileName' from ${resourcePack.downloadUrl}")
+            Logger.info { "\uD83D\uDD3D Downloading resource-pack '$resourcePackFileName' from ${resourcePack.downloadUrl}" }
 
             FileDownloader(
                 downloadUrl = resourcePack.downloadUrl,
