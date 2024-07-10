@@ -33,12 +33,14 @@ val generateBuildConfig =
     tasks.register<GenerateBuildConfigTask>("generateBuildConfig") {
         // To allow overriding the current project version
         val projectVersion: String? by project
+        val developmentMode: String? by project
 
         val buildConfigDirectory = project.layout.buildDirectory.dir("generated")
 
         classFullyQualifiedName.set("generated.BuildConfig")
         generatedOutputDirectory.set(buildConfigDirectory)
         fieldsToGenerate.put("PROJECT_VERSION", projectVersion ?: libs.versions.project.get())
+        fieldsToGenerate.put("DEVELOPMENT_MODE", developmentMode?.toBooleanStrictOrNull() ?: false)
     }
 
 sourceSets.main.configure {
