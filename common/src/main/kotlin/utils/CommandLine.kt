@@ -27,7 +27,7 @@ fun commandLine(
                 }
                 append(": ${args.joinToString(" ")}")
             }
-        println(message)
+        Logger.info { message }
     }
     return try {
         val process =
@@ -39,18 +39,22 @@ fun commandLine(
             process.destroy()
             val errorMessage = "⏰ Process timed out for the command: ${args.joinToString(" ")}"
             if (isLoggingEnabled) {
-                println("❌ $errorMessage")
+                Logger.error { "❌ $errorMessage" }
             }
             return Result.failure(RuntimeException(errorMessage))
         }
         val result = process.inputStream.bufferedReader().use { it.readText() }
         if (isLoggingEnabled) {
-            println("✅ Command executed successfully: '${args.joinToString(" ")}'. " + "📜 Output: ${result.trim()}")
+            Logger.info {
+                "✅ Command executed successfully: '${args.joinToString(" ")}'. " + "📜 Output: ${result.trim()}"
+            }
         }
         Result.success(result)
     } catch (e: Exception) {
         if (isLoggingEnabled) {
-            println("❌ Error executing command `${args.joinToString(" ")}`: ${e.message}")
+            Logger.error {
+                "❌ Error executing command `${args.joinToString(" ")}`: ${e.message}"
+            }
         }
         e.printStackTrace()
         Result.failure(e)

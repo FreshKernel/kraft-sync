@@ -1,5 +1,6 @@
 package gui.utils
 
+import utils.Logger
 import utils.SystemInfoProvider
 import utils.commandLine
 import utils.os.LinuxDesktopEnvironment
@@ -48,20 +49,20 @@ object ThemeDetector {
                             SystemInfoProvider.getUserHomeDirectoryPath(),
                             ".config/kdeglobals",
                         )
-                    println(
+                    Logger.info {
                         "\uD83D\uDCC4 Reading the following file to check if the KDE Plasma desktop environment " +
-                            "is in dark mode: ${kdeGlobalsFile.pathString}",
-                    )
+                            "is in dark mode: ${kdeGlobalsFile.pathString}"
+                    }
                     return try {
                         val lookAndFeelPackageName =
                             kdeGlobalsFile.bufferedReader().useLines { line ->
                                 line.firstOrNull { it.startsWith("LookAndFeelPackage=") }?.substringAfter('=')
                             }
-                        println("✨ The KDE Plasma look and feel package name: 🎨 $lookAndFeelPackageName")
+                        Logger.info { "✨ The KDE Plasma look and feel package name: 🎨 $lookAndFeelPackageName" }
                         Result.success(lookAndFeelPackageName)
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        println("❌ Error while reading the file ${kdeGlobalsFile.name}: ${e.message}")
+                        Logger.error { "❌ Error while reading the file ${kdeGlobalsFile.name}: ${e.message}" }
                         Result.failure(e)
                     }
                 }

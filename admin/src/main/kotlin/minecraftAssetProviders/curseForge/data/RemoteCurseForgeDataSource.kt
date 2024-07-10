@@ -5,6 +5,7 @@ import minecraftAssetProviders.curseForge.models.CurseForgeModFileDownloadUrlRes
 import minecraftAssetProviders.curseForge.models.CurseForgeModFileResponse
 import services.HttpClient
 import services.HttpResponse
+import utils.Logger
 
 class RemoteCurseForgeDataSource : CurseForgeDataSource {
     companion object {
@@ -28,7 +29,7 @@ class RemoteCurseForgeDataSource : CurseForgeDataSource {
                 )
         ) {
             is HttpResponse.Success -> {
-                println("ℹ\uFE0F Curse Forge Mod ($modId) File ($fileId) Json Response: ${response.body}")
+                Logger.info { "ℹ\uFE0F Curse Forge Mod ($modId) File ($fileId) Json Response: ${response.body}" }
                 Result.success(response.decodeJson<CurseForgeModFileResponse>())
             }
 
@@ -52,7 +53,7 @@ class RemoteCurseForgeDataSource : CurseForgeDataSource {
             )
         return when (response) {
             is HttpResponse.Success -> {
-                println("ℹ\uFE0F Curse Forge Mod ($modId) File ($fileId) Download URL Json Response: ${response.body}")
+                Logger.info { "ℹ\uFE0F Curse Forge Mod ($modId) File ($fileId) Download URL Json Response: ${response.body}" }
                 Result.success(response.decodeJson<CurseForgeModFileDownloadUrlResponse>())
             }
 

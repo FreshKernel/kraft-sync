@@ -17,6 +17,7 @@ import net.benwoodworth.knbt.put
 import syncInfo.models.SyncInfo
 import syncInfo.models.instance
 import utils.ExecutionTimer
+import utils.Logger
 import utils.buildHtml
 import utils.isFileEmpty
 import utils.showErrorMessageAndTerminate
@@ -47,7 +48,7 @@ class ServersSyncService : SyncService {
         val executionTimer = ExecutionTimer()
         executionTimer.setStartTime()
 
-        println("\n\uD83D\uDD04 Syncing server list...")
+        Logger.info(extraLine = true) { "\uD83D\uDD04 Syncing server list..." }
 
         val currentRootCompound =
             loadServersDatFile().getOrElse {
@@ -105,7 +106,9 @@ class ServersSyncService : SyncService {
             return
         }
 
-        println("\uD83D\uDD52 Finished syncing the server list in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
+        Logger.info {
+            "\uD83D\uDD52 Finished syncing the server list in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms."
+        }
     }
 
     private fun loadServersDatFile(): Result<NbtCompound> {
@@ -121,7 +124,7 @@ class ServersSyncService : SyncService {
                     exitProcess(1)
                 }
                 if (serversDatFilePath.isFileEmpty()) {
-                    println("ℹ️ The file '${serversDatFilePath.name}' exists and is currently empty.")
+                    Logger.info { "ℹ️ The file '${serversDatFilePath.name}' exists and is currently empty." }
                     return Result.success(createEmptyServerCompound())
                 }
                 return Result.success(

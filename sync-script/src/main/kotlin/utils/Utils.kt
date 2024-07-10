@@ -35,7 +35,7 @@ fun showErrorMessageAndTerminate(
             parentComponent = guiParentComponent,
         )
     } else {
-        println("❌ $title: $message")
+        Logger.error { "❌ $title: $message" }
     }
     terminateWithOrWithoutError()
 }

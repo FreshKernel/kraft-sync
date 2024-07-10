@@ -14,6 +14,7 @@ import syncInfo.models.shouldVerifyFileIntegrity
 import syncService.common.AssetSyncService
 import utils.ExecutionTimer
 import utils.FileDownloader
+import utils.Logger
 import utils.calculateProgressByIndex
 import utils.convertBytesToReadableMegabytesAsString
 import utils.deleteExistingOrTerminate
@@ -41,17 +42,17 @@ class ModsSyncService :
         withContext(Dispatchers.IO) {
             val executionTimer = ExecutionTimer()
             executionTimer.setStartTime()
-            println("\n\uD83D\uDD04 Syncing mods...")
+            Logger.info(extraLine = true) { "\uD83D\uDD04 Syncing mods..." }
 
             // Mods from the remote
             val mods = modSyncInfo.mods
-            println("📥 Total received mods from server: ${mods.size}")
+            Logger.info { "📥 Total received mods from server: ${mods.size}" }
 
             validateAssetDirectory()
             deleteUnSyncedLocalModFiles(mods = mods)
 
             val currentEnvironmentModsOrAll = getCurrentEnvironmentModsOrAll(mods = mods)
-            println("📥 Current environment mods: ${currentEnvironmentModsOrAll.size}")
+            Logger.info { "📥 Current environment mods: ${currentEnvironmentModsOrAll.size}" }
 
             LoadingIndicatorDialog.instance?.updateComponentProperties(
                 title = "Syncing Mods...",
@@ -66,14 +67,16 @@ class ModsSyncService :
                 getModsForDownloadAndValidateIfRequired(
                     mods = currentEnvironmentModsOrAll,
                 )
-            println("\n🔍 Mods to download: ${modsToDownload.size}")
+            Logger.info(extraLine = true) { "🔍 Mods to download: ${modsToDownload.size}" }
 
             downloadMods(
                 modsToDownload = modsToDownload,
                 totalMods = currentEnvironmentModsOrAll,
             )
 
-            println("\uD83D\uDD52 Finished syncing the mods in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms.")
+            Logger.info {
+                "\uD83D\uDD52 Finished syncing the mods in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms."
+            }
         }
 
     private suspend fun deleteUnSyncedLocalModFiles(mods: List<Mod>) {
@@ -87,7 +90,7 @@ class ModsSyncService :
         val remoteModFileNames: List<String> = mods.map { getModFilePath(it).name }
         for (localModFilePath in localModFilePathsToProcess) {
             if (localModFilePath.name !in remoteModFileNames) {
-                println("\uD83D\uDEAB Deleting the mod '${localModFilePath.name}' as it's no longer on the server.")
+                Logger.info { "\uD83D\uDEAB Deleting the mod '${localModFilePath.name}' as it's no longer on the server." }
                 localModFilePath.deleteExistingOrTerminate(
                     fileEntityType = "mod",
                     reasonOfDelete = "it's no longer on the server",
@@ -109,7 +112,7 @@ class ModsSyncService :
 
                 val modFilePath = getModFilePath(mod)
                 if (modFilePath.exists()) {
-                    println("❌ Deleting the mod '${modFilePath.name}' as it's not needed on the current environment.")
+                    Logger.info { "\uD83D\uDEAB Deleting the mod '${modFilePath.name}' as it's not needed on the current environment." }
                     modFilePath.deleteExistingOrTerminate(
                         fileEntityType = "mod",
                         reasonOfDelete = "it's not required on the current environment",
@@ -127,7 +130,7 @@ class ModsSyncService :
             val modFilePath = getModFilePath(mod)
             if (modFilePath.exists()) {
                 if (!mod.shouldVerifyFileIntegrity()) {
-                    println("ℹ️ The mod: '$modFileName' is set to not be verified. Skipping to the next mod.")
+                    Logger.info { "ℹ️ The mod: '$modFileName' is set to not be verified. Skipping to the next mod." }
                     return@filter false
                 }
 
@@ -142,17 +145,16 @@ class ModsSyncService :
                 )
                 val hasValidModFileIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)
                 if (hasValidModFileIntegrity == null) {
-                    println("❓ The mod: '$modFileName' has an unknown integrity. Skipping to the next mod.")
+                    Logger.info { "❓ The mod: '$modFileName' has an unknown integrity. Skipping to the next mod." }
                     return@filter false
                 }
                 if (hasValidModFileIntegrity) {
-                    println("✅ The mod: '$modFileName' has valid file integrity. Skipping to the next mod.")
+                    Logger.info { "✅ The mod: '$modFileName' has valid file integrity. Skipping to the next mod." }
                     return@filter false
                 }
-                println(
-                    "❌ The mod: '$modFileName' has invalid integrity. Deleting the mod " +
-                        "and downloading it again.",
-                )
+                Logger.info {
+                    "\uD83D\uDEAB The mod: '$modFileName' has invalid integrity. Deleting the mod and downloading it again."
+                }
                 modFilePath.deleteExistingOrTerminate(
                     fileEntityType = "mod",
                     reasonOfDelete = "it has invalid file integrity",
@@ -172,10 +174,10 @@ class ModsSyncService :
             val modFileName = getFileNameFromUrlOrError(mod.downloadUrl)
             val modFilePath = getModFilePath(mod)
             if (modFilePath.exists()) {
-                println("⚠\uFE0F The mod: '$modFileName' already exists.")
+                Logger.warning { "⚠\uFE0F The mod: '$modFileName' already exists." }
             }
 
-            println("\uD83D\uDD3D Downloading mod '$modFileName' from ${mod.downloadUrl}")
+            Logger.info { "\uD83D\uDD3D Downloading mod '$modFileName' from ${mod.downloadUrl}" }
 
             FileDownloader(
                 downloadUrl = mod.downloadUrl,
