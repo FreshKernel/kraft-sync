@@ -66,7 +66,7 @@ class ResourcePacksSyncService :
         )
 
         if (resourcePackSyncInfo.applyResourcePacks) {
-            applyResourcePacks()
+            applyResourcePacks(resourcePacks = resourcePacks)
         }
 
         Logger.info {
@@ -191,9 +191,10 @@ class ResourcePacksSyncService :
         }
     }
 
-    private suspend fun applyResourcePacks() {
-        val resourcePackFilePaths = getScriptLocalResourcePackFilePathsOrAll()
-
+    /**
+     * @param resourcePacks The list of resource packs to apply, the ones that are synced using the script
+     * */
+    private fun applyResourcePacks(resourcePacks: List<ResourcePack>) {
         MinecraftOptionsManager.loadPropertiesFromFile(createIfMissing = true)
 
         val optionsResourcePacks: List<MinecraftOptionsManager.ResourcePack>? =
@@ -215,8 +216,9 @@ class ResourcePacksSyncService :
                         userOptionsResourcePacks?.let { addAll(userOptionsResourcePacks) }
                     }
                     addAll(
-                        resourcePackFilePaths
-                            .map { MinecraftOptionsManager.ResourcePack.File(it.name) },
+                        resourcePacks.map {
+                            MinecraftOptionsManager.ResourcePack.File(getResourcePackFilePath(it).name)
+                        },
                     )
                 },
         )
