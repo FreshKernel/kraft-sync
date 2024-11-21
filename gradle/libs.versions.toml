@@ -1,21 +1,21 @@
 [versions]
 project = "0.0.3-alpha"
 
-kotlin = "2.0.20"
-kotlinx-serialization = "1.7.1"
-kolinx-coroutines = "1.9.0-RC.2"
+kotlin = "2.0.21"
+kotlinx-serialization = "1.7.3"
+kolinx-coroutines = "1.9.0"
 okhttp = "4.12.0"
-okio = "3.9.0"
-flatlaf = "3.5.1"
+okio = "3.9.1"
+flatlaf = "3.5.2"
 knbt = "0.11.5"
 
-## For admin
+# For admin
 ktoml = "0.5.2"
 
 # Plugins
-shadow-jar = "8.3.0"
-proguard = "7.5.0"
-# The version of ktlint is different from ktlint gradle plugin
+shadow-jar = "8.3.5"
+proguard = "7.6.0"
+# The version of ktlint is different from ktlint Gradle plugin
 ktlint-gradle = "12.1.1"
 
 # Lower value extends support to older Minecraft versions
@@ -36,7 +36,7 @@ knbt = { module = "net.benwoodworth.knbt:knbt", version.ref = "knbt" }
 # For tests
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
-## For admin
+# For admin
 ktoml-core = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
 
 # For buildSrc
