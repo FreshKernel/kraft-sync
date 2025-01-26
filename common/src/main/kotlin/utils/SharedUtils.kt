@@ -55,6 +55,8 @@ fun String.baseUrl(): String {
     return "${url.protocol}://${url.host}$port/"
 }
 
+// TODO: Use @JsonIgnoreUnknownKeys annotation
+//  in https://github.com/Kotlin/kotlinx.serialization/releases/tag/v1.8.0 instead?
 val JsonIgnoreUnknownKeys = Json { ignoreUnknownKeys = true }
 
 val JsonPrettyPrint = Json { prettyPrint = true }
