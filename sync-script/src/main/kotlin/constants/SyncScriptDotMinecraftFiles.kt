@@ -40,14 +40,14 @@ sealed class SyncScriptDotMinecraftFiles(
         /**
          * The script needs a config file that contains required data and other optional to configure it
          * */
-        data object ScriptConfig : SyncScriptDotMinecraftFiles(SyncScriptData.path.resolve("config.json"))
+        data object ScriptConfig : SyncScriptDotMinecraftFiles(path.resolve("config.json"))
 
         /**
          * A directory that contain the temporary files used by the script,
          * for example, when downloading a file, the content will be saved to this directory
          * and after finish downloading, the file will be moved into where it should.
          * */
-        data object Temp : SyncScriptDotMinecraftFiles(SyncScriptData.path.resolve("temp"))
+        data object Temp : SyncScriptDotMinecraftFiles(path.resolve("temp"))
 
         /**
          * A file will be used to indicate if the user did set up the preferences for using the script, and it will
@@ -57,6 +57,13 @@ sealed class SyncScriptDotMinecraftFiles(
          * it later and launch the dialog again.
          * */
         data object IsPreferencesConfigured :
-            SyncScriptDotMinecraftFiles(SyncScriptData.path.resolve("isPreferencesConfigured"))
+            SyncScriptDotMinecraftFiles(path.resolve("isPreferencesConfigured"))
+
+        /**
+         * Stores the custom files that have been stored previously by the script on the last run.
+         * Allows the script to delete the removed files from
+         * the list ([syncInfo.models.customFile.CustomFileSyncInfo.files]) to sync them with the remote.
+         * */
+        data object CustomSyncedFiles : SyncScriptDotMinecraftFiles(path.resolve("customSyncedFiles.json"))
     }
 }

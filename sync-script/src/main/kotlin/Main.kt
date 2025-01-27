@@ -20,6 +20,7 @@ import syncInfo.data.RemoteSyncInfoDataSource
 import syncInfo.data.SyncInfoDataSource
 import syncInfo.models.SyncInfo
 import syncInfo.models.instance
+import syncService.CustomFileSyncService
 import syncService.ModsSyncService
 import syncService.ResourcePacksSyncService
 import syncService.ServersSyncService
@@ -304,6 +305,7 @@ private suspend fun performSyncServices(scriptConfig: ScriptConfig) {
                 add(ResourcePacksSyncService())
                 add(ServersSyncService())
             }
+            add(CustomFileSyncService())
         }
 
     syncServices.forEach { it.syncData() }

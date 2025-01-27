@@ -19,29 +19,32 @@ import kotlin.io.path.pathString
  * A utility class for downloading files from [downloadUrl] to [targetFilePath] with [progressListener].
  * TODO: Add the option to cancel a download, might need to refactor this class too
  *
- * Currently will handle errors internally by showing a error message and close.
- * This might change in case
- * we want to share this with other modules.
+ * Handle errors internally by showing a error message and close the application.
+ *
+ * The parent directory of [targetFilePath] should exist before calling [downloadFile].
  * */
 class FileDownloader(
     private val downloadUrl: String,
     private val targetFilePath: Path,
     val progressListener: (
         (
-            downloadedBytes: Long,
-            // in percentage, from 0 to 100
-            downloadedProgress: Float,
-            bytesToDownload: Long,
-        ) -> Unit
+        downloadedBytes: Long,
+        // in percentage, from 0 to 100
+        downloadedProgress: Float,
+        bytesToDownload: Long,
+    ) -> Unit
     )?,
 ) {
-    suspend fun downloadFile() {
+    /**
+     * @param fileEntityType The display file type that's used in error messages (e.g., `Failed to move the <file-entity-type> file`).
+     * */
+    suspend fun downloadFile(fileEntityType: String) {
         if (targetFilePath.exists()) {
             showErrorMessageAndTerminate(
                 title = "📁 File Conflict",
                 message =
                     "Unable to download the file. The destination file already exists. " +
-                        "This might be a bug, delete the file: (${targetFilePath.pathString}) as a workaround.",
+                            "This might be a bug, delete the file: (${targetFilePath.pathString}) as a workaround.",
             )
         }
         val request =
@@ -90,7 +93,7 @@ class FileDownloader(
                         title = "🔒 Permission Error",
                         message =
                             "It seems that we don't have the necessary write permission to download" +
-                                " the file: ${tempFile.pathString}. Double check your permissions and try again.",
+                                    " the file: ${tempFile.pathString}. Double check your permissions and try again.",
                     )
                 }
                 tempFile.sink().buffer().use { sink ->
@@ -113,7 +116,7 @@ class FileDownloader(
                 tempFile.moveToOrTerminate(
                     target = targetFilePath,
                     StandardCopyOption.ATOMIC_MOVE,
-                    fileEntityType = "JAR",
+                    fileEntityType = fileEntityType,
                 )
             } catch (e: Exception) {
                 e.printStackTrace()

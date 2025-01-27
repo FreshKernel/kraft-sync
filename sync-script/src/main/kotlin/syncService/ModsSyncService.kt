@@ -137,7 +137,7 @@ class ModsSyncService :
                 LoadingIndicatorDialog.instance?.updateComponentProperties(
                     title =
                         "Verifying mods",
-                    infoText = buildVerifyAssetFileMessage(assetDisplayName = mod.getDisplayName()),
+                    infoText = buildVerifyFileMessage(fileDisplayName = mod.getDisplayName()),
                     progress =
                         mods.calculateProgressByIndex(currentIndex = mods.indexOf(mod)),
                     detailsText =
@@ -191,14 +191,14 @@ class ModsSyncService :
                                 totalCount = totalMods.size,
                             ),
                         infoText =
-                            buildDownloadAssetFileMessage(assetDisplayName = mod.getDisplayName()),
+                            buildDownloadFileMessage(fileDisplayName = mod.getDisplayName()),
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
                                 " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
                     )
                 },
-            ).downloadFile()
+            ).downloadFile(fileEntityType = "Mod JAR")
 
             // This will always validate newly downloaded mods regardless of the configurations
             val isNewlyDownloadedFileHasValidFileIntegrity = mod.hasValidFileIntegrityOrError(modFilePath)

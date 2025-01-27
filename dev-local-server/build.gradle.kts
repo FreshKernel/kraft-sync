@@ -1,7 +1,6 @@
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.ktlint)
 }
 
 group = "org.freshkernel"

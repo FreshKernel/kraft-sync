@@ -111,7 +111,7 @@ class ResourcePacksSyncService :
                 LoadingIndicatorDialog.instance?.updateComponentProperties(
                     title =
                         "Verifying Resource Packs",
-                    infoText = buildVerifyAssetFileMessage(assetDisplayName = resourcePack.getDisplayName()),
+                    infoText = buildVerifyFileMessage(fileDisplayName = resourcePack.getDisplayName()),
                     progress =
                         resourcePacks.calculateProgressByIndex(currentIndex = resourcePacks.indexOf(resourcePack)),
                     detailsText =
@@ -168,14 +168,14 @@ class ResourcePacksSyncService :
                                 pendingCount = resourcePacksToDownload.size,
                                 totalCount = totalResourcePacks.size,
                             ),
-                        infoText = buildDownloadAssetFileMessage(assetDisplayName = resourcePack.getDisplayName()),
+                        infoText = buildDownloadFileMessage(fileDisplayName = resourcePack.getDisplayName()),
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
                                 " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
                     )
                 },
-            ).downloadFile()
+            ).downloadFile(fileEntityType = "Resource pack")
 
             // This will always validate newly downloaded resource-packs regardless of the configurations
             val isNewlyDownloadedFileHasValidFileIntegrity =

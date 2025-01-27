@@ -38,6 +38,14 @@ class SharedUtilsTest {
     }
 
     @Test
+    fun `getFileNameFromUrl removes query parameters if exist`() {
+        assertEquals(
+            "build.gradle.kts",
+            getFileNameFromUrl("https://github.com/FreshKernel/kraft-sync/blob/main/sync-script/build.gradle.kts?raw=true").getOrThrow(),
+        )
+    }
+
+    @Test
     fun `test isValidUrl`() {
         assertEquals(
             "http://example.com".isValidUrl(),
