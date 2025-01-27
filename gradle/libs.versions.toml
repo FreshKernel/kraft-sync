@@ -15,8 +15,6 @@ ktoml = "0.5.2"
 # Plugins
 shadow-jar = "8.3.5"
 proguard = "7.6.1"
-# The version of ktlint is different from ktlint Gradle plugin
-ktlint-gradle = "12.1.2"
 
 # Lower value extends support to older Minecraft versions
 # since the script uses the Java version bundled with the launcher,
@@ -46,4 +44,3 @@ proguard = { module = "com.guardsquare:proguard-gradle", version.ref = "proguard
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 shadow-jar = { id = "com.gradleup.shadow", version.ref = "shadow-jar" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
