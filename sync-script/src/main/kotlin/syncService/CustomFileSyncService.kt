@@ -28,39 +28,40 @@ import kotlin.io.path.writeText
 class CustomFileSyncService : SyncService {
     private val customFileSyncService = SyncInfo.instance.customFileSyncInfo
 
-    override suspend fun syncData() = withContext(Dispatchers.IO) {
-        if (customFileSyncService == null) {
-            return@withContext
+    override suspend fun syncData() =
+        withContext(Dispatchers.IO) {
+            if (customFileSyncService == null) {
+                return@withContext
+            }
+
+            val executionTimer = ExecutionTimer()
+            executionTimer.setStartTime()
+            Logger.info(extraLine = true) { "\uD83D\uDD04 Syncing custom files..." }
+
+            val customFiles = customFileSyncService.files
+            Logger.info { "📥 Total received custom files from server: ${customFiles.size}" }
+
+            deleteRemovedFiles(customFiles)
+
+            LoadingIndicatorDialog.instance?.updateComponentProperties(
+                title = "Syncing Custom-files...",
+                infoText = "In progress",
+                progress = null,
+                detailsText = null,
+            )
+
+            val customFilesToDownload = getCustomFilesForDownloadAndValidateIfRequired(customFiles)
+
+            Logger.info(extraLine = true) { "🔍 Custom-files to download: ${customFilesToDownload.size}" }
+
+            downloadCustomFiles(customFilesToDownload)
+
+            updateCustomSyncedFiles(customFiles)
+
+            Logger.info {
+                "\uD83D\uDD52 Finished syncing the custom-files in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms."
+            }
         }
-
-        val executionTimer = ExecutionTimer()
-        executionTimer.setStartTime()
-        Logger.info(extraLine = true) { "\uD83D\uDD04 Syncing custom files..." }
-
-        val customFiles = customFileSyncService.files
-        Logger.info { "📥 Total received custom files from server: ${customFiles.size}" }
-
-        deleteRemovedFiles(customFiles)
-
-        LoadingIndicatorDialog.instance?.updateComponentProperties(
-            title = "Syncing Custom-files...",
-            infoText = "In progress",
-            progress = null,
-            detailsText = null,
-        )
-
-        val customFilesToDownload = getCustomFilesForDownloadAndValidateIfRequired(customFiles)
-
-        Logger.info(extraLine = true) { "🔍 Custom-files to download: ${customFilesToDownload.size}" }
-
-        downloadCustomFiles(customFilesToDownload)
-
-        updateCustomSyncedFiles(customFiles)
-
-        Logger.info {
-            "\uD83D\uDD52 Finished syncing the custom-files in ${executionTimer.getRunningUntilNowDuration().inWholeMilliseconds}ms."
-        }
-    }
 
     /**
      * Delete custom files that have been created by the script previously, but no longer exist in the list.
@@ -179,7 +180,7 @@ class CustomFileSyncService : SyncService {
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
                                     " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
                     )
-                }
+                },
             ).downloadFile(fileEntityType = "Custom")
         }
     }

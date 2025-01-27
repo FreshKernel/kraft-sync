@@ -2,7 +2,6 @@ package syncService.common
 
 import syncService.SyncService
 import utils.Logger
-import utils.buildHtml
 import utils.getFileNameFromUrlOrError
 import utils.listFilteredPaths
 import utils.showErrorMessageAndTerminate

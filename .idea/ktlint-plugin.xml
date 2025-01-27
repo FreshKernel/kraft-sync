@@ -3,4 +3,8 @@
   <component name="KtLint plugin">
     <ktlintMode>DISTRACT_FREE</ktlintMode>
   </component>
+  <component name="com.nbadal.ktlint.KtlintProjectSettings">
+    <formatOnSave>false</formatOnSave>
+    <attachToIntellijFormat>false</attachToIntellijFormat>
+  </component>
 </project>
