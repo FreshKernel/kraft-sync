@@ -1,6 +1,7 @@
 package syncInfo.models
 
 import kotlinx.serialization.Serializable
+import syncInfo.models.customFile.CustomFileSyncInfo
 import syncInfo.models.mod.ModSyncInfo
 import syncInfo.models.resourcePack.ResourcePackSyncInfo
 import syncInfo.models.server.ServerSyncInfo
@@ -44,6 +45,10 @@ data class SyncInfo(
      * All required and optional properties for the server syncing process
      * */
     val serverSyncInfo: ServerSyncInfo = ServerSyncInfo(),
+    /**
+     * All required and optional properties for the custom file syncing process.
+     * */
+    val customFileSyncInfo: CustomFileSyncInfo? = null,
 ) {
     companion object
 }

@@ -27,7 +27,7 @@ fun getFileNameFromUrl(url: String): Result<String?> {
             return Result.failure(IllegalArgumentException("Provided URL cannot be empty or blank."))
         }
         val parts = url.split("/")
-        val fileName = if (parts.isNotEmpty()) URLDecoder.decode(parts.last(), "UTF-8") else null
+        val fileName = if (parts.isNotEmpty()) URLDecoder.decode(parts.last(), "UTF-8").substringBefore("?") else null
         Result.success(fileName)
     } catch (e: Exception) {
         e.printStackTrace()

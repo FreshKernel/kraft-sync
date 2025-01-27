@@ -89,9 +89,9 @@ class LoadingIndicatorDialog(
         progress: Int?,
         detailsText: String?,
     ) {
-        title?.let { this.title = it }
-        infoText?.let { infoLabel.text = it }
-        progress?.let { progressBar.value = it }
-        detailsText?.let { detailsLabel.text = it }
+        this.title = title.orEmpty()
+        infoLabel.text = infoText.orEmpty()
+        progressBar.value = progress ?: 0
+        detailsLabel.text = detailsText.orEmpty()
     }
 }

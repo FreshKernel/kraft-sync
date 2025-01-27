@@ -71,7 +71,7 @@ object JarAutoUpdater {
                                 " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
                     )
                 },
-            ).downloadFile()
+            ).downloadFile(fileEntityType = "JAR")
             Result.success(newJarFile)
         } catch (e: Exception) {
             e.printStackTrace()
