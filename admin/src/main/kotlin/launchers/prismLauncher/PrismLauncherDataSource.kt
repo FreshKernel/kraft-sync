@@ -1,26 +1,16 @@
 package launchers.prismLauncher
 
-import com.akuleshov7.ktoml.Toml
 import constants.DotMinecraftFileNames
 import curseForgeDataSource
 import launchers.Instance
 import launchers.LauncherDataSource
 import syncInfo.models.mod.Mod
 import utils.SystemFileProvider
+import utils.TomlIgnoreUnknownKeys
 import utils.listFilteredPaths
 import java.io.IOException
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.exists
-import kotlin.io.path.extension
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isHidden
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.name
-import kotlin.io.path.pathString
-import kotlin.io.path.readLines
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 
 class PrismLauncherDataSource : LauncherDataSource {
     companion object {
@@ -129,7 +119,7 @@ class PrismLauncherDataSource : LauncherDataSource {
             val modsMetadata =
                 modMetadataFilePaths.map {
                     val fileText = it.readText()
-                    Toml.decodeFromString(PrismLauncherModMetadata.serializer(), fileText)
+                    TomlIgnoreUnknownKeys.decodeFromString(PrismLauncherModMetadata.serializer(), fileText)
                 }
             Result.success(modsMetadata)
         } catch (e: Exception) {

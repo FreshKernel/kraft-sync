@@ -1,5 +1,7 @@
 package utils
 
+import com.akuleshov7.ktoml.Toml
+import com.akuleshov7.ktoml.TomlInputConfig
 import kotlinx.serialization.json.JsonObject
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -24,3 +26,5 @@ fun simpleMergeJsonObjects(
     original: JsonObject,
     updates: JsonObject,
 ): JsonObject = JsonObject(original + updates)
+
+val TomlIgnoreUnknownKeys = Toml(inputConfig = TomlInputConfig(ignoreUnknownNames = true))
