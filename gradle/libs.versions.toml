@@ -13,7 +13,7 @@ knbt = "0.11.8"
 ktoml = "0.5.2"
 
 # Plugins
-shadow-jar = "8.3.5"
+shadow-jar = "8.3.6"
 proguard = "7.6.1"
 
 # Lower value extends support to older Minecraft versions
