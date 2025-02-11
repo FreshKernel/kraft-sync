@@ -68,7 +68,7 @@ object JarAutoUpdater {
                         // TODO: This is duplicated twice
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
-                                " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
+                                    " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
                     )
                 },
             ).downloadFile(fileEntityType = "JAR")
@@ -116,7 +116,7 @@ object JarAutoUpdater {
         if (latestProjectVersionString == null) {
             Logger.error {
                 "⚠\uFE0F It seems that the project version is missing, it could have been moved somewhere else. " +
-                    "Consider updating manually."
+                        "Consider updating manually."
             }
             return false
         }
@@ -300,7 +300,7 @@ object JarAutoUpdater {
     private fun buildUpdateSuccessMessage(): Pair<String, String> =
         Pair(
             "Update Complete",
-            "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version.",
+            "${ProjectInfoConstants.DISPLAY_NAME} has been updated. Relaunch to use the new version. Please ignore the error that's shown by the launcher.",
         )
 
     private fun shouldShowSuccessMessage(): Boolean = GuiState.isGuiEnabled
