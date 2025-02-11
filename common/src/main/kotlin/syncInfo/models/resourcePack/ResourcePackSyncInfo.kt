@@ -29,6 +29,26 @@ data class ResourcePackSyncInfo(
      */
     val applyResourcePacks: Boolean = false,
     /**
+     * The applied resource-packs in the game options (`options.txt`).
+     *
+     * Resource packs listed first have lower priority, while those listed last have higher priority.
+     *
+     * Example:
+     * `resourcePacks:["file/FantasticCombatMusic.synced.zip","file/EFM_IronsV2.0.synced.zip","file/LowOnFire_1.20.1.synced.zip","file/Enhanced Audio r6.synced.zip","file/Alacrity.synced.zip","file/EpicFightSoundOverhaul2.1_modified.synced.zip","file/Minimal-Rain-and-Snow-2.2.synced.zip","file/[1.4.1] Enhanced Boss Bars.synced.zip","file/TZP_1.20.1_2.7.synced.zip","file/FreshAnimations_v1.9.2.synced.zip","file/FA All_Extensions-v1.4.synced.zip","file/Icon_Xaero_X_FA_v2.4_1.20.2.synced.zip","file/Icon_Xaeros_1.2_HF.synced.zip"]`.
+     *
+     * Only applicable if [applyResourcePacks] is `true`.
+     *
+     * @see [incompatibleResourcePacks]
+     * */
+    val resourcePacksOrder: List<String>? = null,
+    /**
+     * By default, resource-packs that are made for newer or older Minecraft versions will be marked
+     * as incompatible and will be disabled by defaults on game launch unless they are declared in this list.
+     *
+     * Only applicable if [applyResourcePacks] is `true`.
+     * */
+    val incompatibleResourcePacks: List<String>? = null,
+    /**
      * Will override [SyncInfo.verifyAssetFilesIntegrity] for the resource-packs
      *
      * See [ResourcePack.verifyFileIntegrity] to override this value for a specific resource-pack

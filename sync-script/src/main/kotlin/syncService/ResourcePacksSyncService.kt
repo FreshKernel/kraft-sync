@@ -132,7 +132,7 @@ class ResourcePacksSyncService :
                 }
                 Logger.info {
                     "\uD83D\uDEAB The resource-pack: '$resourcePackFileName' has invalid integrity. Deleting the resource-pack " +
-                        "and downloading it again."
+                            "and downloading it again."
                 }
                 resourcePackFilePath.deleteExistingOrTerminate(
                     fileEntityType = "resource-pack",
@@ -172,7 +172,7 @@ class ResourcePacksSyncService :
                         progress = downloadedProgress.toInt(),
                         detailsText =
                             "${downloadedBytes.convertBytesToReadableMegabytesAsString()} MB /" +
-                                " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
+                                    " ${bytesToDownload.convertBytesToReadableMegabytesAsString()} MB",
                     )
                 },
             ).downloadFile(fileEntityType = "Resource pack")
@@ -185,7 +185,7 @@ class ResourcePacksSyncService :
                     title = "❌ File Integrity Check Failed",
                     message =
                         "\uD83D\uDEA8 The newly downloaded file has failed the integrity check. This might be due to a bug " +
-                            "in the script \uD83D\uDC1B or an incorrect integrity info value provided by the admin.",
+                                "in the script \uD83D\uDC1B or an incorrect integrity info value provided by the admin.",
                 )
             }
         }
@@ -203,15 +203,21 @@ class ResourcePacksSyncService :
             optionsResourcePacks
                 ?.filterIsInstance<MinecraftOptionsManager.ResourcePack.BuiltIn>()
 
+        fun mapResourcePacksToResourcePacksMinecraft(resourcePacks: List<String>) = resourcePacks.map {
+            if (it.startsWith("file/")) MinecraftOptionsManager.ResourcePack.File(
+                it.replace("file/", "")
+            ) else MinecraftOptionsManager.ResourcePack.BuiltIn(it)
+        }
+
         MinecraftOptionsManager.setResourcePacks(
-            resourcePacks =
-                buildList {
+            resourcePacks = resourcePackSyncInfo.resourcePacksOrder?.let { mapResourcePacksToResourcePacksMinecraft(it) }
+                ?: buildList {
                     builtInOptionsResourcePacks?.let { addAll(it) }
                     if (resourcePackSyncInfo.allowUsingOthers) {
                         val userOptionsResourcePacks =
                             optionsResourcePacks?.filter {
                                 it is MinecraftOptionsManager.ResourcePack.File &&
-                                    !isScriptResourcePackFile(Paths.get(it.resourcePackZipFileName))
+                                        !isScriptResourcePackFile(Paths.get(it.resourcePackZipFileName))
                             }
                         userOptionsResourcePacks?.let { addAll(userOptionsResourcePacks) }
                     }
@@ -222,6 +228,12 @@ class ResourcePacksSyncService :
                     )
                 },
         )
+
+        resourcePackSyncInfo.incompatibleResourcePacks?.let {
+            MinecraftOptionsManager.setIncompatibleResourcePacks(
+                mapResourcePacksToResourcePacksMinecraft(it)
+            )
+        }
     }
 
     private fun getResourcePackFilePath(resourcePack: ResourcePack): Path =
