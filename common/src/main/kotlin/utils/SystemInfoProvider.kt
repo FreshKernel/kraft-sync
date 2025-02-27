@@ -15,12 +15,12 @@ object SystemInfoProvider {
 
     // Environment variables
 
-    fun getCurrentLinuxDesktopEnvironmentName(): String =
-        System.getenv(SystemConstants.EnvironmentVariables.CURRENT_LINUX_DESKTOP_ENVIRONMENT)
+    fun getCurrentLinuxDesktopEnvironmentName(): String? =
+        System.getenv(SystemConstants.EnvironmentVariables.CURRENT_LINUX_DESKTOP_ENVIRONMENT) ?: null
 
-    fun getKdeFullSession(): String? = System.getenv(SystemConstants.EnvironmentVariables.KDE_FULL_SESSION)
+    fun getKdeFullSession(): String? = System.getenv(SystemConstants.EnvironmentVariables.KDE_FULL_SESSION) ?: null
 
-    fun getWindowsAppDataDirectory(): String? = System.getenv(SystemConstants.EnvironmentVariables.WINDOWS_APPDATA)
+    fun getWindowsAppDataDirectory(): String? = System.getenv(SystemConstants.EnvironmentVariables.WINDOWS_APPDATA) ?: null
 
     /**
      * Some constants might be specific to Java or JVM like the [SystemConstants.Properties]

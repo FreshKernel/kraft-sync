@@ -27,7 +27,7 @@ enum class LinuxDesktopEnvironment {
                     "🚫 Unable to determine Linux desktop environment when not running on a Linux \uD83D\uDC27 system.",
                 )
             }
-            val desktopEnvironmentName = SystemInfoProvider.getCurrentLinuxDesktopEnvironmentName()
+            val desktopEnvironmentName = SystemInfoProvider.getCurrentLinuxDesktopEnvironmentName() ?: return@lazy Unknown
             when {
                 desktopEnvironmentName.contains("gnome", ignoreCase = true) -> Gnome
                 desktopEnvironmentName.contains("kde", ignoreCase = true) ||
