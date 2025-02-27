@@ -43,7 +43,7 @@ data class ModSyncInfo(
      * You will get an error from the mod loader.
      *
      * */
-    val syncOnlyModsForCurrentEnv: Boolean = true,
+    val syncOnlyModsForCurrentEnv: Boolean = false,
     /**
      * Indicates whether optional mods for the current [Environment] should be synced.
      *
@@ -54,6 +54,8 @@ data class ModSyncInfo(
      *
      * if [syncOptionalModsForCurrentEnv] is `false`, then will only sync the
      * required mods for the current system [Environment].
+     *
+     * This option is overridable in the script config for a specific client.
      *
      * @see Mod.syncOptionalForCurrentEnv
      * */

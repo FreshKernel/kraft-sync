@@ -8,6 +8,7 @@ import gui.theme.ThemeMode
 import kotlinx.serialization.Serializable
 import syncInfo.models.Environment
 import syncInfo.models.SyncInfo
+import syncInfo.models.mod.ModSyncInfo
 
 /**
  * A data class that represent the json for the [SyncScriptDotMinecraftFiles.SyncScriptData.ScriptConfig]
@@ -82,6 +83,10 @@ data class ScriptConfig(
      * the update process will always update to the minimized JAR.
      * */
     val autoUpdateEnabled: Boolean = false,
+    /**
+     * Overrides [ModSyncInfo.syncOnlyModsForCurrentEnv] for this user.
+     * */
+    val syncOnlyModsForCurrentEnv: Boolean? = null
 ) {
     companion object {
         var instance: ScriptConfig? = null

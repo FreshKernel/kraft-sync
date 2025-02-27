@@ -1,5 +1,6 @@
 package syncService
 
+import config.models.ScriptConfig
 import constants.SyncScriptDotMinecraftFiles
 import gui.dialogs.LoadingIndicatorDialog
 import kotlinx.coroutines.Dispatchers
@@ -100,7 +101,8 @@ class ModsSyncService :
     }
 
     private fun getCurrentEnvironmentModsOrAll(mods: List<Mod>): List<Mod> {
-        if (!modSyncInfo.syncOnlyModsForCurrentEnv) {
+        val syncOnlyModsForCurrentEnv = ScriptConfig.instance?.syncOnlyModsForCurrentEnv ?: modSyncInfo.syncOnlyModsForCurrentEnv
+        if (!syncOnlyModsForCurrentEnv) {
             return mods
         }
         val currentEnvironmentMods =
