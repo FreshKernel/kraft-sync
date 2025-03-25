@@ -14,7 +14,7 @@ ktoml = "0.5.2"
 
 # Plugins
 shadow-jar = "8.3.6"
-proguard = "7.6.1"
+proguard = "7.7.0"
 
 # Lower value extends support to older Minecraft versions
 # since the script uses the Java version bundled with the launcher,
