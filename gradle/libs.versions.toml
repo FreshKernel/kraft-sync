@@ -10,7 +10,7 @@ flatlaf = "3.5.4"
 knbt = "0.11.8"
 
 # For admin
-ktoml = "0.5.2"
+ktoml = "0.6.0"
 
 # Plugins
 shadow-jar = "8.3.6"
