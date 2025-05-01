@@ -32,9 +32,11 @@ matter—unless you're confident you know what you're doing.
 
 ![Screenshot](https://github.com/FreshKernel/kraft-sync/assets/73608287/fc645eee-62a7-4f43-89ef-98677524446e)
 
-> [!CAUTION]
-> The script might introduce **Breaking Changes** as it's still in the early stages. We will provide migration
-instructions if there is any breaking change in each release. Some features might not be available yet, or unstable.
+> [!NOTE]
+> 🚀 **Future Direction:**
+> If you're looking for a more integrated and user-friendly solution, consider checking out [Kraft Launcher](https://github.com/FreshKernel/kraft-launcher) — a modern launcher that aims to solve the same problems as Kraft Sync in a more seamless and robust way.
+> 
+> ⚠️ **Note:** Kraft Launcher is in **very early development** and is **not yet ready for general use**. But it's the direction this ecosystem is heading toward.
 
 **Kraft Sync is not affiliated
 with [Mojang AB](https://mojang.com/), [Microsoft Corporation](https://www.microsoft.com/), or any of their
