@@ -34,9 +34,9 @@ matter—unless you're confident you know what you're doing.
 
 > [!NOTE]
 > 🚀 **Future Direction:**
-> If you're looking for a more integrated and user-friendly solution, consider checking out [Kraft Launcher](https://github.com/FreshKernel/kraft-launcher) — a modern launcher that aims to solve the same problems as Kraft Sync in a more seamless and robust way.
+> If you're looking for a more integrated and user-friendly solution, consider checking out [Kraft Launcher]([https://github.com/FreshKernel/kraft-launcher](https://github.com/EchoEllet/kraft-launcher)) — a modern launcher that aims to solve the same problems as Kraft Sync in a more seamless and robust way.
 > 
-> ⚠️ **Note:** Kraft Launcher is in **very early development** and is **not yet ready for general use**. But it's the direction this ecosystem is heading toward.
+> ⚠️ **Note:** Kraft Launcher is in **very early development** and is **not yet ready for general use**.
 
 **Kraft Sync is not affiliated
 with [Mojang AB](https://mojang.com/), [Microsoft Corporation](https://www.microsoft.com/), or any of their
